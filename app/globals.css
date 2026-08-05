@@ -1,0 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: #fff8e7;
+  color: #1f2937;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* FRONTEND-GLOBAL-RULES §8 — animations must be fast, smooth, minimal */
+* {
+  transition-property: background-color, border-color, color, box-shadow, transform;
+  transition-duration: 150ms;
+  transition-timing-function: ease-in-out;
+}
+
+:focus-visible {
+  outline: 2px solid #e6a520;
+  outline-offset: 2px;
+}

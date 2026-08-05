@@ -1,0 +1,128 @@
+'use client';
+
+import Link from 'next/link';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import toast from 'react-hot-toast';
+import { AuthLayout } from '@/components/layout/AuthLayout';
+import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/Button';
+import { useAuth } from '@/lib/auth-context';
+import { getApiErrorMessage } from '@/lib/api-client';
+import { registerSchema, type RegisterFormValues } from '@/lib/validators';
+
+/**
+ * FRONTEND-03 §11 — Free Trial Flow:
+ * Sign Up -> Business Registration -> 3-Day Free Trial Activated -> Dashboard Access.
+ * The backend activates the trial automatically on registration, so a
+ * successful submit here logs the owner straight into their new business.
+ */
+export default function RegisterPage() {
+  const { register: registerBusiness } = useAuth();
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterFormValues>({ resolver: zodResolver(registerSchema) });
+
+  async function onSubmit(values: RegisterFormValues) {
+    setIsSubmitting(true);
+    try {
+      const { confirmPassword, ...payload } = values;
+      await registerBusiness(payload);
+      toast.success('Business registered. Your 3-day free trial has started.');
+      router.push('/dashboard');
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, 'Could not create your account.'));
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  return (
+    <AuthLayout title="Start your free trial" subtitle="3 days, full access, no credit card required.">
+      <div className="rounded-card bg-white p-8 shadow-card">
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+          <Input
+            label="Business name"
+            placeholder="Acme Home Services"
+            error={errors.businessName?.message}
+            {...register('businessName')}
+          />
+
+          <div className="grid grid-cols-2 gap-4">
+            <Input
+              label="Business phone"
+              placeholder="Optional"
+              error={errors.businessPhone?.message}
+              {...register('businessPhone')}
+            />
+            <Input
+              label="Industry"
+              placeholder="Optional"
+              error={errors.industry?.message}
+              {...register('industry')}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <Input
+              label="First name"
+              autoComplete="given-name"
+              error={errors.firstName?.message}
+              {...register('firstName')}
+            />
+            <Input
+              label="Last name"
+              autoComplete="family-name"
+              error={errors.lastName?.message}
+              {...register('lastName')}
+            />
+          </div>
+
+          <Input
+            label="Email address"
+            type="email"
+            autoComplete="email"
+            placeholder="you@business.com"
+            error={errors.email?.message}
+            {...register('email')}
+          />
+
+          <Input
+            label="Password"
+            type="password"
+            autoComplete="new-password"
+            helperText="At least 8 characters, with uppercase, lowercase, and a number."
+            error={errors.password?.message}
+            {...register('password')}
+          />
+
+          <Input
+            label="Confirm password"
+            type="password"
+            autoComplete="new-password"
+            error={errors.confirmPassword?.message}
+            {...register('confirmPassword')}
+          />
+
+          <Button type="submit" isLoading={isSubmitting} className="mt-2">
+            Create account
+          </Button>
+        </form>
+
+        <p className="mt-6 text-center text-sm text-text-secondary">
+          Already have an account?{' '}
+          <Link href="/login" className="font-semibold text-brand-dark hover:underline">
+            Log in
+          </Link>
+        </p>
+      </div>
+    </AuthLayout>
+  );
+}
