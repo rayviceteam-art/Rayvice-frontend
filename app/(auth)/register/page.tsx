@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import toast from 'react-hot-toast';
+import { Eye, EyeOff } from 'lucide-react';
 import { AuthLayout } from '@/components/layout/AuthLayout';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
@@ -23,6 +24,8 @@ export default function RegisterPage() {
   const { register: registerBusiness } = useAuth();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
     register,
@@ -94,22 +97,42 @@ export default function RegisterPage() {
             {...register('email')}
           />
 
-          <Input
-            label="Password"
-            type="password"
-            autoComplete="new-password"
-            helperText="At least 8 characters, with uppercase, lowercase, and a number."
-            error={errors.password?.message}
-            {...register('password')}
-          />
+          <div className="relative">
+            <Input
+              label="Password"
+              type={showPassword ? 'text' : 'password'}
+              autoComplete="new-password"
+              helperText="At least 8 characters, with uppercase, lowercase, and a number."
+              error={errors.password?.message}
+              {...register('password')}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-[38px] text-text-secondary hover:text-brand-dark focus:outline-none"
+              tabIndex={-1}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
 
-          <Input
-            label="Confirm password"
-            type="password"
-            autoComplete="new-password"
-            error={errors.confirmPassword?.message}
-            {...register('confirmPassword')}
-          />
+          <div className="relative">
+            <Input
+              label="Confirm password"
+              type={showConfirmPassword ? 'text' : 'password'}
+              autoComplete="new-password"
+              error={errors.confirmPassword?.message}
+              {...register('confirmPassword')}
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute right-3 top-[38px] text-text-secondary hover:text-brand-dark focus:outline-none"
+              tabIndex={-1}
+            >
+              {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
 
           <Button type="submit" isLoading={isSubmitting} className="mt-2">
             Create account
