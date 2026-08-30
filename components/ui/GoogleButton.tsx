@@ -108,10 +108,10 @@ export function GoogleButton({ text = 'Continue with Google', className = '' }: 
       type="button"
       onClick={handleGoogleClick}
       disabled={isLoading}
-      className={`group relative flex w-full items-center justify-center gap-3 rounded-control border border-border bg-white px-4 py-2.5 text-sm font-semibold text-text-primary shadow-sm transition-all hover:bg-ash-100 hover:border-ash-300 hover:shadow active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 ${className}`}
+      className={`group relative flex w-full items-center justify-center gap-3 rounded-btn border border-[#253130] bg-[#131B1C] px-4 py-2.5 text-sm font-semibold text-[#F1F5F4] shadow-card transition-all duration-150 hover:bg-[#182122] hover:border-[#34413F] active:scale-[0.99] active:bg-[#0D332D] disabled:cursor-not-allowed disabled:bg-[#182122] disabled:text-[#3F4C49] disabled:border-[#253130] ${className}`}
     >
       {isLoading ? (
-        <Loader2 className="h-5 w-5 animate-spin text-charcoal" />
+        <Loader2 className="h-5 w-5 animate-spin text-[#16A085]" />
       ) : (
         <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24">
           <path

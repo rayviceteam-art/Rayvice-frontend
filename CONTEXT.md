@@ -95,10 +95,10 @@ All records are strictly isolated by `businessId` (Tenant isolation).
 ## 6. Recently Modified Files & Commits
 
 ### Frontend (`Rayvice-frontend`):
-- `components/ui/GoogleButton.tsx`: Added Google OAuth popup & token exchange handler.
-- `app/(auth)/login/page.tsx` & `register/page.tsx`: Google Sign-In placed as top priority action.
-- `app/globals.css` & `tailwind.config.ts`: Updated theme to Charcoal, Ash, and Pearl color palette.
-- `.env.local`: Configured with `NEXT_PUBLIC_GOOGLE_CLIENT_ID` and `NEXT_PUBLIC_API_URL`.
+- `tailwind.config.ts` & `app/globals.css`: Implemented Rayvice Dark UI Design System (Neutrals `#080B0D`/`#131B1C`, Brand Teal `#16A085`, Text `#F1F5F4`/`#9AA9A5`).
+- `components/ui/Button.tsx`, `Card.tsx`, `Input.tsx`, `GoogleButton.tsx`: Full component dark styling, focus rings, hover states, and transitions.
+- `components/layout/AuthLayout.tsx` & `app/dashboard/page.tsx`: Updated layouts, dark headers, emerald brand glow badge, and alert states.
+- `app/(auth)/*`: Completely updated all auth views (Login, Register, Forgot Password, Reset Password, Verify Email) with dark cards, modern typography, and input visibility toggles.
 
 ### Backend (`Rayvice-backend`):
 - `src/auth/auth.controller.ts`: Added `googleAuth` handler.

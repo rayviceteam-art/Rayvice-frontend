@@ -44,12 +44,12 @@ function DashboardContent() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="flex items-center justify-between border-b border-border bg-white px-6 py-4">
+      <header className="flex items-center justify-between border-b border-[#253130] bg-[#0A0F10] px-6 py-4">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-charcoal text-sm font-bold text-white shadow-sm">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#0D332D] text-sm font-bold text-[#5EE0C1] shadow-glow border border-[#117A65]">
             R
           </div>
-          <span className="text-lg font-bold tracking-tight text-text-primary">Rayvice</span>
+          <span className="text-lg font-bold tracking-tight text-[#F1F5F4]">Rayvice</span>
         </div>
         <Button variant="secondary" className="w-auto" onClick={handleLogout} isLoading={isLoggingOut}>
           <LogOut className="h-4 w-4" />
@@ -59,14 +59,14 @@ function DashboardContent() {
 
       <main className="mx-auto max-w-3xl px-6 py-10">
         {user && user.isEmailVerified === false && (
-          <div className="mb-6 flex items-center justify-between gap-4 rounded-control border border-amber-200 bg-amber-50/80 px-4 py-3">
-            <div className="flex items-center gap-2 text-sm text-text-primary">
-              <MailWarning className="h-4 w-4 shrink-0 text-warning" />
+          <div className="mb-6 flex items-center justify-between gap-4 rounded-card border border-[#92400E] bg-[#2A210B] px-4 py-3">
+            <div className="flex items-center gap-2 text-sm text-[#FEF3C7]">
+              <MailWarning className="h-4 w-4 shrink-0 text-[#F59E0B]" />
               Please verify your email address to unlock all features.
             </div>
             <Button
               variant="secondary"
-              className="w-auto shrink-0 px-3 py-1.5 text-xs"
+              className="w-auto shrink-0 px-3 py-1.5 text-xs text-[#FEF3C7] border-[#92400E] hover:bg-[#382D0F]"
               onClick={handleResendVerification}
               isLoading={isResending}
             >
@@ -75,9 +75,9 @@ function DashboardContent() {
           </div>
         )}
 
-        <Card>
-          <h1 className="text-xl font-bold tracking-tight text-text-primary">Welcome, {user?.firstName}.</h1>
-          <p className="mt-2 text-sm leading-relaxed text-text-secondary">
+        <Card className="p-8">
+          <h1 className="text-xl font-bold tracking-tight text-[#F1F5F4]">Welcome, {user?.firstName}.</h1>
+          <p className="mt-2 text-sm leading-relaxed text-[#9AA9A5]">
             The authentication and organization foundation is live. Dashboard widgets, CRM, and the rest of the
             platform will land here in later modules.
           </p>

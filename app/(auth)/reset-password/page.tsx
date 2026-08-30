@@ -29,13 +29,13 @@ function ResetPasswordForm() {
 
   if (!token) {
     return (
-      <Card>
+      <Card className="p-8">
         <div className="flex flex-col items-center gap-3 text-center">
-          <AlertTriangle className="h-10 w-10 text-warning" />
-          <p className="text-sm text-text-primary">
+          <AlertTriangle className="h-10 w-10 text-[#F59E0B]" />
+          <p className="text-sm text-[#F1F5F4]">
             This reset link is missing or invalid. Request a new one to continue.
           </p>
-          <Link href="/forgot-password" className="text-sm font-semibold text-charcoal hover:underline">
+          <Link href="/forgot-password" className="text-sm font-semibold text-[#16A085] hover:text-[#5EE0C1] hover:underline transition-colors">
             Request a new link
           </Link>
         </div>
@@ -58,7 +58,7 @@ function ResetPasswordForm() {
   }
 
   return (
-    <Card>
+    <Card className="p-8">
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <Input
           label="New password"

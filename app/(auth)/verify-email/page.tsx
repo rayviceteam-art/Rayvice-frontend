@@ -35,18 +35,18 @@ function VerifyEmailContent() {
   }, [token]);
 
   return (
-    <Card>
+    <Card className="p-8">
       <div className="flex flex-col items-center gap-3 text-center">
         {status === 'verifying' && (
           <>
-            <Loader2 className="h-10 w-10 animate-spin text-brand" />
-            <p className="text-sm text-text-secondary">Verifying your email...</p>
+            <Loader2 className="h-10 w-10 animate-spin text-[#16A085]" />
+            <p className="text-sm text-[#9AA9A5]">Verifying your email...</p>
           </>
         )}
         {status === 'success' && (
           <>
-            <CheckCircle2 className="h-10 w-10 text-success" />
-            <p className="text-sm text-text-primary">Your email has been verified.</p>
+            <CheckCircle2 className="h-10 w-10 text-[#22C55E]" />
+            <p className="text-sm text-[#F1F5F4]">Your email has been verified.</p>
             <Link href="/login" className="w-full">
               <Button className="mt-2">Continue to login</Button>
             </Link>
@@ -54,9 +54,9 @@ function VerifyEmailContent() {
         )}
         {status === 'error' && (
           <>
-            <XCircle className="h-10 w-10 text-error" />
-            <p className="text-sm text-text-primary">{errorMessage}</p>
-            <Link href="/login" className="text-sm font-semibold text-charcoal hover:underline">
+            <XCircle className="h-10 w-10 text-[#EF4444]" />
+            <p className="text-sm text-[#F1F5F4]">{errorMessage}</p>
+            <Link href="/login" className="text-sm font-semibold text-[#16A085] hover:text-[#5EE0C1] hover:underline transition-colors">
               Back to login
             </Link>
           </>

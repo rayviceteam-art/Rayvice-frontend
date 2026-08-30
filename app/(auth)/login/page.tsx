@@ -8,6 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import toast from 'react-hot-toast';
 import { Eye, EyeOff } from 'lucide-react';
 import { AuthLayout } from '@/components/layout/AuthLayout';
+import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { GoogleButton } from '@/components/ui/GoogleButton';
@@ -42,15 +43,15 @@ export default function LoginPage() {
 
   return (
     <AuthLayout title="Log in to Rayvice" subtitle="Welcome back — pick up right where you left off.">
-      <div className="rounded-card border border-border bg-white p-8 shadow-card">
+      <Card className="p-8">
         {/* 1st Priority: Direct Google Login */}
         <div className="mb-5">
           <GoogleButton text="Continue with Google" />
         </div>
 
         <div className="relative my-6 flex items-center justify-center">
-          <div className="w-full border-t border-border" />
-          <span className="absolute bg-white px-3 text-xs uppercase tracking-wider text-ash-400 font-medium">
+          <div className="w-full border-t border-[#253130]" />
+          <span className="absolute bg-[#131B1C] px-3 text-xs uppercase tracking-wider text-[#687572] font-medium">
             or continue with email
           </span>
         </div>
@@ -77,7 +78,7 @@ export default function LoginPage() {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-[38px] text-text-secondary hover:text-charcoal focus:outline-none"
+              className="absolute right-3 top-[38px] text-[#9AA9A5] hover:text-[#F1F5F4] focus:outline-none transition-colors"
               tabIndex={-1}
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -85,7 +86,7 @@ export default function LoginPage() {
           </div>
 
           <div className="flex justify-end">
-            <Link href="/forgot-password" className="text-sm font-medium text-ash-dark hover:text-charcoal hover:underline">
+            <Link href="/forgot-password" className="text-sm font-medium text-[#9AA9A5] hover:text-[#5EE0C1] hover:underline transition-colors">
               Forgot password?
             </Link>
           </div>
@@ -95,13 +96,13 @@ export default function LoginPage() {
           </Button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-text-secondary">
+        <p className="mt-6 text-center text-sm text-[#9AA9A5]">
           Don&apos;t have an account?{' '}
-          <Link href="/register" className="font-semibold text-charcoal hover:underline">
+          <Link href="/register" className="font-semibold text-[#16A085] hover:text-[#5EE0C1] hover:underline transition-colors">
             Start your free trial
           </Link>
         </p>
-      </div>
+      </Card>
     </AuthLayout>
   );
 }

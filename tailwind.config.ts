@@ -1,72 +1,113 @@
 import type { Config } from 'tailwindcss';
 
 /**
- * Color tokens sourced directly from FRONTEND-02 — Design System,
- * UI Components & Visual Standards. Do not introduce new colors
- * outside this palette without updating that document first.
+ * RAYVICE — DARK UI DESIGN SYSTEM
+ * 
+ * Palette:
+ * - Neutral: Background (#080B0D), Sidebar (#0A0F10), Surface (#131B1C), Elevated (#182122), Input (#0E1617)
+ * - Borders: Default (#253130), Hover (#34413F)
+ * - Brand/Primary: Default (#16A085), Hover (#1DB89A), Light/Accent (#5EE0C1), Dark (#117A65), Bg/Active (#0D332D)
+ * - Text: Primary (#F1F5F4), Secondary (#9AA9A5), Muted (#687572), Disabled (#3F4C49)
+ * - Semantic: Success (#22C55E), Warning (#F59E0B), Error (#EF4444), Info (#3B82F6)
  */
 const config: Config = {
   content: ['./app/**/*.{js,ts,jsx,tsx,mdx}', './components/**/*.{js,ts,jsx,tsx,mdx}'],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        pearl: {
-          50: '#FAFBFD',
-          100: '#F5F6F8',
-          200: '#EAEEF2',
-          DEFAULT: '#F5F6F8',
-        },
-        charcoal: {
-          50: '#F1F3F5',
-          100: '#E1E4E8',
-          300: '#8C94A0',
-          500: '#47505F',
-          700: '#2A303C',
-          DEFAULT: '#1E232A',
-          dark: '#111418',
-        },
-        ash: {
-          50: '#F8FAFC',
-          100: '#F1F5F9',
-          200: '#E2E8F0',
-          300: '#CBD5E1',
-          400: '#94A3B8',
-          DEFAULT: '#64748B',
-          dark: '#475569',
-        },
+        // Main Surfaces & Neutrals
         background: {
-          DEFAULT: '#F5F6F8', // Pearl Primary Background
-          secondary: '#EAEEF2', // Pearl Secondary Background
+          DEFAULT: '#080B0D',
+          sidebar: '#0A0F10',
+          surface: '#131B1C',
+          elevated: '#182122',
+          input: '#0E1617',
         },
+        surface: {
+          DEFAULT: '#131B1C',
+          elevated: '#182122',
+          card: '#131B1C',
+          input: '#0E1617',
+          sidebar: '#0A0F10',
+        },
+        // Borders
+        border: {
+          DEFAULT: '#253130',
+          hover: '#34413F',
+          focus: '#16A085',
+        },
+        // Brand / Primary Teal-Emerald Palette
         brand: {
-          DEFAULT: '#1E232A', // Charcoal Primary Brand
-          dark: '#111418', // Deep Charcoal
-          ash: '#64748B', // Ash Accent
+          DEFAULT: '#16A085',
+          hover: '#1DB89A',
+          light: '#5EE0C1',
+          accent: '#5EE0C1',
+          dark: '#117A65',
+          bg: '#0D332D',
         },
-        success: '#10B981',
+        primary: {
+          DEFAULT: '#16A085',
+          hover: '#1DB89A',
+          light: '#5EE0C1',
+          dark: '#117A65',
+          bg: '#0D332D',
+        },
+        // Text
+        text: {
+          primary: '#F1F5F4',
+          secondary: '#9AA9A5',
+          muted: '#687572',
+          disabled: '#3F4C49',
+        },
+        // Semantic / Status Colors
+        status: {
+          success: {
+            DEFAULT: '#22C55E',
+            bg: '#0B2B1B',
+            border: '#166534',
+            text: '#D1FAE5',
+          },
+          warning: {
+            DEFAULT: '#F59E0B',
+            bg: '#2A210B',
+            border: '#92400E',
+            text: '#FEF3C7',
+          },
+          error: {
+            DEFAULT: '#EF4444',
+            bg: '#2B1010',
+            border: '#991B1B',
+            text: '#FEE2E2',
+          },
+          info: {
+            DEFAULT: '#3B82F6',
+            bg: '#0C1D35',
+            border: '#1D4ED8',
+            text: '#DBEAFE',
+          },
+        },
+        success: '#22C55E',
         warning: '#F59E0B',
         error: '#EF4444',
         info: '#3B82F6',
-        text: {
-          primary: '#1E232A', // Charcoal Primary Text
-          secondary: '#64748B', // Ash Secondary Text
-          muted: '#94A3B8',
-        },
-        border: {
-          DEFAULT: '#E2E8F0', // Ash Border
-          focus: '#1E232A',
-        },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
       },
       borderRadius: {
-        card: '16px',
-        control: '10px',
+        sm: '6px',
+        control: '8px',
+        btn: '8px',
+        input: '8px',
+        card: '12px',
+        modal: '16px',
+        section: '16px',
       },
       boxShadow: {
-        card: '0 4px 20px -2px rgba(30, 35, 42, 0.06), 0 2px 6px -1px rgba(30, 35, 42, 0.04)',
-        glow: '0 0 15px rgba(30, 35, 42, 0.08)',
+        card: '0 4px 16px rgba(0, 0, 0, 0.20)',
+        modal: '0 16px 40px rgba(0, 0, 0, 0.35)',
+        glow: '0 0 20px rgba(22, 160, 133, 0.15)',
       },
     },
   },
