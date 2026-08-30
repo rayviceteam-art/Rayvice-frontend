@@ -17,6 +17,19 @@ export function GoogleButton({ text = 'Continue with Google', className = '' }: 
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
+  useEffect(() => {
+    function handleMessage(event: MessageEvent) {
+      if (typeof window !== 'undefined' && event.origin !== window.location.origin) return;
+      if (event.data?.type === 'GOOGLE_AUTH_SUCCESS') {
+        setIsLoading(false);
+        toast.success('Successfully authenticated with Google.');
+        router.push('/dashboard');
+      }
+    }
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [router]);
+
   async function handleGoogleClick() {
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
@@ -35,6 +48,13 @@ export function GoogleButton({ text = 'Continue with Google', className = '' }: 
         redirectUri
       )}&response_type=token%20id_token&scope=openid%20email%20profile&nonce=${Date.now()}`;
 
+      const isMobile = typeof window !== 'undefined' && (window.innerWidth < 768 || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
+
+      if (isMobile) {
+        window.location.href = googleAuthUrl;
+        return;
+      }
+
       const width = 500;
       const height = 600;
       const left = window.screenX + (window.outerWidth - width) / 2;
@@ -47,7 +67,8 @@ export function GoogleButton({ text = 'Continue with Google', className = '' }: 
       );
 
       if (!popup) {
-        throw new Error('Popup blocked. Please allow popups for this site.');
+        window.location.href = googleAuthUrl;
+        return;
       }
 
       const checkPopup = setInterval(async () => {

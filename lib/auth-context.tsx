@@ -31,11 +31,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [business, setBusiness] = useState<Business | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // On first load, silently try to exchange the httpOnly refresh cookie for
-  // a fresh access token so a page reload doesn't force a re-login.
+  // On first load, check if redirected back with Google OAuth tokens in hash,
+  // or silently try to exchange the httpOnly refresh cookie for a fresh access token.
   useEffect(() => {
     async function bootstrap() {
       try {
+        if (typeof window !== 'undefined' && window.location.hash) {
+          const hash = window.location.hash.startsWith('#')
+            ? window.location.hash.substring(1)
+            : window.location.hash;
+          const params = new URLSearchParams(hash);
+          const idToken = params.get('id_token');
+          const accessTokenParam = params.get('access_token');
+
+          if (idToken || accessTokenParam) {
+            window.history.replaceState(null, '', window.location.pathname);
+            const result = await authService.loginWithGoogle({
+              idToken: idToken || undefined,
+              accessToken: accessTokenParam || undefined,
+            });
+            setAccessToken(result.accessToken);
+            setUser(result.user);
+            if (result.business) {
+              setBusiness(result.business);
+            }
+
+            if (window.opener && window.opener !== window) {
+              try {
+                window.opener.postMessage({ type: 'GOOGLE_AUTH_SUCCESS' }, window.location.origin);
+                window.close();
+                return;
+              } catch {
+                // Continue in this tab if opener is inaccessible
+              }
+            }
+            setIsLoading(false);
+            return;
+          }
+        }
+
         const { accessToken } = await authService.refresh();
         setAccessToken(accessToken);
         const profile = await authService.getMe();
