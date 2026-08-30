@@ -18,6 +18,7 @@ interface AuthContextValue {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (values: LoginFormValues) => Promise<void>;
+  loginWithGoogle: (payload: { credential?: string; idToken?: string; accessToken?: string }) => Promise<void>;
   register: (values: Omit<RegisterFormValues, 'confirmPassword'>) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
@@ -55,6 +56,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(result.user);
   }
 
+  async function loginWithGoogle(payload: { credential?: string; idToken?: string; accessToken?: string }) {
+    const result = await authService.loginWithGoogle(payload);
+    setAccessToken(result.accessToken);
+    setUser(result.user);
+    if (result.business) {
+      setBusiness(result.business);
+    }
+  }
+
   async function register(values: Omit<RegisterFormValues, 'confirmPassword'>) {
     const result = await authService.register(values);
     setAccessToken(result.accessToken);
@@ -85,6 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isAuthenticated: !!user,
       isLoading,
       login,
+      loginWithGoogle,
       register,
       logout,
       refreshUser,

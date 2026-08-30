@@ -10,6 +10,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import { AuthLayout } from '@/components/layout/AuthLayout';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
+import { GoogleButton } from '@/components/ui/GoogleButton';
 import { useAuth } from '@/lib/auth-context';
 import { getApiErrorMessage } from '@/lib/api-client';
 import { loginSchema, type LoginFormValues } from '@/lib/validators';
@@ -42,6 +43,18 @@ export default function LoginPage() {
   return (
     <AuthLayout title="Log in to Rayvice" subtitle="Welcome back — pick up right where you left off.">
       <div className="rounded-card border border-border bg-white p-8 shadow-card">
+        {/* 1st Priority: Direct Google Login */}
+        <div className="mb-5">
+          <GoogleButton text="Continue with Google" />
+        </div>
+
+        <div className="relative my-6 flex items-center justify-center">
+          <div className="w-full border-t border-border" />
+          <span className="absolute bg-white px-3 text-xs uppercase tracking-wider text-ash-400 font-medium">
+            or continue with email
+          </span>
+        </div>
+
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           <Input
             label="Email address"

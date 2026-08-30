@@ -10,6 +10,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import { AuthLayout } from '@/components/layout/AuthLayout';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
+import { GoogleButton } from '@/components/ui/GoogleButton';
 import { useAuth } from '@/lib/auth-context';
 import { getApiErrorMessage } from '@/lib/api-client';
 import { registerSchema, type RegisterFormValues } from '@/lib/validators';
@@ -50,6 +51,18 @@ export default function RegisterPage() {
   return (
     <AuthLayout title="Start your free trial" subtitle="3 days, full access, no credit card required.">
       <div className="rounded-card border border-border bg-white p-8 shadow-card">
+        {/* 1st Priority: Direct Google Sign-up */}
+        <div className="mb-5">
+          <GoogleButton text="Sign up with Google" />
+        </div>
+
+        <div className="relative my-6 flex items-center justify-center">
+          <div className="w-full border-t border-border" />
+          <span className="absolute bg-white px-3 text-xs uppercase tracking-wider text-ash-400 font-medium">
+            or sign up with email
+          </span>
+        </div>
+
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           <Input
             label="Business name"

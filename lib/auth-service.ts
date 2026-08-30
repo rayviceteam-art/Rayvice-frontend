@@ -23,6 +23,11 @@ export async function login(values: LoginFormValues) {
   return data.data;
 }
 
+export async function loginWithGoogle(payload: { credential?: string; idToken?: string; accessToken?: string }) {
+  const { data } = await apiClient.post<ApiEnvelope<{ user: User; accessToken: string; business?: RegisterResponseData['business'] }>>('/auth/google', payload);
+  return data.data;
+}
+
 export async function refresh() {
   const { data } = await apiClient.post<ApiEnvelope<{ accessToken: string }>>('/auth/refresh');
   return data.data;
