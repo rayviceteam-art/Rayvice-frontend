@@ -56,7 +56,7 @@ function VerifyEmailContent() {
           <>
             <XCircle className="h-10 w-10 text-error" />
             <p className="text-sm text-text-primary">{errorMessage}</p>
-            <Link href="/login" className="text-sm font-semibold text-brand-dark hover:underline">
+            <Link href="/login" className="text-sm font-semibold text-charcoal hover:underline">
               Back to login
             </Link>
           </>

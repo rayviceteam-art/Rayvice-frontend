@@ -9,8 +9,8 @@ body {
   padding: 0;
   margin: 0;
   font-family: 'Inter', system-ui, sans-serif;
-  background-color: #fff8e7;
-  color: #1f2937;
+  background-color: #f5f6f8;
+  color: #1e232a;
 }
 
 * {
@@ -25,6 +25,6 @@ body {
 }
 
 :focus-visible {
-  outline: 2px solid #e6a520;
+  outline: 2px solid #1e232a;
   outline-offset: 2px;
 }

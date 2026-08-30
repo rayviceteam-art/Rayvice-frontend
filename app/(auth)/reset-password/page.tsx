@@ -35,7 +35,7 @@ function ResetPasswordForm() {
           <p className="text-sm text-text-primary">
             This reset link is missing or invalid. Request a new one to continue.
           </p>
-          <Link href="/forgot-password" className="text-sm font-semibold text-brand-dark hover:underline">
+          <Link href="/forgot-password" className="text-sm font-semibold text-charcoal hover:underline">
             Request a new link
           </Link>
         </div>

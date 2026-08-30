@@ -49,7 +49,7 @@ export default function RegisterPage() {
 
   return (
     <AuthLayout title="Start your free trial" subtitle="3 days, full access, no credit card required.">
-      <div className="rounded-card bg-white p-8 shadow-card">
+      <div className="rounded-card border border-border bg-white p-8 shadow-card">
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           <Input
             label="Business name"
@@ -109,7 +109,7 @@ export default function RegisterPage() {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-[38px] text-text-secondary hover:text-brand-dark focus:outline-none"
+              className="absolute right-3 top-[38px] text-text-secondary hover:text-charcoal focus:outline-none"
               tabIndex={-1}
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -127,7 +127,7 @@ export default function RegisterPage() {
             <button
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute right-3 top-[38px] text-text-secondary hover:text-brand-dark focus:outline-none"
+              className="absolute right-3 top-[38px] text-text-secondary hover:text-charcoal focus:outline-none"
               tabIndex={-1}
             >
               {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -141,7 +141,7 @@ export default function RegisterPage() {
 
         <p className="mt-6 text-center text-sm text-text-secondary">
           Already have an account?{' '}
-          <Link href="/login" className="font-semibold text-brand-dark hover:underline">
+          <Link href="/login" className="font-semibold text-charcoal hover:underline">
             Log in
           </Link>
         </p>

@@ -45,7 +45,12 @@ function DashboardContent() {
   return (
     <div className="min-h-screen bg-background">
       <header className="flex items-center justify-between border-b border-border bg-white px-6 py-4">
-        <span className="text-lg font-bold text-brand-dark">Rayvice</span>
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-charcoal text-sm font-bold text-white shadow-sm">
+            R
+          </div>
+          <span className="text-lg font-bold tracking-tight text-text-primary">Rayvice</span>
+        </div>
         <Button variant="secondary" className="w-auto" onClick={handleLogout} isLoading={isLoggingOut}>
           <LogOut className="h-4 w-4" />
           Log out
@@ -54,7 +59,7 @@ function DashboardContent() {
 
       <main className="mx-auto max-w-3xl px-6 py-10">
         {user && user.isEmailVerified === false && (
-          <div className="mb-6 flex items-center justify-between gap-4 rounded-control border border-warning/40 bg-warning/10 px-4 py-3">
+          <div className="mb-6 flex items-center justify-between gap-4 rounded-control border border-amber-200 bg-amber-50/80 px-4 py-3">
             <div className="flex items-center gap-2 text-sm text-text-primary">
               <MailWarning className="h-4 w-4 shrink-0 text-warning" />
               Please verify your email address to unlock all features.
@@ -71,8 +76,8 @@ function DashboardContent() {
         )}
 
         <Card>
-          <h1 className="text-xl font-bold text-text-primary">Welcome, {user?.firstName}.</h1>
-          <p className="mt-2 text-sm text-text-secondary">
+          <h1 className="text-xl font-bold tracking-tight text-text-primary">Welcome, {user?.firstName}.</h1>
+          <p className="mt-2 text-sm leading-relaxed text-text-secondary">
             The authentication and organization foundation is live. Dashboard widgets, CRM, and the rest of the
             platform will land here in later modules.
           </p>

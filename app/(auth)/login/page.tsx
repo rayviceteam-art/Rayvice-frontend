@@ -41,7 +41,7 @@ export default function LoginPage() {
 
   return (
     <AuthLayout title="Log in to Rayvice" subtitle="Welcome back — pick up right where you left off.">
-      <div className="rounded-card bg-white p-8 shadow-card">
+      <div className="rounded-card border border-border bg-white p-8 shadow-card">
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           <Input
             label="Email address"
@@ -64,7 +64,7 @@ export default function LoginPage() {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-[38px] text-text-secondary hover:text-brand-dark focus:outline-none"
+              className="absolute right-3 top-[38px] text-text-secondary hover:text-charcoal focus:outline-none"
               tabIndex={-1}
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -72,7 +72,7 @@ export default function LoginPage() {
           </div>
 
           <div className="flex justify-end">
-            <Link href="/forgot-password" className="text-sm font-medium text-brand-dark hover:underline">
+            <Link href="/forgot-password" className="text-sm font-medium text-ash-dark hover:text-charcoal hover:underline">
               Forgot password?
             </Link>
           </div>
@@ -84,7 +84,7 @@ export default function LoginPage() {
 
         <p className="mt-6 text-center text-sm text-text-secondary">
           Don&apos;t have an account?{' '}
-          <Link href="/register" className="font-semibold text-brand-dark hover:underline">
+          <Link href="/register" className="font-semibold text-charcoal hover:underline">
             Start your free trial
           </Link>
         </p>

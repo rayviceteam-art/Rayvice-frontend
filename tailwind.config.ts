@@ -10,24 +10,51 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        pearl: {
+          50: '#FAFBFD',
+          100: '#F5F6F8',
+          200: '#EAEEF2',
+          DEFAULT: '#F5F6F8',
+        },
+        charcoal: {
+          50: '#F1F3F5',
+          100: '#E1E4E8',
+          300: '#8C94A0',
+          500: '#47505F',
+          700: '#2A303C',
+          DEFAULT: '#1E232A',
+          dark: '#111418',
+        },
+        ash: {
+          50: '#F8FAFC',
+          100: '#F1F5F9',
+          200: '#E2E8F0',
+          300: '#CBD5E1',
+          400: '#94A3B8',
+          DEFAULT: '#64748B',
+          dark: '#475569',
+        },
         background: {
-          DEFAULT: '#FFF8E7', // Primary Background
-          secondary: '#FFD77A', // Secondary Background
+          DEFAULT: '#F5F6F8', // Pearl Primary Background
+          secondary: '#EAEEF2', // Pearl Secondary Background
         },
         brand: {
-          DEFAULT: '#E6A520', // Primary Brand Color
-          dark: '#7A4A00', // Primary Dark
+          DEFAULT: '#1E232A', // Charcoal Primary Brand
+          dark: '#111418', // Deep Charcoal
+          ash: '#64748B', // Ash Accent
         },
-        success: '#22C55E',
+        success: '#10B981',
         warning: '#F59E0B',
         error: '#EF4444',
         info: '#3B82F6',
         text: {
-          primary: '#1F2937',
-          secondary: '#6B7280',
+          primary: '#1E232A', // Charcoal Primary Text
+          secondary: '#64748B', // Ash Secondary Text
+          muted: '#94A3B8',
         },
         border: {
-          DEFAULT: '#E5E7EB',
+          DEFAULT: '#E2E8F0', // Ash Border
+          focus: '#1E232A',
         },
       },
       fontFamily: {
@@ -38,7 +65,8 @@ const config: Config = {
         control: '10px',
       },
       boxShadow: {
-        card: '0 2px 12px rgba(31, 41, 55, 0.06)',
+        card: '0 4px 20px -2px rgba(30, 35, 42, 0.06), 0 2px 6px -1px rgba(30, 35, 42, 0.04)',
+        glow: '0 0 15px rgba(30, 35, 42, 0.08)',
       },
     },
   },
