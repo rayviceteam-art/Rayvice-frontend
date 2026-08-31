@@ -3,8 +3,8 @@ import { Providers } from './providers';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Rayvice — AI-Powered Business Management',
-  description: 'Automate customer communication, appointments, CRM, and revenue recovery.',
+  title: 'Rayvice — NDIS Sole-Trader Billing & Compliance OS',
+  description: 'Automated billing, rate-splitting, and compliance OS for independent Australian NDIS Sole Traders.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
