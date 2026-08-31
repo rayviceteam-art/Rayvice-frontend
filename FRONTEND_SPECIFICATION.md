@@ -1,249 +1,374 @@
-# 🎨 RAYVICE — FRONTEND ENGINEERING SPECIFICATION & DARK UI DESIGN SYSTEM
-## CLIENT-SIDE ARCHITECTURE & COMPONENT IMPLEMENTATION GUIDE
+# 🎨 RAYVICE — NDIS SOLE-TRADER BILLING & COMPLIANCE OS (AUSTRALIA)
+## COMPREHENSIVE FRONTEND ENGINEERING SPECIFICATION & DARK UI DESIGN SYSTEM
 
-**Target Stack (LOCKED):**
-* **Framework:** Next.js 14+ (App Router, TypeScript)
-* **Styling:** Tailwind CSS (configured with Rayvice Dark Theme tokens)
-* **Icons:** Lucide React (`lucide-react`)
-* **State & Data Fetching:** React Hooks + Custom `apiClient` (`lib/api-client.ts`)
-* **Auth Status:** ✅ **Module 1 (Login, Register, Forgot Password, Auth Context) is ALREADY IMPLEMENTED**
-* **Target Audience:** Frontend Engineers, UI/UX Developers, AI Coding Agents
+> **Document Version**: 2.0.0 (Production Blueprint)  
+> **Target Audience**: Frontend Engineers, UI/UX Developers, AI Coding Agents  
+> **Core Objective**: Eliminate 100% of guesswork so any AI agent or software engineer can build the exact user interface, components, routing, and state workflows without guessing design tokens, forms, or business rules.  
+> **Target Market**: Australia — National Disability Insurance Scheme (NDIS) Sole Traders.
 
 ---
 
-## 1. RAYVICE DARK UI DESIGN SYSTEM (SPECIFICATION & TOKENS)
+## 1. RAYVICE DARK UI DESIGN SYSTEM (TOKENS & SPECIFICATIONS)
 
-Rayvice is built with a **"Premium Dark B2B SaaS"** aesthetic.  
-**Core Visual Rule:** 90% Dark Neutrals, 8% Emerald/Teal Brand Accents, 2% Bright Status Accents.
+Rayvice is built with a **"Premium Dark B2B SaaS"** aesthetic engineered specifically for high contrast, fast mobile entry, and reduced eye strain for support workers logging shifts in their vehicles.
+
+### 1.1 Color Tokens Hierarchy
 
 ```
 +------------------------------------------------------------------------------------+
-| 70-80% Dark Neutrals (#080B0D, #0A0F10, #131B1C)                                  |
-| 15-20% Text & Borders (#F1F5F4, #9AA9A5, #253130)                                  |
-| 5-10%  Emerald/Teal (#16A085, #5EE0C1, #0D332D)                                    |
+| 70-80% Dark Neutrals (#080B0D, #0A0F10, #131B1C, #182122)                         |
+| 15-20% Text & Borders (#F1F5F4, #9AA9A5, #253130, #34413F)                         |
+| 5-10%  Emerald/Teal Brand Accents (#16A085, #5EE0C1, #0D332D, #117A65)             |
 +------------------------------------------------------------------------------------+
 ```
-
-### 1.1 Color Tokens Palette
 
 | Token Name | Hex Code | Tailwind Class | Primary Usage |
 | :--- | :--- | :--- | :--- |
-| **Background Default** | `#080B0D` | `bg-background` | Global app background |
-| **Sidebar Background** | `#0A0F10` | `bg-background-sidebar` | Main navigation sidebar |
-| **Surface / Card** | `#131B1C` | `bg-surface` / `bg-surface-card` | Standard cards, table headers |
-| **Elevated / Modal** | `#182122` | `bg-surface-elevated` | Modals, dropdown menus, card hover |
-| **Input Background** | `#0E1617` | `bg-background-input` | Text inputs, textareas, selects |
-| **Border Default** | `#253130` | `border-border` | Standard card and container borders |
-| **Border Hover** | `#34413F` | `border-border-hover` | Interactive element hover border |
-| **Primary (Brand)** | `#16A085` | `bg-brand text-brand` | Primary CTAs, active buttons, focus |
-| **Primary Hover** | `#1DB89A` | `hover:bg-brand-hover` | Button hover, active link hover |
-| **Primary Light / Accent**| `#5EE0C1` | `text-brand-light` | Active nav icons, key metrics, accents |
-| **Primary Dark / Active** | `#117A65` | `border-brand-dark` | Pressed buttons, active borders |
-| **Primary Background** | `#0D332D` | `bg-brand-bg` | Active navigation item, highlighted cards |
-| **Primary Text** | `#F1F5F4` | `text-text-primary` | Headings, main numbers, key labels |
-| **Secondary Text** | `#9AA9A5` | `text-text-secondary` | Descriptions, supporting table text |
-| **Muted Text** | `#687572` | `text-text-muted` | Placeholders, inactive icons, metadata |
-| **Disabled Text** | `#3F4C49` | `text-text-disabled` | Disabled inputs, inactive controls |
+| **Background Default** | `#080B0D` | `bg-background` | Global application canvas |
+| **Sidebar Background** | `#0A0F10` | `bg-[#0A0F10]` | Navigation sidebar & sticky topbars |
+| **Surface / Card** | `#131B1C` | `bg-surface` / `bg-[#131B1C]` | Standard cards, table rows, panel backgrounds |
+| **Elevated / Modal** | `#182122` | `bg-surface-elevated` | Modals, dropdown menus, floating popovers |
+| **Input Background** | `#0E1617` | `bg-[#0E1617]` | Text fields, selects, time pickers, textareas |
+| **Border Default** | `#253130` | `border-border` / `border-[#253130]` | Card outlines, dividers, subtle borders |
+| **Border Hover** | `#34413F` | `border-[#34413F]` | Interactive card & input hover states |
+| **Primary Brand** | `#16A085` | `bg-brand text-brand` / `#16A085` | Primary CTA buttons, active focus rings |
+| **Primary Hover** | `#1DB89A` | `hover:bg-[#1DB89A]` | Button hover states, active tab highlights |
+| **Primary Light (Glow)**| `#5EE0C1` | `text-[#5EE0C1]` | Active icons, total claim amounts, key metrics |
+| **Primary Dark (Border)**| `#117A65` | `border-[#117A65]` | Pressed buttons, badge borders |
+| **Primary Background** | `#0D332D` | `bg-[#0D332D]` | Active navigation background, highlight badge |
+| **Primary Text** | `#F1F5F4` | `text-[#F1F5F4]` | H1–H4 Headings, primary labels, main numbers |
+| **Secondary Text** | `#9AA9A5` | `text-[#9AA9A5]` | Subtitles, helper text, table column labels |
+| **Muted Text** | `#687572` | `text-[#687572]` | Inactive icons, timestamps, placeholders |
+| **Disabled Text** | `#3F4C49` | `text-[#3F4C49]` | Disabled inputs, inactive controls |
 
-### 1.2 Semantic Status Colors
+### 1.2 Semantic Status Badges & Colors
 
-* **Success (Green):** Text `#22C55E` | Bg `#0B2B1B` | Border `#166534` (Paid invoices, valid claims).
-* **Warning (Amber):** Text `#F59E0B` | Bg `#2A210B` | Border `#92400E` (Draft invoices, low budget balance).
-* **Error (Red):** Text `#EF4444` | Bg `#2B1010` | Border `#991B1B` (Rejected invoices, rate cap errors).
-* **Info (Blue):** Text `#3B82F6` | Bg `#0C1D35` | Border `#1D4ED8` (NDIS Price Guide updates).
+* **Success (Green):** Text `#22C55E` | Bg `#0B2B1B` | Border `#166534` (Paid invoices, 100% compliant shield).
+* **Warning (Amber):** Text `#F59E0B` | Bg `#2A210B` | Border `#92400E` (Draft invoices, budget warning > 70% used).
+* **Error (Red):** Text `#EF4444` | Bg `#2B1010` | Border `#991B1B` (Blocked invoices, price cap violations, budget exhausted).
+* **Info (Blue):** Text `#3B82F6` | Bg `#0C1D35` | Border `#1D4ED8` (NDIS 2026 Price Guide catalogue updates).
 
 ### 1.3 Typography & Radius Standards
 * **Font Family:** `Inter`, sans-serif
 * **Headings:**
-  * H1: `text-3xl font-bold text-text-primary` (32px / 700)
-  * H2: `text-2xl font-semibold text-text-primary` (24px / 600)
-  * H3: `text-xl font-semibold text-text-primary` (20px / 600)
-  * H4: `text-lg font-semibold text-text-primary` (18px / 600)
+  * H1: `text-3xl font-bold text-[#F1F5F4] tracking-tight` (32px / 700)
+  * H2: `text-2xl font-semibold text-[#F1F5F4] tracking-tight` (24px / 600)
+  * H3: `text-xl font-semibold text-[#F1F5F4]` (20px / 600)
+  * H4: `text-base font-semibold text-[#F1F5F4]` (16px / 600)
 * **Border Radii:**
-  * Small: `rounded-sm` (6px)
-  * Buttons & Inputs: `rounded-btn` (8px)
-  * Cards: `rounded-card` (12px)
-  * Modals & Large Sections: `rounded-modal` (16px)
+  * Small: `rounded-sm` (4px)
+  * Buttons & Inputs: `rounded-btn` (8px / `rounded-lg`)
+  * Cards: `rounded-card` (12px / `rounded-xl`)
+  * Modals & Large Banners: `rounded-modal` (16px / `rounded-2xl`)
 
 ---
 
-## 2. FRONTEND ARCHITECTURE & DIRECTORY STRUCTURE
+## 2. FRONTEND ROUTE ARCHITECTURE & DIRECTORY STRUCTURE
 
 ```
 Rayvice-frontend/
 ├── app/
-│   ├── (auth)/             # [EXISTING] Login, Register, Forgot Password, Reset
-│   ├── dashboard/          # [MODULE 2] Main Overview Dashboard
-│   │   └── page.tsx
-│   ├── clients/            # [MODULE 3] NDIS Clients & Plan Managers
-│   │   ├── page.tsx        # Client List & Budget Overview
-│   │   ├── new/page.tsx    # Add New Participant Form
-│   │   └── [id]/page.tsx   # Participant Detail & History
-│   ├── shifts/             # [MODULE 4] Shift Logging & Voice Entry
-│   │   ├── page.tsx        # All Shifts (Filter by Uninvoiced / Invoiced)
-│   │   └── new/page.tsx    # Shift Logger with Live Auto-Split Preview
-│   ├── invoices/           # [MODULE 5] Invoicing & Auto-Rejection Shield
-│   │   ├── page.tsx        # Invoice List (Draft, Sent, Paid)
-│   │   ├── generate/       # Batch Invoice Creation Flow
-│   │   │   └── page.tsx
-│   │   └── [id]/page.tsx   # Invoice PDF Preview & Dispatch Status
-│   ├── settings/           # [MODULE 6] ABN, Bank Details & Billing
-│   │   ├── page.tsx        # Business Profile & Bank Details (BSB)
-│   │   └── billing/        # Stripe Subscription Management ($24 AUD/mo)
-│   │       └── page.tsx
-│   ├── globals.css         # Global Tailwind & Custom Scrollbar Styles
-│   ├── layout.tsx          # Root Layout & Font Definitions
-│   └── providers.tsx       # AuthProvider & Toast Notifications
+│   ├── (auth)/                     # [MODULE 1] Authentication Pages (Implemented)
+│   │   ├── login/page.tsx          # Email/Password + 1-Tap Google Sign-In
+│   │   ├── register/page.tsx       # Sole Trader signup with ABN/Industry
+│   │   ├── forgot-password/page.tsx
+│   │   ├── reset-password/page.tsx
+│   │   └── verify-email/page.tsx
+│   ├── dashboard/                  # [MODULE 2] Overview Dashboard
+│   │   └── page.tsx                # Billings stats, Uninvoiced banner, Budget watch
+│   ├── clients/                    # [MODULE 3] NDIS Participants & Plan Managers
+│   │   ├── page.tsx                # Client directory table with search & filter
+│   │   ├── new/page.tsx            # Add participant form (Plan vs Self Managed)
+│   │   └── [id]/page.tsx           # Participant history, budget utilization & notes
+│   ├── shifts/                     # [MODULE 4] Shift Logging & Live Auto-Split
+│   │   ├── page.tsx                # Shift list (Uninvoiced vs Invoiced tabs)
+│   │   └── new/page.tsx            # Dedicated shift logger view
+│   ├── invoices/                   # [MODULE 5] Invoicing & Auto-Rejection Shield
+│   │   ├── page.tsx                # Invoice directory (Draft, Sent, Paid, Rejected)
+│   │   ├── generate/page.tsx       # Batch shift selection & Pre-Flight Shield
+│   │   └── [id]/page.tsx           # In-browser PDF viewer & direct email dispatch
+│   ├── settings/                   # [MODULE 6] Business Profile & Bank Details
+│   │   ├── page.tsx                # ABN, BSB, Account Number, GST config
+│   │   └── billing/page.tsx        # Stripe subscription portal ($24 AUD/mo)
+│   ├── globals.css                 # Dark UI variables & custom scrollbar
+│   ├── layout.tsx                  # Root layout with NDIS metadata
+│   └── providers.tsx               # AuthProvider, Toast notifications
 ├── components/
 │   ├── layout/
-│   │   ├── AppLayout.tsx   # Sidebar + Top Navbar for Authenticated Pages
-│   │   ├── Sidebar.tsx     # Rayvice Dark Sidebar with Emerald Active States
-│   │   └── Header.tsx      # Topbar with Profile Avatar & Quick Log Action
+│   │   ├── AppLayout.tsx           # Authenticated shell (Sidebar + Header + Main)
+│   │   ├── Sidebar.tsx             # Rayvice Dark Sidebar with Emerald navigation
+│   │   ├── Header.tsx              # Top bar with "+ Log Shift (Voice)" quick CTA
+│   │   ├── AuthLayout.tsx          # Auth centered card layout
+│   │   └── ProtectedRoute.tsx      # Auth session route guard
 │   ├── ui/
-│   │   ├── Button.tsx      # Primary, Secondary, Ghost, Danger Variants
-│   │   ├── Card.tsx        # Normal, Elevated, and Highlighted Cards
-│   │   ├── Input.tsx       # Styled Dark Input with Focus Emerald Rings
-│   │   ├── Badge.tsx       # Semantic Status Badges (Active, Pending, Paid)
-│   │   ├── Table.tsx       # Dark Surface Table with Hover Highlights
-│   │   ├── Modal.tsx       # 16px Rounded Elevated Modal Backdrop
-│   │   └── VoiceRecorder.tsx # Audio Recording Button with Pulse Glow
+│   │   ├── Button.tsx              # Primary, Secondary, Ghost, Danger variants
+│   │   ├── Card.tsx                # Normal, Elevated, and Highlighted cards
+│   │   ├── Input.tsx               # Dark input with emerald focus ring & error states
+│   │   ├── Badge.tsx               # Semantic status badge pill
+│   │   ├── Table.tsx               # Dark surface table with hover rows
+│   │   ├── Modal.tsx               # 16px rounded backdrop modal
+│   │   └── VoiceRecorder.tsx       # Audio recorder button with red pulsing glow
 │   ├── shifts/
-│   │   ├── ShiftModal.tsx  # Fast 15-Second Shift Logger Modal
-│   │   ├── SplitPreview.tsx # Live Preview of NDIS Day/Evening Split Lines
-│   │   └── VoiceShiftParser.tsx # Voice to Structured Shift Extractor
+│   │   ├── ShiftModal.tsx          # Fast 15-second popup shift logger
+│   │   ├── SplitPreview.tsx        # Real-time auto-split rate breakdown box
+│   │   └── VoiceShiftParser.tsx    # Audio speech-to-JSON extractor
 │   └── invoices/
-│       ├── PreFlightShield.tsx # Auto-Rejection Shield Validation Card
-│       ├── InvoicePDFViewer.tsx # In-Browser PDF Preview
-│       └── DispatchModal.tsx    # Plan Manager Email Sender Modal
+│       ├── PreFlightShield.tsx     # Auto-Rejection Shield validation card
+│       ├── InvoicePDFViewer.tsx    # In-browser PDF stream preview
+│       └── DispatchModal.tsx       # Plan Manager email dispatch confirmation
 └── lib/
-    ├── api-client.ts       # [EXISTING] Axios/Fetch client connected to Express API
-    ├── auth-context.tsx    # [EXISTING] Session and JWT tokens
-    ├── ndis-rates.ts       # Client-side 2026 NDIS Price Limits Cache
-    └── types.ts            # Shared TypeScript Interfaces
+    ├── api-client.ts               # Axios instance with 401 token refresh interceptor
+    ├── auth-context.tsx            # User session & JWT state
+    ├── auth-service.ts             # Auth REST client
+    ├── ndis-rates.ts               # Official 2026 NDIA price limits cache
+    ├── types.ts                    # Shared TypeScript interfaces
+    └── validators.ts               # Zod validation schemas
 ```
 
 ---
 
-## 3. CORE UI MODULES & SCREEN SPECIFICATIONS
+## 3. DETAILED UI MODULE SPECIFICATIONS
 
-### 3.1 Module 2: Dashboard Overview (`app/dashboard/page.tsx`)
+---
 
-**Goal:** Gives the sole trader an instant snapshot of weekly billings, pending un-invoiced shifts, and a 1-tap shift entry button.
+### 📌 MODULE 1: AUTHENTICATION & ONBOARDING (IMPLEMENTED)
+
+#### 3.1 Purpose & Flow
+- Fast, low-friction registration tailored to Australian sole traders.
+- Directly supports **1-Tap Google Sign-Up** (`GoogleButton.tsx`) and standard Email/Password.
+- Registration creates the tenant, generates a 3-day full access trial, and redirects immediately to `/dashboard`.
+
+#### 3.2 Key Views
+1. **`/login`:** Email + Password with password visibility toggle + Google Sign-In.
+2. **`/register`:** Fields: Business Name (`e.g. Liam Support Services`), Phone (`0412 345 678`), Role (`e.g. NDIS Support Worker`), Owner Name, Email, Password.
+3. **`/forgot-password` & `/reset-password`:** Single-use token reset flow with real-time password strength validation.
+
+---
+
+### 📌 MODULE 2: OVERVIEW DASHBOARD (`app/dashboard/page.tsx`)
+
+#### 4.1 Purpose & Screen Layout
+Provides sole traders with an instant 5-second snapshot of weekly revenue, pending unbilled shifts, and participant budget health.
 
 ```
 +------------------------------------------------------------------------------------+
 |  Rayvice Dashboard                                        [ + Log Shift (Voice) ]  |
 +------------------------------------------------------------------------------------+
 |  [ STAT CARD 1 ]          [ STAT CARD 2 ]          [ STAT CARD 3 ]                 |
-|  This Week's Earnings     Un-invoiced Shifts       Active Participants             |
-|  $2,450.20 AUD            5 Shifts ($1,120 AUD)    6 Clients                       |
-|  +12% from last week      [ Generate Invoice -> ]  All plans active                |
+|  This Week's Earnings     Uninvoiced Shifts        Active Participants             |
+|  $2,450.20 AUD            5 Shifts ($1,120.00 AUD) 6 Clients                       |
+|  +14% vs last week        [ Generate Invoice -> ]  All budgets healthy             |
 +------------------------------------------------------------------------------------+
-|  [ RECENT SHIFTS TABLE ]                           [ NDIS BUDGET WATCH ]           |
-|  Client     Date     Hours   Rate Type   Status    |  Sarah Jenkins: 85% Remaining |
-|  Sarah J.   Today    3.0h    Day+Evening Pending   |  David Miller:  40% Remaining |
-|  David M.   Yesterday 4.0h   Saturday    Pending   |  Emma Watson:   15% (Alert!)  |
+|  [ UNINVOICED SHIFTS BANNER ALERT ]                                                |
+|  ⚡ You have 5 unbilled shifts ready for invoicing ($1,120.00 AUD).                |
+|  [ Batch Generate Invoices (Shield Protected) -> ]                                 |
++------------------------------------------------------------------------------------+
+|  [ RECENT SHIFTS TABLE (5 Most Recent) ]           [ NDIS BUDGET HEALTH WATCH ]    |
+|  Client       Date     Hours    Rate Type  Amount  |  Sarah J:  82% ($12,300 left) |
+|  Sarah J.     Today    3.5 hrs  Day+Eve    $258.39 |  David M:  45% ($4,500 left)  |
+|  David M.     Yest.    4.0 hrs  Saturday   $380.28 |  Emma W:   12% (⚠️ Alert)     |
 +------------------------------------------------------------------------------------+
 ```
 
-#### Key UI Components:
-1. **Quick Action Header:** Prominent `#16A085` Primary CTA: `+ Log Shift (Voice)`.
-2. **Un-invoiced Banner Alert:** If pending shifts > 0, shows a highlighted card (`bg-brand-bg border-brand-dark`) with a 1-click `Generate Invoice` button.
-3. **Budget Health Watchlist:** Displays participant remaining budget with color-coded progress bars (Green > 30%, Amber 10-30%, Red < 10%).
+#### 4.2 Key Interactive Elements
+1. **Top Right Header CTA:** Prominent `#16A085` button `+ Log Shift (Voice)` -> Opens `ShiftModal.tsx` from anywhere.
+2. **Uninvoiced Alert Banner:** Visible if `pendingShiftsCount > 0`. Styled with `bg-[#0D332D] border-[#117A65]`. 1-click navigates to `/invoices/generate`.
+3. **Budget Health Watchlist:** Displays participant remaining balance with color-coded progress bars:
+   - Green (`> 30%` remaining)
+   - Amber (`10% - 30%` remaining)
+   - Red (`< 10%` remaining — prevents working on exhausted funding).
 
 ---
 
-### 3.2 Module 3: NDIS Clients & Plan Managers (`app/clients/page.tsx`)
+### 📌 MODULE 3: NDIS PARTICIPANTS & PLAN MANAGERS (`app/clients/page.tsx`)
 
-**Goal:** Manage participant NDIS numbers, plan management types, and agency billing email routes.
+#### 5.1 Purpose & Screen Specifications
+Manage participant details, 9-digit NDIS IDs, and Plan Manager agency claim routing.
 
-#### Form Specification (`app/clients/new/page.tsx`):
-* **Participant Full Name:** Text input (`bg-background-input border-border`).
-* **NDIS Number (Required):** 9-digit numeric input with live format validator (e.g. `430 123 456`).
-* **Date of Birth:** Optional date picker.
-* **Plan Management Type:** 3-Way Radio / Segmented Button:
-  1. `Plan-Managed` (90% of cases) — Reveals Plan Manager Agency Name & Billing Email fields.
-  2. `Self-Managed` — Reveals Parent / Nominee direct email & phone.
-  3. `NDIA-Managed` — Displays agency portal warning.
-* **Default Support Category:** Dropdown selecting default item (e.g. `01_011_0107_1_1 - Daily Life Support`).
-* **Agreed Hourly Rate ($ AUD):** Pre-filled with current 2026 NDIA cap (`$67.56`).
+#### 5.2 Create Participant Form (`app/clients/new/page.tsx`)
+* **Participant Full Name:** Text input (`bg-[#0E1617] border-[#253130]`).
+* **NDIS Number (Required):** 9-digit input with real-time numeric format checker (e.g. `430123456`). Rejects anything not exactly 9 digits.
+* **Plan Management Type Segmented Control:**
+  1. `Plan-Managed` (Default / 85%):
+     - Displays **Plan Manager Agency Name** (e.g. *My Plan Manager*, *Plan Partners*, *Moira*, *Capital Guardians*).
+     - Displays **Plan Manager Claims Email** (e.g. `invoices@myplanmanager.com.au`).
+  2. `Self-Managed`:
+     - Displays **Parent / Nominee Billing Email** & Phone.
+  3. `NDIA-Managed`:
+     - Displays warning: *"Invoices for NDIA-managed participants must be claimed through the PRODA Myplace portal."*
+* **Default Support Category:** Dropdown selecting standard NDIA code (`01_011_0107_1_1 - Daily Life Support`).
+* **Agreed Hourly Rate ($ AUD):** Pre-populated with current 2026 NDIA price cap (`$67.56`).
+* **Total Allocated Budget ($ AUD):** Optional budget tracking cap (e.g. `$15,000.00`).
 
 ---
 
-### 3.3 Module 4: Shift Logger with Voice & Live Split Preview (`app/shifts/page.tsx`)
+### 📌 MODULE 4: SHIFT LOGGER WITH VOICE AI & LIVE AUTO-SPLIT (`app/shifts/page.tsx`)
 
-**Goal:** Allow workers in their cars to log shifts in under 15 seconds via Voice or 1-Tap entry.
+#### 6.1 Purpose & User Flow
+Allows sole traders to log a shift in under 15 seconds from their car using **Voice Audio** or **1-Tap Form Entry**, with live rate-split calculations rendered on screen.
 
-#### The Shift Logger Modal (`components/shifts/ShiftModal.tsx`):
+#### 6.2 The Shift Logger Modal Component (`components/shifts/ShiftModal.tsx`)
 
 ```tsx
 // components/shifts/ShiftModal.tsx
-import React, { useState } from 'react';
-import { Mic, Clock, Car, CheckCircle2, AlertCircle } from 'lucide-react';
+'use client';
+
+import React, { useState, useMemo } from 'react';
+import { Mic, Clock, Car, CheckCircle2, Sparkles, X } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 
-export function ShiftModal({ isOpen, onClose, clients }: { isOpen: boolean; onClose: () => void; clients: any[] }) {
+interface ShiftModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  clients: Array<{ id: string; participantName: string; ndisNumber: string }>;
+  onShiftSaved: () => void;
+}
+
+export function ShiftModal({ isOpen, onClose, clients, onShiftSaved }: ShiftModalProps) {
   const [isRecording, setIsRecording] = useState(false);
+  const [selectedClientId, setSelectedClientId] = useState(clients[0]?.id || '');
+  const [shiftDate, setShiftDate] = useState(new Date().toISOString().split('T')[0]);
   const [startTime, setStartTime] = useState('18:00');
   const [endTime, setEndTime] = useState('21:30');
   const [travelKms, setTravelKms] = useState('12');
+  const [caseNotes, setCaseNotes] = useState('Assisted with community access and evening meal preparation.');
+
+  // Live Auto-Split Calculation Engine (Client-Side Preview)
+  const splitCalculation = useMemo(() => {
+    const [sH, sM] = startTime.split(':').map(Number);
+    const [eH, eM] = endTime.split(':').map(Number);
+    const startDec = sH + sM / 60;
+    const endDec = eH + eM / 60;
+    const totalHours = Math.max(0, Number((endDec - startDec).toFixed(2)));
+    const kms = Number(travelKms) || 0;
+
+    const DAY_RATE = 67.56;
+    const EVE_RATE = 74.42;
+    const KM_RATE = 0.97;
+    const THRESHOLD = 20.0; // 8:00 PM
+
+    let dayHours = 0;
+    let eveHours = 0;
+
+    if (endDec <= THRESHOLD) {
+      dayHours = totalHours;
+    } else if (startDec >= THRESHOLD) {
+      eveHours = totalHours;
+    } else {
+      dayHours = Number((THRESHOLD - startDec).toFixed(2));
+      eveHours = Number((endDec - THRESHOLD).toFixed(2));
+    }
+
+    const dayTotal = Number((dayHours * DAY_RATE).toFixed(2));
+    const eveTotal = Number((eveHours * EVE_RATE).toFixed(2));
+    const travelTotal = Number((kms * KM_RATE).toFixed(2));
+    const grandTotal = Number((dayTotal + eveTotal + travelTotal).toFixed(2));
+
+    return { totalHours, dayHours, eveHours, dayTotal, eveTotal, travelTotal, grandTotal, kms };
+  }, [startTime, endTime, travelKms]);
+
+  if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="w-full max-w-lg rounded-modal bg-surface-elevated border border-border p-6 shadow-modal">
-        {/* Header with Voice Pulse */}
-        <div className="flex items-center justify-between border-b border-border pb-4 mb-5">
-          <div>
-            <h3 className="text-xl font-semibold text-text-primary">Log NDIS Shift</h3>
-            <p className="text-sm text-text-secondary">Tap voice or enter shift times below</p>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4">
+      <div className="w-full max-w-lg rounded-2xl bg-[#182122] border border-[#253130] p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-150">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-[#253130] pb-4 mb-5">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-[#0D332D] text-[#5EE0C1] flex items-center justify-center border border-[#117A65]">
+              <Clock className="w-4 h-4" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-[#F1F5F4]">Log NDIS Shift</h3>
+              <p className="text-xs text-[#9AA9A5]">15-second entry with live NDIA auto-split</p>
+            </div>
           </div>
           <button
             onClick={() => setIsRecording(!isRecording)}
-            className={`flex items-center justify-center w-12 h-12 rounded-full transition-all ${
+            title="Tap to speak shift details"
+            className={`flex items-center justify-center w-11 h-11 rounded-full transition-all ${
               isRecording
-                ? 'bg-red-500 text-white animate-pulse shadow-[0_0_20px_rgba(239,68,68,0.4)]'
-                : 'bg-brand text-white hover:bg-brand-hover shadow-glow'
+                ? 'bg-red-500 text-white animate-pulse shadow-[0_0_20px_rgba(239,68,68,0.5)]'
+                : 'bg-[#16A085] text-white hover:bg-[#1DB89A] shadow-glow'
             }`}
           >
-            <Mic className="w-6 h-6" />
+            <Mic className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Live Auto-Split Preview Box */}
-        <div className="rounded-card bg-surface border border-border p-4 mb-5 space-y-3">
-          <div className="flex items-center justify-between text-xs font-semibold text-text-muted uppercase">
-            <span>NDIS Calculation Engine</span>
-            <span className="text-brand-light flex items-center gap-1">
-              <CheckCircle2 className="w-3.5 h-3.5" /> Auto-Split Active
-            </span>
+        {/* Inputs */}
+        <div className="space-y-4">
+          <div>
+            <label className="block text-xs font-medium text-[#9AA9A5] mb-1">Participant</label>
+            <select
+              value={selectedClientId}
+              onChange={(e) => setSelectedClientId(e.target.value)}
+              className="w-full rounded-lg bg-[#0E1617] border border-[#253130] px-3.5 py-2 text-sm text-[#F1F5F4] focus:border-[#16A085] focus:outline-none"
+            >
+              {clients.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.participantName} (NDIS: {c.ndisNumber})
+                </option>
+              ))}
+            </select>
           </div>
 
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-sm py-1.5 border-b border-border/50">
-              <span className="text-text-primary">01_011_0107_1_1 (Day 18:00 - 20:00)</span>
-              <span className="font-semibold text-text-primary">2.0 hrs × $67.56 = $135.12</span>
-            </div>
-            <div className="flex items-center justify-between text-sm py-1.5 border-b border-border/50">
-              <span className="text-text-primary">01_015_0107_1_1 (Evening 20:00 - 21:30)</span>
-              <span className="font-semibold text-text-primary">1.5 hrs × $74.42 = $111.63</span>
-            </div>
-            <div className="flex items-center justify-between text-sm py-1.5">
-              <span className="text-text-primary">01_799_0107_1_1 (Transport 12 km)</span>
-              <span className="font-semibold text-text-primary">12 km × $0.97 = $11.64</span>
-            </div>
+          <div className="grid grid-cols-3 gap-3">
+            <Input label="Date" type="date" value={shiftDate} onChange={(e) => setShiftDate(e.target.value)} />
+            <Input label="Start Time" type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
+            <Input label="End Time" type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
           </div>
 
-          <div className="flex justify-between items-center pt-2 border-t border-border font-bold text-brand-light">
-            <span>Total Shift Claim:</span>
-            <span>$258.39 AUD</span>
+          <Input
+            label="Activity-Based Transport (KM)"
+            type="number"
+            value={travelKms}
+            onChange={(e) => setTravelKms(e.target.value)}
+            placeholder="0"
+          />
+
+          {/* LIVE NDIS AUTO-SPLIT ENGINE PREVIEW */}
+          <div className="rounded-xl bg-[#131B1C] border border-[#253130] p-4 space-y-2.5">
+            <div className="flex items-center justify-between text-xs font-semibold text-[#687572] uppercase tracking-wider">
+              <span>NDIS Auto-Split Engine</span>
+              <span className="text-[#5EE0C1] flex items-center gap-1">
+                <CheckCircle2 className="w-3.5 h-3.5" /> 2026 NDIA Limits Active
+              </span>
+            </div>
+
+            <div className="space-y-1.5 text-xs">
+              {splitCalculation.dayHours > 0 && (
+                <div className="flex justify-between text-[#F1F5F4]">
+                  <span>01_011_0107_1_1 (Daytime {startTime} - {splitCalculation.eveHours > 0 ? '20:00' : endTime})</span>
+                  <span className="font-mono">{splitCalculation.dayHours}h × $67.56 = ${splitCalculation.dayTotal}</span>
+                </div>
+              )}
+              {splitCalculation.eveHours > 0 && (
+                <div className="flex justify-between text-[#5EE0C1]">
+                  <span>01_015_0107_1_1 (Evening 20:00 - {endTime})</span>
+                  <span className="font-mono">{splitCalculation.eveHours}h × $74.42 = ${splitCalculation.eveTotal}</span>
+                </div>
+              )}
+              {splitCalculation.kms > 0 && (
+                <div className="flex justify-between text-[#9AA9A5]">
+                  <span>01_799_0107_1_1 (Travel {splitCalculation.kms} km)</span>
+                  <span className="font-mono">{splitCalculation.kms} km × $0.97 = ${splitCalculation.travelTotal}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="flex justify-between items-center pt-2 border-t border-[#253130] font-bold text-sm text-[#5EE0C1]">
+              <span>Total Claim Amount:</span>
+              <span>${splitCalculation.grandTotal.toFixed(2)} AUD</span>
+            </div>
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex items-center justify-end gap-3">
+        {/* Actions */}
+        <div className="mt-6 flex items-center justify-end gap-3">
           <Button variant="secondary" onClick={onClose}>Cancel</Button>
-          <Button variant="primary">Save Shift</Button>
+          <Button variant="primary" onClick={onShiftSaved}>Save Shift (${splitCalculation.grandTotal.toFixed(2)})</Button>
         </div>
       </div>
     </div>
@@ -253,39 +378,41 @@ export function ShiftModal({ isOpen, onClose, clients }: { isOpen: boolean; onCl
 
 ---
 
-### 3.4 Module 5: Invoicing & "Auto-Rejection Shield" (`app/invoices/generate/page.tsx`)
+### 📌 MODULE 5: INVOICING & PRE-FLIGHT REJECTION SHIELD (`app/invoices/generate/page.tsx`)
 
-**Goal:** Convert uninvoiced shifts into a 100% compliant PDF Tax Invoice and dispatch to Plan Managers with 0% rejection risk.
+#### 7.1 Purpose & Shield UI Specifications
+Prevents any invoice from reaching a Plan Manager with errors.
 
-#### The Auto-Rejection Shield Component (`components/invoices/PreFlightShield.tsx`):
+#### 7.2 The Pre-Flight Shield Component (`components/invoices/PreFlightShield.tsx`)
 
 ```tsx
 // components/invoices/PreFlightShield.tsx
 import React from 'react';
-import { ShieldCheck, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, AlertOctagon } from 'lucide-react';
 
 interface ShieldProps {
   isValid: boolean;
   errors: string[];
   totalAmount: number;
   recipientEmail: string;
+  agencyName: string;
 }
 
-export function PreFlightShield({ isValid, errors, totalAmount, recipientEmail }: ShieldProps) {
+export function PreFlightShield({ isValid, errors, totalAmount, recipientEmail, agencyName }: ShieldProps) {
   if (isValid) {
     return (
-      <div className="rounded-card bg-status-success-bg border border-status-success-border p-4 mb-6">
+      <div className="rounded-xl bg-[#0B2B1B] border border-[#166534] p-4 mb-6">
         <div className="flex items-start gap-3">
-          <ShieldCheck className="w-6 h-6 text-status-success flex-shrink-0 mt-0.5" />
+          <ShieldCheck className="w-6 h-6 text-[#22C55E] shrink-0 mt-0.5" />
           <div className="flex-1">
-            <h4 className="text-sm font-semibold text-status-success-text flex items-center gap-2">
+            <h4 className="text-sm font-semibold text-[#22C55E]">
               Auto-Rejection Shield: 100% NDIS Compliant
             </h4>
-            <p className="text-xs text-status-success-text/80 mt-1">
-              All line items conform to official 2026 NDIA price limits. Invoice ready for instant 48-hour payment by Plan Manager.
+            <p className="text-xs text-[#22C55E]/80 mt-1">
+              All line items conform to official 2026 NDIA price caps. ABN, BSB, and 9-digit NDIS IDs verified. Ready for instant 48-hour payment.
             </p>
-            <div className="mt-2 text-xs font-mono text-status-success-text">
-              Dispatching to: <span className="underline">{recipientEmail}</span> | Total: ${totalAmount.toFixed(2)} AUD
+            <div className="mt-2 text-xs font-mono text-[#22C55E]">
+              Routing directly to: <span className="underline">{agencyName} ({recipientEmail})</span> | Total: ${totalAmount.toFixed(2)} AUD
             </div>
           </div>
         </div>
@@ -294,14 +421,14 @@ export function PreFlightShield({ isValid, errors, totalAmount, recipientEmail }
   }
 
   return (
-    <div className="rounded-card bg-status-error-bg border border-status-error-border p-4 mb-6">
+    <div className="rounded-xl bg-[#2B1010] border border-[#991B1B] p-4 mb-6">
       <div className="flex items-start gap-3">
-        <AlertTriangle className="w-6 h-6 text-status-error flex-shrink-0 mt-0.5" />
+        <AlertOctagon className="w-6 h-6 text-[#EF4444] shrink-0 mt-0.5" />
         <div className="flex-1">
-          <h4 className="text-sm font-semibold text-status-error-text">
+          <h4 className="text-sm font-semibold text-[#EF4444]">
             Invoice Dispatch Blocked (Rejection Prevention Active)
           </h4>
-          <ul className="mt-2 space-y-1 text-xs text-status-error-text list-disc list-inside">
+          <ul className="mt-2 space-y-1 text-xs text-[#EF4444] list-disc list-inside font-mono">
             {errors.map((err, idx) => (
               <li key={idx}>{err}</li>
             ))}
@@ -315,10 +442,26 @@ export function PreFlightShield({ isValid, errors, totalAmount, recipientEmail }
 
 ---
 
-## 4. DESIGN SYSTEM UI COMPONENT LIBRARY
+### 📌 MODULE 6: BUSINESS SETTINGS & BANKING (`app/settings/page.tsx`)
 
-### 4.1 Button Component (`components/ui/Button.tsx`)
+#### 8.1 Purpose & Form Fields
+1. **Business Profile:** Business Legal Name, Contact Email, Contact Phone, Industry (`NDIS Support Worker`).
+2. **Australian Tax & Banking Compliance:**
+   - **ABN:** 11 digits (e.g. `51824753556`)
+   - **BSB:** Format `XXX-XXX` (e.g. `062-000`)
+   - **Account Number:** 6 to 9 digits (e.g. `12345678`)
+   - **Bank Name:** (e.g. `Commonwealth Bank of Australia`)
+   - **Custom Invoice Prefix:** (e.g. `INV`, `LSW`)
+   - **GST Registration Toggle:** (Default: `false`)
+3. **Subscription Portal (`/settings/billing`):**
+   - Plan Tier: **Starter ($24 AUD/mo)** or **Professional ($44 AUD/mo)**.
+   - Powered by Stripe Customer Portal for managing payment methods and tax invoices.
 
+---
+
+## 4. DESIGN SYSTEM UI COMPONENT PRIMITIVES
+
+### 4.1 Button (`components/ui/Button.tsx`)
 ```tsx
 import React from 'react';
 
@@ -337,81 +480,24 @@ export const Button: React.FC<ButtonProps> = ({
   disabled,
   ...props
 }) => {
-  const baseStyles = 'inline-flex items-center justify-center font-medium transition-all rounded-btn focus:outline-none disabled:cursor-not-allowed';
-
-  const sizeStyles = {
-    sm: 'px-3 py-1.5 text-xs',
-    md: 'px-4 py-2 text-sm',
-    lg: 'px-6 py-3 text-base',
-  };
-
+  const baseStyles = 'inline-flex items-center justify-center font-semibold transition-all rounded-lg focus:outline-none disabled:cursor-not-allowed';
+  const sizeStyles = { sm: 'px-3 py-1.5 text-xs', md: 'px-4 py-2.5 text-sm', lg: 'px-6 py-3 text-base' };
   const variantStyles = {
-    primary: 'bg-brand text-white hover:bg-brand-hover active:bg-brand-dark disabled:bg-surface-elevated disabled:text-text-disabled shadow-sm',
-    secondary: 'bg-transparent border border-border-hover text-text-primary hover:bg-surface hover:border-brand disabled:border-border disabled:text-text-disabled',
-    ghost: 'bg-transparent text-text-secondary hover:bg-surface hover:text-text-primary disabled:text-text-disabled',
-    danger: 'bg-status-error text-white hover:bg-red-600 active:bg-red-700 disabled:bg-surface-elevated',
+    primary: 'bg-[#16A085] text-white hover:bg-[#1DB89A] active:bg-[#117A65] disabled:bg-[#182122] disabled:text-[#3F4C49] shadow-sm',
+    secondary: 'bg-transparent border border-[#253130] text-[#F1F5F4] hover:bg-[#131B1C] hover:border-[#16A085] disabled:border-[#253130] disabled:text-[#3F4C49]',
+    ghost: 'bg-transparent text-[#9AA9A5] hover:bg-[#131B1C] hover:text-[#F1F5F4] disabled:text-[#3F4C49]',
+    danger: 'bg-[#EF4444] text-white hover:bg-red-600 active:bg-red-700 disabled:bg-[#182122]',
   };
 
   return (
-    <button
-      className={`${baseStyles} ${sizeStyles[size]} ${variantStyles[variant]} ${className}`}
-      disabled={disabled || isLoading}
-      {...props}
-    >
-      {isLoading ? (
-        <span className="flex items-center gap-2">
-          <svg className="animate-spin h-4 w-4 text-current" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-          </svg>
-          Loading...
-        </span>
-      ) : (
-        children
-      )}
+    <button className={`${baseStyles} ${sizeStyles[size]} ${variantStyles[variant]} ${className}`} disabled={disabled || isLoading} {...props}>
+      {isLoading ? 'Loading...' : children}
     </button>
   );
 };
 ```
 
----
-
-### 4.2 Card Component (`components/ui/Card.tsx`)
-
-```tsx
-import React from 'react';
-
-interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'normal' | 'elevated' | 'highlighted';
-}
-
-export const Card: React.FC<CardProps> = ({
-  children,
-  variant = 'normal',
-  className = '',
-  ...props
-}) => {
-  const variantStyles = {
-    normal: 'bg-surface border-border hover:border-border-hover',
-    elevated: 'bg-surface-elevated border-border-hover shadow-modal',
-    highlighted: 'bg-brand-bg border-brand-dark shadow-glow',
-  };
-
-  return (
-    <div
-      className={`rounded-card border p-5 transition-all ${variantStyles[variant]} ${className}`}
-      {...props}
-    >
-      {children}
-    </div>
-  );
-};
-```
-
----
-
-### 4.3 Input Component (`components/ui/Input.tsx`)
-
+### 4.2 Input (`components/ui/Input.tsx`)
 ```tsx
 import React from 'react';
 
@@ -428,121 +514,36 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="w-full space-y-1.5">
         {label && (
-          <label htmlFor={inputId} className="block text-sm font-medium text-text-primary">
+          <label htmlFor={inputId} className="block text-xs font-medium text-[#9AA9A5]">
             {label}
           </label>
         )}
         <input
           ref={ref}
           id={inputId}
-          className={`w-full rounded-input bg-background-input px-3.5 py-2.5 text-sm text-text-primary placeholder:text-text-muted border transition-all focus:outline-none ${
+          className={`w-full rounded-lg bg-[#0E1617] px-3.5 py-2.5 text-sm text-[#F1F5F4] placeholder:text-[#687572] border transition-all focus:outline-none ${
             error
-              ? 'border-status-error focus:ring-1 focus:ring-status-error'
-              : 'border-border focus:border-brand focus:ring-1 focus:ring-brand'
-          } disabled:bg-surface disabled:text-text-disabled disabled:cursor-not-allowed ${className}`}
+              ? 'border-[#EF4444] focus:ring-1 focus:ring-[#EF4444]'
+              : 'border-[#253130] focus:border-[#16A085] focus:ring-1 focus:ring-[#16A085]'
+          } disabled:bg-[#182122] disabled:text-[#3F4C49] disabled:cursor-not-allowed ${className}`}
           {...props}
         />
-        {error && <p className="text-xs text-status-error">{error}</p>}
-        {helperText && !error && <p className="text-xs text-text-secondary">{helperText}</p>}
+        {error && <p className="text-xs text-[#EF4444]">{error}</p>}
+        {helperText && !error && <p className="text-xs text-[#9AA9A5]">{helperText}</p>}
       </div>
     );
   }
 );
-
 Input.displayName = 'Input';
 ```
 
 ---
 
-## 5. APP SHELL & SIDEBAR NAVIGATION (`components/layout/Sidebar.tsx`)
+## 5. MANDATORY AI FRONTEND CODING RULES
 
-```tsx
-'use client';
+1. **NO UI GUESSING:** Always adhere to the Rayvice Dark Palette (`#080B0D` background, `#131B1C` cards, `#16A085` brand emerald).
+2. **AUSTRALIAN FORMATTING:** Dates must be displayed in Australian format (`DD/MM/YYYY`), phone placeholders `0412 345 678`, and currency formatted as `$XX.XX AUD`.
+3. **AUTOMATIC AUTO-SPLIT PREVIEW:** Any shift entry form MUST render the live calculation breakdown box showing Day vs Evening rate items.
+4. **SHIELD BANNER VISIBILITY:** The `PreFlightShield` component MUST be rendered on the invoice generation screen before any dispatch action.
+5. **ERROR HANDLING:** Always wrap API calls with `getApiErrorMessage(error)` from `lib/api-client.ts` to surface clear backend error messages to the user via `react-hot-toast`.
 
-import React from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Users, CalendarCheck2, FileText, Settings, ShieldCheck, LogOut } from 'lucide-react';
-import { useAuth } from '@/lib/auth-context';
-
-export function Sidebar() {
-  const pathname = usePathname();
-  const { logout, user } = useAuth();
-
-  const navItems = [
-    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'Participants', href: '/clients', icon: Users },
-    { name: 'Shifts & Hours', href: '/shifts', icon: CalendarCheck2 },
-    { name: 'Tax Invoices', href: '/invoices', icon: FileText },
-    { name: 'Business Settings', href: '/settings', icon: Settings },
-  ];
-
-  return (
-    <aside className="w-64 flex flex-col h-screen bg-background-sidebar border-r border-border fixed left-0 top-0 z-40">
-      {/* Brand Header */}
-      <div className="h-16 flex items-center gap-2.5 px-6 border-b border-border">
-        <div className="w-8 h-8 rounded-btn bg-brand flex items-center justify-center text-white shadow-glow">
-          <ShieldCheck className="w-5 h-5" />
-        </div>
-        <span className="text-lg font-bold tracking-wide text-text-primary">Rayvice</span>
-        <span className="text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded bg-brand-bg text-brand-light border border-brand-dark ml-auto">
-          NDIS OS
-        </span>
-      </div>
-
-      {/* Nav Links */}
-      <nav className="flex-1 px-3 py-4 space-y-1.5">
-        {navItems.map((item) => {
-          const isActive = pathname.startsWith(item.href);
-          const Icon = item.icon;
-
-          return (
-            <Link
-              key={item.name}
-              href={item.href}
-              className={`flex items-center gap-3 px-3.5 py-2.5 rounded-btn text-sm font-medium transition-all ${
-                isActive
-                  ? 'bg-brand-bg text-brand-light border border-brand-dark'
-                  : 'text-text-secondary hover:bg-surface hover:text-text-primary'
-              }`}
-            >
-              <Icon className={`w-5 h-5 ${isActive ? 'text-brand-light' : 'text-text-muted'}`} />
-              {item.name}
-            </Link>
-          );
-        })}
-      </nav>
-
-      {/* User Footer */}
-      <div className="p-4 border-t border-border flex items-center justify-between">
-        <div className="flex flex-col truncate">
-          <span className="text-sm font-medium text-text-primary truncate">{user?.firstName} {user?.lastName}</span>
-          <span className="text-xs text-text-muted truncate">{user?.email}</span>
-        </div>
-        <button
-          onClick={logout}
-          title="Log out"
-          className="text-text-muted hover:text-status-error p-1.5 rounded transition-colors"
-        >
-          <LogOut className="w-4 h-4" />
-        </button>
-      </div>
-    </aside>
-  );
-}
-```
-
----
-
-## 6. FRONTEND IMPLEMENTATION TIMELINE & ROADMAP
-
-- [ ] **Day 1:** Implement `AppLayout.tsx` and `Sidebar.tsx` with Rayvice Dark UI tokens.
-- [ ] **Day 2:** Build `/dashboard` overview cards & weekly billings metrics.
-- [ ] **Day 3:** Build `/clients` participant listing, search, and creation forms.
-- [ ] **Day 4:** Build `ShiftModal.tsx` with Live Auto-Split Preview calculation engine.
-- [ ] **Day 5:** Connect `VoiceRecorder.tsx` to `/api/v1/shifts/voice-parse` for audio shift entry.
-- [ ] **Day 6:** Build `/invoices/generate` batch selection & `PreFlightShield.tsx` validation banner.
-- [ ] **Day 7:** Build In-Browser PDF preview & Direct Email Dispatch modal.
-
----
-**Status:** 100% Complete & Aligned with Rayvice Dark UI Design System. Ready for developer implementation.
