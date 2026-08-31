@@ -78,8 +78,7 @@ function DashboardContent() {
         <Card className="p-8">
           <h1 className="text-xl font-bold tracking-tight text-[#F1F5F4]">Welcome, {user?.firstName}.</h1>
           <p className="mt-2 text-sm leading-relaxed text-[#9AA9A5]">
-            The authentication and organization foundation is live. Dashboard widgets, CRM, and the rest of the
-            platform will land here in later modules.
+            Your NDIS Sole-Trader Billing & Compliance OS foundation is active. Participant management, Voice Shift Logging, and Automated Invoicing modules are ready to be built.
           </p>
         </Card>
       </main>

@@ -1,63 +1,46 @@
-# Rayvice Frontend — Module 1: Authentication, Organization & Tenant Foundation
+# Rayvice Frontend — NDIS Sole-Trader Billing & Compliance OS
 
-Next.js (App Router, TypeScript) frontend for the auth module only, wired to
-match `src/auth/auth.routes.ts` on the backend exactly.
+**Next.js 14+ (App Router, TypeScript) • Rayvice Dark UI Design System**
 
-## What's included
+The mobile-first web frontend for Rayvice, engineered for independent Australian NDIS Sole Traders (Support Workers, Independent Carers, and Allied Health Providers).
 
-- Login, Register (business + owner signup), Forgot Password, Reset Password,
-  Verify Email pages
-- A minimal protected `/dashboard` placeholder proving login → session →
-  protected route works end-to-end (real dashboard widgets are a later module)
-- Centralized API client (`lib/api-client.ts`) with automatic access-token
-  refresh on 401
-- Auth state via React Context (`lib/auth-context.tsx`)
-- Design system colors/typography from FRONTEND-02 wired into Tailwind
+---
 
-## Setup
+## 1. What's Included
+
+- **Module 1 (Auth & Onboarding):** Login, Register (Business/Sole Trader + Owner signup), Forgot Password, Reset Password, Verify Email pages, Google OAuth 2.0 1-Tap Sign-In.
+- **Design System:** Custom Dark Theme (`#080B0D` background, `#131B1C` cards, `#16A085` emerald brand accents, Inter typography).
+- **API Client (`lib/api-client.ts`):** Centralized HTTP client connected to Express API with auto access-token refresh on 401.
+- **Auth Context (`lib/auth-context.tsx`):** Reactive user session & JWT state management.
+
+---
+
+## 2. Upcoming NDIS Modules
+
+- **Dashboard (`/dashboard`):** Weekly billings progress, uninvoiced shifts counter, participant budget health watch.
+- **Participants (`/clients`):** 9-digit NDIS validation, Plan Management badges, agency billing email routes.
+- **Shift Logger (`/shifts`):** 15-second voice/1-tap logging, live auto-split rate engine preview.
+- **Invoicing (`/invoices`):** Auto-Rejection Shield pre-flight validator, in-browser PDF viewer, direct email dispatch.
+- **Settings (`/settings`):** ABN, BSB & Bank details, Stripe Australian subscription management ($24 AUD/mo).
+
+---
+
+## 3. Setup & Local Development
 
 ```bash
 npm install
 cp .env.local.example .env.local
-# edit .env.local — set NEXT_PUBLIC_API_URL to your Render backend's /api URL
+# Edit .env.local — set NEXT_PUBLIC_API_URL to http://localhost:5000/api (local) or your Render backend URL
 npm run dev
 ```
 
-Open http://localhost:3000 — it redirects to `/login`.
+Open [http://localhost:3000](http://localhost:3000) — redirects to `/login`.
 
-## Deploying to Vercel
+---
 
-1. Push this to GitHub.
-2. Import the repo in Vercel.
-3. Add environment variable `NEXT_PUBLIC_API_URL` (Vercel dashboard →
-   Settings → Environment Variables) pointing at your Render backend, e.g.
-   `https://rayvice-backend.onrender.com/api`.
-4. Deploy.
+## 4. Deploying to Vercel
 
-## Before this works end-to-end, confirm on the backend
+1. Push changes to GitHub.
+2. Ensure environment variable `NEXT_PUBLIC_API_URL` is set in Vercel dashboard to your Render backend API URL (e.g. `https://rayvice-backend.onrender.com/api`).
+3. Ensure backend `CORS_ORIGIN` contains your Vercel domain.
 
-- `CORS_ORIGIN` (Render env var) matches your Vercel URL exactly.
-- The refresh-token cookie (`src/utils/cookies.ts`) is set with
-  `SameSite=None; Secure` — required because Vercel and Render are different
-  domains. Without this, login works but the session won't survive a page
-  refresh.
-- `/api/auth/*` paths match what's in `lib/auth-service.ts` — if your Express
-  app mounts auth routes somewhere other than `/api/auth`, update
-  `NEXT_PUBLIC_API_URL` or the paths accordingly.
-
-## Testing this module manually
-
-1. `/register` — create a business + owner account → should land on
-   `/dashboard` immediately (3-day trial auto-activates).
-2. Refresh the dashboard page — you should stay logged in (tests the
-   refresh-token cookie flow).
-3. Click "Log out" → redirected to `/login`.
-4. Log back in with the same credentials at `/login`.
-5. `/forgot-password` → check email for reset link → `/reset-password?token=...`
-6. Check email for verification link → `/verify-email?token=...`
-
-## Next module
-
-Do not add business/CRM/dashboard features to these files. Start a new
-module in its own folder under `app/` and reuse `lib/api-client.ts`,
-`lib/auth-context.tsx`, and the `components/ui/*` primitives as-is.

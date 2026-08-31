@@ -67,7 +67,7 @@ export default function RegisterPage() {
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           <Input
             label="Business name"
-            placeholder="Acme Home Services"
+            placeholder="e.g. Liam Support Services"
             error={errors.businessName?.message}
             {...register('businessName')}
           />
@@ -75,13 +75,13 @@ export default function RegisterPage() {
           <div className="grid grid-cols-2 gap-4">
             <Input
               label="Business phone"
-              placeholder="Optional"
+              placeholder="e.g. 0412 345 678"
               error={errors.businessPhone?.message}
               {...register('businessPhone')}
             />
             <Input
-              label="Industry"
-              placeholder="Optional"
+              label="Industry / Role"
+              placeholder="e.g. NDIS Support Worker"
               error={errors.industry?.message}
               {...register('industry')}
             />
