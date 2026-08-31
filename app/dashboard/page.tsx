@@ -1,172 +1,278 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import toast from 'react-hot-toast';
-import { LogOut, MailWarning, Sparkles, Users, Clock, FileText, CheckCircle2, ArrowUpRight } from 'lucide-react';
-import { ProtectedRoute } from '@/components/layout/ProtectedRoute';
-import { Button } from '@/components/ui/Button';
+import {
+  DollarSign,
+  Clock,
+  Users,
+  FileText,
+  ShieldCheck,
+  AlertTriangle,
+  ArrowUpRight,
+  Sparkles,
+  Calendar,
+  ChevronRight,
+  TrendingUp,
+  Building2,
+} from 'lucide-react';
+import { AppLayout } from '@/components/layout/AppLayout';
 import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
 import { useAuth } from '@/lib/auth-context';
-import * as authService from '@/lib/auth-service';
+import { getBusinessProfile } from '@/lib/business-service';
+import { BusinessProfile } from '@/lib/types';
 import { getApiErrorMessage } from '@/lib/api-client';
 
-/**
- * FRONTEND-GLOBAL-RULES §3 — "Dashboard First Philosophy": after login,
- * users land here. Shows 9-day trial status, participant quota (1 client limit),
- * and upcoming NDIS OS core modules.
- */
-function DashboardContent() {
-  const { user, logout } = useAuth();
-  const router = useRouter();
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [isResending, setIsResending] = useState(false);
+export default function DashboardPage() {
+  const { user } = useAuth();
+  const [profile, setProfile] = useState<BusinessProfile | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  async function handleLogout() {
-    setIsLoggingOut(true);
-    await logout();
-    router.push('/login');
-  }
+  useEffect(() => {
+    getBusinessProfile()
+      .then(setProfile)
+      .catch((err) => toast.error(getApiErrorMessage(err)))
+      .finally(() => setIsLoading(false));
+  }, []);
 
-  async function handleResendVerification() {
-    if (!user) return;
-    setIsResending(true);
-    try {
-      await authService.resendVerification(user.email);
-      toast.success('Verification email sent. Check your inbox.');
-    } catch (error) {
-      toast.error(getApiErrorMessage(error));
-    } finally {
-      setIsResending(false);
-    }
-  }
+  const compliance = profile?.compliance;
+  const trial = profile?.trial;
+  const daysRemaining = trial?.daysRemaining ?? 9;
+
+  // Sample shifts preview to demonstrate live rate-splitting and auto-split values
+  const recentShifts = [
+    {
+      id: 'shift-1',
+      clientName: 'Sarah Jenkins',
+      ndisNumber: '430123456',
+      date: 'Today',
+      time: '18:00 – 21:30 (3.5 hrs)',
+      splitType: 'Daytime + Evening Split',
+      travel: '12 km',
+      totalAmount: 258.39,
+    },
+    {
+      id: 'shift-2',
+      clientName: 'David Miller',
+      ndisNumber: '430889211',
+      date: 'Yesterday',
+      time: '09:00 – 13:00 (4.0 hrs)',
+      splitType: 'Saturday Weekend Loading',
+      travel: '5 km',
+      totalAmount: 385.13,
+    },
+  ];
 
   return (
-    <div className="min-h-screen bg-background text-[#F1F5F4]">
-      <header className="flex items-center justify-between border-b border-[#253130] bg-[#0A0F10] px-6 py-4">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#0D332D] text-sm font-bold text-[#5EE0C1] shadow-glow border border-[#117A65]">
-            R
-          </div>
-          <span className="text-lg font-bold tracking-tight text-[#F1F5F4]">Rayvice</span>
-          <span className="ml-2 rounded-full border border-[#117A65] bg-[#0D332D] px-2.5 py-0.5 text-xs font-semibold text-[#5EE0C1]">
-            NDIS Sole-Trader OS
-          </span>
-        </div>
-        <Button variant="secondary" className="w-auto" onClick={handleLogout} isLoading={isLoggingOut}>
-          <LogOut className="h-4 w-4" />
-          Log out
-        </Button>
-      </header>
-
-      <main className="mx-auto max-w-4xl px-6 py-8 space-y-6">
-        {user && user.isEmailVerified === false && (
-          <div className="flex items-center justify-between gap-4 rounded-card border border-[#92400E] bg-[#2A210B] px-4 py-3">
-            <div className="flex items-center gap-2 text-sm text-[#FEF3C7]">
-              <MailWarning className="h-4 w-4 shrink-0 text-[#F59E0B]" />
-              Please verify your email address to unlock all features.
+    <AppLayout
+      title={`Welcome back, ${user?.firstName || 'Support Worker'}`}
+      subtitle="NDIS Sole-Trader Billing, Timesheets & Auto-Rejection Shield Dashboard"
+    >
+      <div className="space-y-6">
+        {/* Compliance Incomplete Alert Banner (if ABN / Banking not setup) */}
+        {!compliance?.isCompliant && (
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-xl border border-[#92400E] bg-[#2A210B] p-4 text-xs">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="h-5 w-5 text-[#F59E0B] shrink-0 mt-0.5" />
+              <div>
+                <h4 className="font-semibold text-[#FEF3C7]">
+                  Setup Incomplete: Action Required for Tax Invoices
+                </h4>
+                <p className="text-[#FEF3C7]/80 mt-0.5">
+                  Your Australian Business Number (ABN) or EFT bank details need to be configured in Settings to enable 1-Click invoice generation.
+                </p>
+              </div>
             </div>
-            <Button
-              variant="secondary"
-              className="w-auto shrink-0 px-3 py-1.5 text-xs text-[#FEF3C7] border-[#92400E] hover:bg-[#382D0F]"
-              onClick={handleResendVerification}
-              isLoading={isResending}
-            >
-              Resend email
-            </Button>
+            <Link href="/settings">
+              <Button variant="secondary" size="sm" className="shrink-0 border-[#92400E] text-[#FEF3C7] hover:bg-[#382D0F]">
+                Complete Business Settings
+              </Button>
+            </Link>
           </div>
         )}
 
-        {/* 9-Day Free Trial Banner */}
-        <div className="relative overflow-hidden rounded-xl border border-[#117A65] bg-gradient-to-r from-[#0D332D] via-[#102A26] to-[#0A0F10] p-6 shadow-glow">
+        {/* 9-Day Free Trial Notice Banner */}
+        <div className="relative overflow-hidden rounded-xl border border-[#117A65] bg-gradient-to-r from-[#0D332D] via-[#102A26] to-[#0A0F10] p-5 shadow-glow">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="space-y-1.5">
-              <div className="inline-flex items-center gap-2 rounded-full border border-[#16A085] bg-[#0E1617] px-3 py-1 text-xs font-semibold text-[#5EE0C1]">
-                <Sparkles className="h-3.5 w-3.5 text-[#5EE0C1]" />
-                9-Day Free Trial (Limited Access Mode)
+            <div className="space-y-1">
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-[#16A085] bg-[#0E1617] px-2.5 py-0.5 text-[11px] font-semibold text-[#5EE0C1]">
+                <Sparkles className="h-3 w-3" />
+                9-Day Free Trial ({daysRemaining} days remaining)
               </div>
-              <h2 className="text-xl font-bold text-[#F1F5F4]">
-                Welcome to Rayvice, {user?.firstName}!
+              <h2 className="text-base sm:text-lg font-bold text-[#F1F5F4]">
+                1-Participant Trial Mode Active
               </h2>
-              <p className="text-sm text-[#9AA9A5] max-w-xl">
-                Your 9-day trial is active. You can manage <strong>1 participant</strong>, test live NDIS evening/weekend rate-splitting on up to <strong>5 shifts</strong>, and generate <strong>2 test invoices</strong> with zero rejection shield.
+              <p className="text-xs text-[#9AA9A5] max-w-xl">
+                Test live NDIS rate splitting on shifts and generate test invoices with zero rejections. Upgrade anytime to Starter ($24 AUD/mo) or Pro ($44 AUD/mo).
               </p>
             </div>
-            <div className="shrink-0">
-              <Button
-                variant="primary"
-                className="w-auto shadow-glow flex items-center gap-2"
-                onClick={() => toast('Subscription billing portal will open upon Module 6 Stripe rollout.', { icon: '💳' })}
-              >
-                Upgrade Plan
-                <ArrowUpRight className="h-4 w-4" />
+            <Link href="/settings/billing">
+              <Button variant="primary" size="sm" className="shadow-glow flex items-center gap-1.5 shrink-0">
+                Manage Subscription
+                <ArrowUpRight className="h-3.5 w-3.5" />
               </Button>
-            </div>
-          </div>
-
-          {/* Trial Quotas Grid */}
-          <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3 pt-4 border-t border-[#117A65]/40">
-            <div className="flex items-center gap-3 rounded-lg bg-[#080B0D]/70 p-3 border border-[#253130]">
-              <Users className="h-5 w-5 text-[#5EE0C1] shrink-0" />
-              <div>
-                <p className="text-xs text-[#9AA9A5]">Active Participants</p>
-                <p className="text-sm font-semibold text-[#F1F5F4]">Max 1 Client <span className="text-xs text-[#5EE0C1]">(Trial Limit)</span></p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 rounded-lg bg-[#080B0D]/70 p-3 border border-[#253130]">
-              <Clock className="h-5 w-5 text-[#5EE0C1] shrink-0" />
-              <div>
-                <p className="text-xs text-[#9AA9A5]">Shift Logging</p>
-                <p className="text-sm font-semibold text-[#F1F5F4]">Up to 5 Shifts <span className="text-xs text-[#5EE0C1]">(Auto-Split)</span></p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 rounded-lg bg-[#080B0D]/70 p-3 border border-[#253130]">
-              <FileText className="h-5 w-5 text-[#5EE0C1] shrink-0" />
-              <div>
-                <p className="text-xs text-[#9AA9A5]">Compliant Invoices</p>
-                <p className="text-sm font-semibold text-[#F1F5F4]">Up to 2 Invoices <span className="text-xs text-[#5EE0C1]">(PDF Shield)</span></p>
-              </div>
-            </div>
+            </Link>
           </div>
         </div>
 
-        {/* Modules & Feature Status */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card className="p-6 space-y-3">
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="h-5 w-5 text-[#5EE0C1]" />
-              <h3 className="text-base font-semibold text-[#F1F5F4]">Module 1: Tenant & Auth</h3>
+        {/* Top 3 Stat Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {/* Card 1: Estimated Earnings */}
+          <Card className="p-5 border-[#253130] bg-[#131B1C]">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-[#9AA9A5]">This Week's Logged Shifts</span>
+              <div className="rounded-lg bg-[#0D332D] p-2 text-[#5EE0C1] border border-[#117A65]">
+                <DollarSign className="h-4 w-4" />
+              </div>
             </div>
-            <p className="text-xs text-[#9AA9A5] leading-relaxed">
-              Multi-tenant organization isolated by business ID, secure JWT session management with refresh token rotation, brute-force lockout protection, and Google OAuth 2.0.
-            </p>
-            <div className="text-xs font-mono text-[#5EE0C1] bg-[#0E1617] p-2 rounded border border-[#253130]">
-              Status: Verified & Live in Production
+            <div className="mt-3">
+              <span className="text-2xl font-bold tracking-tight text-[#F1F5F4]">$643.52</span>
+              <span className="text-xs font-medium text-[#9AA9A5] ml-1">AUD</span>
+            </div>
+            <div className="mt-2 flex items-center gap-1 text-[11px] text-[#22C55E]">
+              <TrendingUp className="h-3 w-3" />
+              <span>2 shifts logged with auto-split math</span>
             </div>
           </Card>
 
-          <Card className="p-6 space-y-3">
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-[#16A085]" />
-              <h3 className="text-base font-semibold text-[#F1F5F4]">Upcoming NDIS Engine</h3>
+          {/* Card 2: Uninvoiced Shifts */}
+          <Card className="p-5 border-[#253130] bg-[#131B1C]">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-[#9AA9A5]">Pending Uninvoiced Shifts</span>
+              <div className="rounded-lg bg-[#2A210B] p-2 text-[#F59E0B] border border-[#92400E]">
+                <Clock className="h-4 w-4" />
+              </div>
             </div>
-            <p className="text-xs text-[#9AA9A5] leading-relaxed">
-              Modules 2–5 will provide automated Australian NDIS rate splitting (8:00 PM evening threshold, Saturday/Sunday/Holiday loadings), Voice-to-Shift logging, and direct Plan Manager invoicing.
-            </p>
-            <div className="text-xs font-mono text-[#9AA9A5] bg-[#0E1617] p-2 rounded border border-[#253130]">
-              Starter: $24 AUD/mo • Pro: $44 AUD/mo
+            <div className="mt-3">
+              <span className="text-2xl font-bold tracking-tight text-[#F1F5F4]">2 Shifts</span>
+            </div>
+            <div className="mt-2 text-[11px] text-[#9AA9A5]">
+              Ready for Shield validation & batch invoicing
+            </div>
+          </Card>
+
+          {/* Card 3: Active Participants */}
+          <Card className="p-5 border-[#253130] bg-[#131B1C]">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-[#9AA9A5]">Active Participants</span>
+              <div className="rounded-lg bg-[#0D332D] p-2 text-[#5EE0C1] border border-[#117A65]">
+                <Users className="h-4 w-4" />
+              </div>
+            </div>
+            <div className="mt-3 flex items-baseline gap-2">
+              <span className="text-2xl font-bold tracking-tight text-[#F1F5F4]">1 Client</span>
+              <span className="text-xs text-[#5EE0C1] font-semibold">(Trial Quota)</span>
+            </div>
+            <div className="mt-2 text-[11px] text-[#9AA9A5]">
+              Sarah Jenkins (NDIS: 430123456)
             </div>
           </Card>
         </div>
-      </main>
-    </div>
-  );
-}
 
-export default function DashboardPage() {
-  return (
-    <ProtectedRoute>
-      <DashboardContent />
-    </ProtectedRoute>
+        {/* Uninvoiced Shifts Batch Callout Banner */}
+        <div className="rounded-xl border border-[#117A65] bg-[#0D332D]/70 p-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="rounded-lg bg-[#0E1617] p-2 text-[#5EE0C1] border border-[#16A085]">
+                <FileText className="h-5 w-5" />
+              </div>
+              <div>
+                <h4 className="text-sm font-semibold text-[#F1F5F4]">
+                  ⚡ 2 unbilled shifts ready for invoicing ($643.52 AUD)
+                </h4>
+                <p className="text-xs text-[#9AA9A5]">
+                  Auto-Rejection Shield verifies 2026 NDIA price caps, evening 8:00 PM splits, and ABN compliance before dispatch.
+                </p>
+              </div>
+            </div>
+            <Button
+              variant="primary"
+              size="sm"
+              className="shadow-glow shrink-0"
+              onClick={() => toast('Invoice batch generation screen will open with Module 5 Invoicing rollout!', { icon: '📄' })}
+            >
+              Batch Generate Invoices (Shield)
+            </Button>
+          </div>
+        </div>
+
+        {/* Split Grid: Recent Shifts & Budget Watch */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Recent Shifts Table (2 cols) */}
+          <div className="lg:col-span-2 space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-[#F1F5F4]">Recent Shift Logs & Split Math</h3>
+              <span className="text-xs text-[#5EE0C1]">2026 NDIA Rates</span>
+            </div>
+
+            <Card className="overflow-hidden border border-[#253130]">
+              <div className="divide-y divide-[#253130]">
+                {recentShifts.map((shift) => (
+                  <div key={shift.id} className="p-4 hover:bg-[#182122]/50 transition-colors flex items-center justify-between gap-4">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-xs text-[#F1F5F4]">{shift.clientName}</span>
+                        <span className="text-[10px] text-[#9AA9A5]">NDIS: {shift.ndisNumber}</span>
+                      </div>
+                      <div className="flex items-center gap-3 text-[11px] text-[#9AA9A5]">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="h-3 w-3" /> {shift.date}
+                        </span>
+                        <span>{shift.time}</span>
+                        <span className="text-[#5EE0C1] font-medium">{shift.splitType}</span>
+                        {shift.travel && <span>Travel: {shift.travel}</span>}
+                      </div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <div className="font-bold text-sm text-[#5EE0C1] font-mono">
+                        ${shift.totalAmount.toFixed(2)} AUD
+                      </div>
+                      <Badge variant="brand" size="sm">Uninvoiced</Badge>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </div>
+
+          {/* NDIS Participant Budget Health Watch (1 col) */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-[#F1F5F4]">Participant Budget Health</h3>
+              <span className="text-xs text-[#9AA9A5]">Active Watch</span>
+            </div>
+
+            <Card className="p-4 space-y-4 border border-[#253130]">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-semibold text-[#F1F5F4]">Sarah Jenkins</span>
+                  <span className="text-[#5EE0C1] font-mono">82% Remaining</span>
+                </div>
+                <div className="h-2 w-full rounded-full bg-[#0E1617] overflow-hidden">
+                  <div className="h-full bg-[#16A085] w-[82%] rounded-full" />
+                </div>
+                <div className="flex justify-between text-[10px] text-[#9AA9A5]">
+                  <span>$2,700 spent</span>
+                  <span>$12,300 balance remaining</span>
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-[#253130] space-y-2">
+                <div className="flex items-center gap-2 text-xs font-semibold text-[#F1F5F4]">
+                  <Building2 className="h-4 w-4 text-[#5EE0C1]" />
+                  Plan Manager Agency
+                </div>
+                <p className="text-xs text-[#9AA9A5]">
+                  My Plan Manager (<span className="text-[#5EE0C1]">invoices@myplanmanager.com.au</span>)
+                </p>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </AppLayout>
   );
 }

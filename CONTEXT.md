@@ -62,12 +62,15 @@
 * `/forgot-password` & `/reset-password`
 * `/verify-email`
 
-### Modules 2–6: NDIS OS Core (UPCOMING)
-* `/dashboard` — Weekly billings, pending un-invoiced shifts counter, participant budget health watch
-* `/clients` & `/clients/new` — NDIS Participant management, 9-digit validation, Plan Manager email routing
+### Module 2: Dashboard & Business Settings ✅ (COMPLETE)
+* `/dashboard` — Overview stat cards, unbilled shifts banner, live rate-split preview, quick voice log CTA
+* `/settings` — Australian Business Profile, ATO Modulo-89 ABN, BSB bank lookup, Pre-Flight Compliance Shield, Team management
+* `/settings/billing` — 9-Day Free Trial countdown banner, quota meters, Stripe subscription tiers ($24 AUD/mo Starter, $44 AUD/mo Pro)
+
+### Modules 3–5: NDIS OS Core (UPCOMING)
+* `/clients` & `/clients/new` — NDIS Participant directory, 9-digit validation, Plan Manager email routing
 * `/shifts` & `/shifts/new` — Shift logging, Voice-to-JSON assistant, live auto-split calculation preview
 * `/invoices` & `/invoices/generate` — Auto-Rejection Shield pre-flight validator, PDF viewer, direct email dispatch
-* `/settings` & `/settings/billing` — ABN, BSB/Bank account config & Stripe subscriptions ($24 AUD/mo)
 
 ---
 

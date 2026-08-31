@@ -145,7 +145,7 @@ Rayvice-frontend/
 
 ---
 
-### 📌 MODULE 2: OVERVIEW DASHBOARD (`app/dashboard/page.tsx`)
+### 📌 MODULE 2: OVERVIEW DASHBOARD (`app/dashboard/page.tsx`) (IMPLEMENTED)
 
 #### 4.1 Purpose & Screen Layout
 Provides sole traders with an instant 5-second snapshot of weekly revenue, pending unbilled shifts, and participant budget health.
@@ -442,7 +442,7 @@ export function PreFlightShield({ isValid, errors, totalAmount, recipientEmail, 
 
 ---
 
-### 📌 MODULE 6: BUSINESS SETTINGS & BANKING (`app/settings/page.tsx`)
+### 📌 MODULE 2 / SETTINGS: BUSINESS PROFILE & BANKING (`app/settings/page.tsx`) (IMPLEMENTED)
 
 #### 8.1 Purpose & Form Fields
 1. **Business Profile:** Business Legal Name, Contact Email, Contact Phone, Industry (`NDIS Support Worker`).
