@@ -10,9 +10,12 @@ import { Loader2 } from 'lucide-react';
  * Disabled: Bg #182122, Text #3F4C49
  */
 type Variant = 'primary' | 'secondary' | 'danger' | 'ghost';
+type Size = 'sm' | 'md' | 'lg';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
+  size?: Size;
+  fullWidth?: boolean;
   isLoading?: boolean;
 }
 
@@ -27,13 +30,21 @@ const variantClasses: Record<Variant, string> = {
     'bg-transparent text-[#9AA9A5] hover:text-[#F1F5F4] hover:bg-[#131B1C] disabled:text-[#3F4C49]',
 };
 
+const sizeClasses: Record<Size, string> = {
+  sm: 'px-3 py-1.5 text-xs',
+  md: 'px-4 py-2.5 text-sm',
+  lg: 'px-5 py-3 text-base',
+};
+
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ variant = 'primary', isLoading = false, disabled, className = '', children, ...props }, ref) => {
+  ({ variant = 'primary', size = 'md', fullWidth = false, isLoading = false, disabled, className = '', children, ...props }, ref) => {
     return (
       <button
         ref={ref}
         disabled={disabled || isLoading}
-        className={`flex w-full items-center justify-center gap-2 rounded-btn px-4 py-2.5 text-sm font-semibold transition-all duration-150 active:scale-[0.99] disabled:cursor-not-allowed disabled:shadow-none ${variantClasses[variant]} ${className}`}
+        className={`flex items-center justify-center gap-2 rounded-btn font-semibold transition-all duration-150 active:scale-[0.99] disabled:cursor-not-allowed disabled:shadow-none ${
+          fullWidth ? 'w-full' : ''
+        } ${sizeClasses[size]} ${variantClasses[variant]} ${className}`}
         {...props}
       >
         {isLoading && <Loader2 className="h-4 w-4 animate-spin text-current" />}

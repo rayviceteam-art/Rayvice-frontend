@@ -8,20 +8,22 @@ import { InputHTMLAttributes, forwardRef } from 'react';
  * message, focus state, disabled state.
  */
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
-  label: string;
+  label?: string;
   error?: string;
   helperText?: string;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ label, error, helperText, id, className = '', ...props }, ref) => {
-    const inputId = id ?? label.toLowerCase().replace(/\s+/g, '-');
+    const inputId = id ?? (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined);
 
     return (
       <div className="flex flex-col gap-1.5">
-        <label htmlFor={inputId} className="text-sm font-medium text-[#F1F5F4]">
-          {label}
-        </label>
+        {label && (
+          <label htmlFor={inputId} className="text-xs font-medium text-[#9AA9A5]">
+            {label}
+          </label>
+        )}
         <input
           ref={ref}
           id={inputId}

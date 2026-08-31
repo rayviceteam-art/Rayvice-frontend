@@ -148,7 +148,7 @@ export default function RegisterPage() {
             </button>
           </div>
 
-          <Button type="submit" isLoading={isSubmitting} className="mt-2">
+          <Button type="submit" fullWidth isLoading={isSubmitting} className="mt-2">
             Create account
           </Button>
         </form>

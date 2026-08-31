@@ -91,7 +91,7 @@ export default function LoginPage() {
             </Link>
           </div>
 
-          <Button type="submit" isLoading={isSubmitting}>
+          <Button type="submit" fullWidth isLoading={isSubmitting}>
             Log in
           </Button>
         </form>

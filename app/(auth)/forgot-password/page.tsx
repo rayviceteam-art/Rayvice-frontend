@@ -60,7 +60,7 @@ export default function ForgotPasswordPage() {
               {...register('email')}
             />
             {submitError && <p className="text-sm font-medium text-[#EF4444]">{submitError}</p>}
-            <Button type="submit" isLoading={isSubmitting}>
+            <Button type="submit" fullWidth isLoading={isSubmitting}>
               Send reset link
             </Button>
           </form>

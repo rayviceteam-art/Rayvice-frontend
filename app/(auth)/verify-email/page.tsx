@@ -48,7 +48,7 @@ function VerifyEmailContent() {
             <CheckCircle2 className="h-10 w-10 text-[#22C55E]" />
             <p className="text-sm text-[#F1F5F4]">Your email has been verified.</p>
             <Link href="/login" className="w-full">
-              <Button className="mt-2">Continue to login</Button>
+              <Button fullWidth className="mt-2">Continue to login</Button>
             </Link>
           </>
         )}
