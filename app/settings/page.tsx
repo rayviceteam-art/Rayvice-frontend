@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 import {
   Building2,
@@ -14,6 +15,7 @@ import {
   Save,
   UserPlus,
   RefreshCw,
+  ArrowRight,
 } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/Button';
@@ -27,8 +29,9 @@ import * as businessService from '@/lib/business-service';
 import { BusinessProfile, TeamMember, ComplianceReport } from '@/lib/types';
 import { validateAbnClient, AUSTRALIAN_STATES, InviteTeamMemberFormValues } from '@/lib/validators';
 
-export default function SettingsPage() {
+function SettingsContent() {
   const { user } = useAuth();
+  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<'profile' | 'banking' | 'team'>('profile');
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -58,6 +61,44 @@ export default function SettingsPage() {
   const [inviteLastName, setInviteLastName] = useState('');
   const [inviteRole, setInviteRole] = useState<'OFFICE_MANAGER' | 'TECHNICIAN'>('OFFICE_MANAGER');
   const [isInviting, setIsInviting] = useState(false);
+
+  // 1-Click Quick Fill & Jump Helper
+  function jumpToField(tab: 'profile' | 'banking', fieldId: string) {
+    setActiveTab(tab);
+    setTimeout(() => {
+      const el = document.getElementById(fieldId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.focus();
+        el.classList.add('ring-2', 'ring-[#16A085]', 'ring-offset-2', 'ring-offset-[#080B0D]');
+        setTimeout(() => {
+          el.classList.remove('ring-2', 'ring-[#16A085]', 'ring-offset-2', 'ring-offset-[#080B0D]');
+        }, 2500);
+      }
+    }, 150);
+  }
+
+  // Handle URL Query Params for direct deep-linking
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    const focusParam = searchParams.get('focus');
+    if (tabParam === 'banking' || tabParam === 'profile' || tabParam === 'team') {
+      setActiveTab(tabParam);
+    }
+    if (focusParam) {
+      setTimeout(() => {
+        const el = document.getElementById(focusParam);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          el.focus();
+          el.classList.add('ring-2', 'ring-[#16A085]', 'ring-offset-2', 'ring-offset-[#080B0D]');
+          setTimeout(() => {
+            el.classList.remove('ring-2', 'ring-[#16A085]', 'ring-offset-2', 'ring-offset-[#080B0D]');
+          }, 2500);
+        }
+      }, 300);
+    }
+  }, [searchParams]);
 
   // Load Business Profile
   useEffect(() => {
@@ -275,58 +316,162 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          {/* Compliance Checklist Items */}
-          <div className="mt-5 grid grid-cols-2 sm:grid-cols-5 gap-2.5 pt-4 border-t border-[#253130]">
-            <div className="flex items-center gap-2 text-xs">
-              {compliance?.checklist.abn ? (
-                <CheckCircle2 className="h-4 w-4 text-[#22C55E] shrink-0" />
-              ) : (
-                <XCircle className="h-4 w-4 text-[#EF4444] shrink-0" />
-              )}
-              <span className={compliance?.checklist.abn ? 'text-[#F1F5F4]' : 'text-[#9AA9A5]'}>
-                11-Digit ABN
+          {/* Interactive Compliance Checklist Items with Direct Quick Fill */}
+          <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5 pt-4 border-t border-[#253130]">
+            {/* 1. ABN */}
+            <button
+              type="button"
+              onClick={() => jumpToField('profile', 'abn-input')}
+              className={`flex items-center justify-between gap-2 rounded-xl p-2.5 border transition-all text-left group ${
+                compliance?.checklist.abn
+                  ? 'border-[#166534]/50 bg-[#0B2B1B]/40 hover:border-[#22C55E]'
+                  : 'border-[#EF4444]/40 bg-[#2A1212]/60 hover:border-[#EF4444] shadow-sm hover:scale-[1.01]'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                {compliance?.checklist.abn ? (
+                  <CheckCircle2 className="h-4 w-4 text-[#22C55E] shrink-0" />
+                ) : (
+                  <XCircle className="h-4 w-4 text-[#EF4444] shrink-0" />
+                )}
+                <div>
+                  <span className={`text-xs font-semibold block ${compliance?.checklist.abn ? 'text-[#F1F5F4]' : 'text-[#FCA5A5]'}`}>
+                    11-Digit ABN
+                  </span>
+                </div>
+              </div>
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full transition-colors shrink-0 ${
+                compliance?.checklist.abn
+                  ? 'bg-[#166534]/40 text-[#5EE0C1] group-hover:bg-[#166534]'
+                  : 'bg-[#EF4444] text-white animate-pulse group-hover:bg-[#DC2626]'
+              }`}>
+                {compliance?.checklist.abn ? 'Edit' : '+ Fill Now'}
               </span>
-            </div>
-            <div className="flex items-center gap-2 text-xs">
-              {compliance?.checklist.bankDetails ? (
-                <CheckCircle2 className="h-4 w-4 text-[#22C55E] shrink-0" />
-              ) : (
-                <XCircle className="h-4 w-4 text-[#EF4444] shrink-0" />
-              )}
-              <span className={compliance?.checklist.bankDetails ? 'text-[#F1F5F4]' : 'text-[#9AA9A5]'}>
-                BSB & Account
+            </button>
+
+            {/* 2. BSB & Bank */}
+            <button
+              type="button"
+              onClick={() => jumpToField('banking', 'bsb-input')}
+              className={`flex items-center justify-between gap-2 rounded-xl p-2.5 border transition-all text-left group ${
+                compliance?.checklist.bankDetails
+                  ? 'border-[#166534]/50 bg-[#0B2B1B]/40 hover:border-[#22C55E]'
+                  : 'border-[#EF4444]/40 bg-[#2A1212]/60 hover:border-[#EF4444] shadow-sm hover:scale-[1.01]'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                {compliance?.checklist.bankDetails ? (
+                  <CheckCircle2 className="h-4 w-4 text-[#22C55E] shrink-0" />
+                ) : (
+                  <XCircle className="h-4 w-4 text-[#EF4444] shrink-0" />
+                )}
+                <div>
+                  <span className={`text-xs font-semibold block ${compliance?.checklist.bankDetails ? 'text-[#F1F5F4]' : 'text-[#FCA5A5]'}`}>
+                    BSB & Account
+                  </span>
+                </div>
+              </div>
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full transition-colors shrink-0 ${
+                compliance?.checklist.bankDetails
+                  ? 'bg-[#166534]/40 text-[#5EE0C1] group-hover:bg-[#166534]'
+                  : 'bg-[#EF4444] text-white animate-pulse group-hover:bg-[#DC2626]'
+              }`}>
+                {compliance?.checklist.bankDetails ? 'Edit' : '+ Fill Now'}
               </span>
-            </div>
-            <div className="flex items-center gap-2 text-xs">
-              {compliance?.checklist.businessAddress ? (
-                <CheckCircle2 className="h-4 w-4 text-[#22C55E] shrink-0" />
-              ) : (
-                <XCircle className="h-4 w-4 text-[#EF4444] shrink-0" />
-              )}
-              <span className={compliance?.checklist.businessAddress ? 'text-[#F1F5F4]' : 'text-[#9AA9A5]'}>
-                Physical Address
+            </button>
+
+            {/* 3. Physical Address */}
+            <button
+              type="button"
+              onClick={() => jumpToField('profile', 'address-input')}
+              className={`flex items-center justify-between gap-2 rounded-xl p-2.5 border transition-all text-left group ${
+                compliance?.checklist.businessAddress
+                  ? 'border-[#166534]/50 bg-[#0B2B1B]/40 hover:border-[#22C55E]'
+                  : 'border-[#EF4444]/40 bg-[#2A1212]/60 hover:border-[#EF4444] shadow-sm hover:scale-[1.01]'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                {compliance?.checklist.businessAddress ? (
+                  <CheckCircle2 className="h-4 w-4 text-[#22C55E] shrink-0" />
+                ) : (
+                  <XCircle className="h-4 w-4 text-[#EF4444] shrink-0" />
+                )}
+                <div>
+                  <span className={`text-xs font-semibold block ${compliance?.checklist.businessAddress ? 'text-[#F1F5F4]' : 'text-[#FCA5A5]'}`}>
+                    Physical Address
+                  </span>
+                </div>
+              </div>
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full transition-colors shrink-0 ${
+                compliance?.checklist.businessAddress
+                  ? 'bg-[#166534]/40 text-[#5EE0C1] group-hover:bg-[#166534]'
+                  : 'bg-[#EF4444] text-white animate-pulse group-hover:bg-[#DC2626]'
+              }`}>
+                {compliance?.checklist.businessAddress ? 'Edit' : '+ Fill Now'}
               </span>
-            </div>
-            <div className="flex items-center gap-2 text-xs">
-              {compliance?.checklist.contactInfo ? (
-                <CheckCircle2 className="h-4 w-4 text-[#22C55E] shrink-0" />
-              ) : (
-                <XCircle className="h-4 w-4 text-[#EF4444] shrink-0" />
-              )}
-              <span className={compliance?.checklist.contactInfo ? 'text-[#F1F5F4]' : 'text-[#9AA9A5]'}>
-                Contact Details
+            </button>
+
+            {/* 4. Contact Details */}
+            <button
+              type="button"
+              onClick={() => jumpToField('profile', 'phone-input')}
+              className={`flex items-center justify-between gap-2 rounded-xl p-2.5 border transition-all text-left group ${
+                compliance?.checklist.contactInfo
+                  ? 'border-[#166534]/50 bg-[#0B2B1B]/40 hover:border-[#22C55E]'
+                  : 'border-[#EF4444]/40 bg-[#2A1212]/60 hover:border-[#EF4444] shadow-sm hover:scale-[1.01]'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                {compliance?.checklist.contactInfo ? (
+                  <CheckCircle2 className="h-4 w-4 text-[#22C55E] shrink-0" />
+                ) : (
+                  <XCircle className="h-4 w-4 text-[#EF4444] shrink-0" />
+                )}
+                <div>
+                  <span className={`text-xs font-semibold block ${compliance?.checklist.contactInfo ? 'text-[#F1F5F4]' : 'text-[#FCA5A5]'}`}>
+                    Contact Details
+                  </span>
+                </div>
+              </div>
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full transition-colors shrink-0 ${
+                compliance?.checklist.contactInfo
+                  ? 'bg-[#166534]/40 text-[#5EE0C1] group-hover:bg-[#166534]'
+                  : 'bg-[#EF4444] text-white animate-pulse group-hover:bg-[#DC2626]'
+              }`}>
+                {compliance?.checklist.contactInfo ? 'Edit' : '+ Fill Now'}
               </span>
-            </div>
-            <div className="flex items-center gap-2 text-xs">
-              {compliance?.checklist.invoicePrefix ? (
-                <CheckCircle2 className="h-4 w-4 text-[#22C55E] shrink-0" />
-              ) : (
-                <XCircle className="h-4 w-4 text-[#EF4444] shrink-0" />
-              )}
-              <span className={compliance?.checklist.invoicePrefix ? 'text-[#F1F5F4]' : 'text-[#9AA9A5]'}>
-                Invoice Prefix
+            </button>
+
+            {/* 5. Invoice Prefix */}
+            <button
+              type="button"
+              onClick={() => jumpToField('profile', 'invoice-prefix-input')}
+              className={`flex items-center justify-between gap-2 rounded-xl p-2.5 border transition-all text-left group ${
+                compliance?.checklist.invoicePrefix
+                  ? 'border-[#166534]/50 bg-[#0B2B1B]/40 hover:border-[#22C55E]'
+                  : 'border-[#EF4444]/40 bg-[#2A1212]/60 hover:border-[#EF4444] shadow-sm hover:scale-[1.01]'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                {compliance?.checklist.invoicePrefix ? (
+                  <CheckCircle2 className="h-4 w-4 text-[#22C55E] shrink-0" />
+                ) : (
+                  <XCircle className="h-4 w-4 text-[#EF4444] shrink-0" />
+                )}
+                <div>
+                  <span className={`text-xs font-semibold block ${compliance?.checklist.invoicePrefix ? 'text-[#F1F5F4]' : 'text-[#FCA5A5]'}`}>
+                    Invoice Prefix
+                  </span>
+                </div>
+              </div>
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full transition-colors shrink-0 ${
+                compliance?.checklist.invoicePrefix
+                  ? 'bg-[#166534]/40 text-[#5EE0C1] group-hover:bg-[#166534]'
+                  : 'bg-[#EF4444] text-white animate-pulse group-hover:bg-[#DC2626]'
+              }`}>
+                {compliance?.checklist.invoicePrefix ? 'Edit' : '+ Fill Now'}
               </span>
-            </div>
+            </button>
           </div>
         </div>
 
@@ -380,6 +525,7 @@ export default function SettingsPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
+                  id="name-input"
                   label="Business Legal / Trading Name *"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -387,6 +533,7 @@ export default function SettingsPage() {
                   required
                 />
                 <Input
+                  id="phone-input"
                   label="Contact Phone Number *"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
@@ -427,6 +574,7 @@ export default function SettingsPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <Input
+                    id="abn-input"
                     label="Australian Business Number (ABN) *"
                     value={abn}
                     onChange={(e) => setAbn(e.target.value)}
@@ -449,6 +597,7 @@ export default function SettingsPage() {
                 </div>
 
                 <Input
+                  id="invoice-prefix-input"
                   label="Sequential Invoice Prefix"
                   value={invoicePrefix}
                   onChange={(e) => setInvoicePrefix(e.target.value.toUpperCase())}
@@ -487,6 +636,7 @@ export default function SettingsPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="md:col-span-2">
                   <Input
+                    id="address-input"
                     label="Street Address *"
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
@@ -494,6 +644,7 @@ export default function SettingsPage() {
                   />
                 </div>
                 <Input
+                  id="suburb-input"
                   label="Suburb / City *"
                   value={suburb}
                   onChange={(e) => setSuburb(e.target.value)}
@@ -515,6 +666,7 @@ export default function SettingsPage() {
                     </select>
                   </div>
                   <Input
+                    id="postcode-input"
                     label="Postcode *"
                     value={postcode}
                     onChange={(e) => setPostcode(e.target.value)}
@@ -548,6 +700,7 @@ export default function SettingsPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <Input
+                    id="bsb-input"
                     label="Bank State Branch (BSB) Code *"
                     value={bsb}
                     onChange={(e) => setBsb(e.target.value)}
@@ -564,6 +717,7 @@ export default function SettingsPage() {
                 </div>
 
                 <Input
+                  id="account-number-input"
                   label="Bank Account Number *"
                   value={accountNumber}
                   onChange={(e) => setAccountNumber(e.target.value)}
@@ -573,6 +727,7 @@ export default function SettingsPage() {
                 />
 
                 <Input
+                  id="account-name-input"
                   label="Account Holder Name *"
                   value={accountName}
                   onChange={(e) => setAccountName(e.target.value)}
@@ -735,5 +890,21 @@ export default function SettingsPage() {
         </form>
       </Modal>
     </AppLayout>
+  );
+}
+
+export default function SettingsPage() {
+  return (
+    <Suspense
+      fallback={
+        <AppLayout title="Business Settings & Compliance" subtitle="Loading organization profile...">
+          <div className="flex h-64 items-center justify-center">
+            <RefreshCw className="h-6 w-6 animate-spin text-[#5EE0C1]" />
+          </div>
+        </AppLayout>
+      }
+    >
+      <SettingsContent />
+    </Suspense>
   );
 }

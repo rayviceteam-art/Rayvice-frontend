@@ -72,25 +72,53 @@ export default function DashboardPage() {
       subtitle="NDIS Sole-Trader Billing, Timesheets & Auto-Rejection Shield Dashboard"
     >
       <div className="space-y-6">
-        {/* Compliance Incomplete Alert Banner (if ABN / Banking not setup) */}
+        {/* Compliance Incomplete Alert Banner with Direct 1-Click Quick Fill */}
         {!compliance?.isCompliant && (
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-xl border border-[#92400E] bg-[#2A210B] p-4 text-xs">
-            <div className="flex items-start gap-3">
-              <AlertTriangle className="h-5 w-5 text-[#F59E0B] shrink-0 mt-0.5" />
-              <div>
-                <h4 className="font-semibold text-[#FEF3C7]">
-                  Setup Incomplete: Action Required for Tax Invoices
-                </h4>
-                <p className="text-[#FEF3C7]/80 mt-0.5">
-                  Your Australian Business Number (ABN) or EFT bank details need to be configured in Settings to enable 1-Click invoice generation.
-                </p>
+          <div className="rounded-xl border border-[#92400E] bg-[#2A210B] p-4 text-xs space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="h-5 w-5 text-[#F59E0B] shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="font-semibold text-[#FEF3C7]">
+                    Setup Incomplete: Action Required for Tax Invoices
+                  </h4>
+                  <p className="text-[#FEF3C7]/80 mt-0.5">
+                    Configure your missing details below to unlock rejection-free 1-Click invoice generation.
+                  </p>
+                </div>
               </div>
+              <Link href="/settings">
+                <Button variant="secondary" size="sm" className="shrink-0 border-[#92400E] text-[#FEF3C7] hover:bg-[#382D0F]">
+                  View All Settings
+                </Button>
+              </Link>
             </div>
-            <Link href="/settings">
-              <Button variant="secondary" size="sm" className="shrink-0 border-[#92400E] text-[#FEF3C7] hover:bg-[#382D0F]">
-                Complete Business Settings
-              </Button>
-            </Link>
+
+            {/* Quick Fill Action Buttons */}
+            <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-[#92400E]/40">
+              <span className="text-[11px] font-medium text-[#FEF3C7]/70">Missing Items (Click to Fill):</span>
+              {!compliance?.checklist.abn && (
+                <Link href="/settings?tab=profile&focus=abn-input">
+                  <span className="inline-flex items-center gap-1 rounded-lg bg-[#EF4444]/20 border border-[#EF4444]/50 px-2.5 py-1 text-xs font-semibold text-[#FCA5A5] hover:bg-[#EF4444]/30 hover:border-[#EF4444] transition-all cursor-pointer">
+                    + Fill 11-Digit ABN
+                  </span>
+                </Link>
+              )}
+              {!compliance?.checklist.bankDetails && (
+                <Link href="/settings?tab=banking&focus=bsb-input">
+                  <span className="inline-flex items-center gap-1 rounded-lg bg-[#EF4444]/20 border border-[#EF4444]/50 px-2.5 py-1 text-xs font-semibold text-[#FCA5A5] hover:bg-[#EF4444]/30 hover:border-[#EF4444] transition-all cursor-pointer">
+                    + Fill BSB & Bank Account
+                  </span>
+                </Link>
+              )}
+              {!compliance?.checklist.businessAddress && (
+                <Link href="/settings?tab=profile&focus=address-input">
+                  <span className="inline-flex items-center gap-1 rounded-lg bg-[#EF4444]/20 border border-[#EF4444]/50 px-2.5 py-1 text-xs font-semibold text-[#FCA5A5] hover:bg-[#EF4444]/30 hover:border-[#EF4444] transition-all cursor-pointer">
+                    + Fill Physical Address
+                  </span>
+                </Link>
+              )}
+            </div>
           </div>
         )}
 
