@@ -5,12 +5,32 @@
 
 export type UserRole = 'OWNER' | 'OFFICE_MANAGER' | 'TECHNICIAN';
 
+export interface TrialLimits {
+  MAX_CLIENTS: number;
+  MAX_SHIFTS: number;
+  MAX_INVOICES: number;
+  MAX_VOICE_TRANSCRIPTIONS: number;
+  DURATION_HOURS: number;
+}
+
+export interface TrialDetails {
+  status: string;
+  effectiveStatus: string;
+  trialEndsAt: string;
+  daysRemaining: number;
+  isExpired: boolean;
+  limits: TrialLimits;
+}
+
 export interface Business {
   id: string;
   name: string;
   phone?: string | null;
   industry?: string | null;
+  status?: string;
+  effectiveStatus?: string;
   trialEndsAt?: string | null;
+  trial?: TrialDetails | null;
   subscriptionStatus?: string | null;
 }
 

@@ -136,7 +136,7 @@ Rayvice-frontend/
 #### 3.1 Purpose & Flow
 - Fast, low-friction registration tailored to Australian sole traders.
 - Directly supports **1-Tap Google Sign-Up** (`GoogleButton.tsx`) and standard Email/Password.
-- Registration creates the tenant, generates a 3-day full access trial, and redirects immediately to `/dashboard`.
+- Registration creates the tenant, activates the **9-day free trial** (216 hours, limited to 1 participant, 5 shifts, 2 invoices), and redirects immediately to `/dashboard`.
 
 #### 3.2 Key Views
 1. **`/login`:** Email + Password with password visibility toggle + Google Sign-In.
@@ -453,9 +453,31 @@ export function PreFlightShield({ isValid, errors, totalAmount, recipientEmail, 
    - **Bank Name:** (e.g. `Commonwealth Bank of Australia`)
    - **Custom Invoice Prefix:** (e.g. `INV`, `LSW`)
    - **GST Registration Toggle:** (Default: `false`)
-3. **Subscription Portal (`/settings/billing`):**
-   - Plan Tier: **Starter ($24 AUD/mo)** or **Professional ($44 AUD/mo)**.
-   - Powered by Stripe Customer Portal for managing payment methods and tax invoices.
+
+#### 8.2 Subscription Portal & 9-Day Free Trial UI (`app/settings/billing/page.tsx`)
+1. **Trial Countdown Banner:**
+   - Visual card with `#0D332D` background and `#5EE0C1` badge:
+   - *"🎁 9-Day Free Trial Active (X days remaining). Limited to 1 Participant, 5 Shifts, 2 Invoices."*
+   - Real-time progress bar showing: `1/1 Participants Used`, `X/5 Shifts Logged`, `X/2 Invoices Generated`.
+2. **Subscription Pricing Tiers (Side-by-Side Cards):**
+   - **⚡ Starter Plan ($24 AUD / mo):**
+     - Target: Part-time Sole Traders.
+     - Up to 5 Active Participants.
+     - Unlimited Shift Logging (Manual).
+     - Up to 20 Invoices / month with Auto-Rejection Shield.
+     - Direct Plan Manager Email Delivery.
+     - Button: `[ Subscribe with Stripe - $24 AUD/mo ]`
+   - **🚀 Pro Plan ($44 AUD / mo - Recommended):**
+     - Target: Full-time Support Workers & Carers.
+     - Unlimited Participants & Clients.
+     - Unlimited Shifts & Unlimited Invoices.
+     - 🎙️ **Unlimited Voice-to-Shift AI Logging**.
+     - Plan Manager Payment Reminders & PRODA CSV Claims Export.
+     - Button: `[ Upgrade to Pro - $44 AUD/mo ]`
+3. **Feature-Limit Modal (`components/billing/UpgradeModal.tsx`):**
+   - When a trial user attempts to add a 2nd participant or 6th shift, displays a dark backdrop modal:
+   - *"Free trial limit reached: 1 Participant maximum during test. Upgrade to Starter or Pro to continue growing your business."*
+   - 1-Click redirect to Stripe Checkout session.
 
 ---
 

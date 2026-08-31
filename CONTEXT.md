@@ -58,7 +58,7 @@
 
 ### Module 1: Auth & Onboarding ✅ (COMPLETE)
 * `/login` — Email/password + 1-Tap Google Sign-In
-* `/register` — Business registration + Google Sign-Up (Starts 14-day trial)
+* `/register` — Business registration + Google Sign-Up (Starts 9-day trial, 1 participant limit)
 * `/forgot-password` & `/reset-password`
 * `/verify-email`
 

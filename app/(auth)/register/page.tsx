@@ -18,8 +18,8 @@ import { registerSchema, type RegisterFormValues } from '@/lib/validators';
 
 /**
  * FRONTEND-03 §11 — Free Trial Flow:
- * Sign Up -> Business Registration -> 3-Day Free Trial Activated -> Dashboard Access.
- * The backend activates the trial automatically on registration, so a
+ * Sign Up -> Business Registration -> 9-Day Free Trial Activated -> Dashboard Access.
+ * The backend activates the 9-day trial automatically on registration, so a
  * successful submit here logs the owner straight into their new business.
  */
 export default function RegisterPage() {
@@ -40,7 +40,7 @@ export default function RegisterPage() {
     try {
       const { confirmPassword, ...payload } = values;
       await registerBusiness(payload);
-      toast.success('Business registered. Your 3-day free trial has started.');
+      toast.success('Business registered. Your 9-day free trial has started.');
       router.push('/dashboard');
     } catch (error) {
       toast.error(getApiErrorMessage(error, 'Could not create your account.'));
@@ -50,7 +50,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <AuthLayout title="Start your free trial" subtitle="3 days, full access, no credit card required.">
+    <AuthLayout title="Start your free trial" subtitle="9 days, 1 participant, live auto-split test, no credit card required.">
       <Card className="p-8">
         {/* 1st Priority: Direct Google Sign-up */}
         <div className="mb-5">
