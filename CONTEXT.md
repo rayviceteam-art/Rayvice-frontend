@@ -80,3 +80,4 @@
 NEXT_PUBLIC_API_URL="https://rayvice-backend.onrender.com/api"
 NEXT_PUBLIC_GOOGLE_CLIENT_ID="1059143178866-opnovptf4l8tfe8cefeln6lvf29mdedv.apps.googleusercontent.com"
 ```
+
