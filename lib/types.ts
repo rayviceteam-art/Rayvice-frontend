@@ -3,7 +3,7 @@
  * Mirrors the backend schema & API responses (src/auth, src/business, compliance).
  */
 
-export type UserRole = 'OWNER' | 'OFFICE_MANAGER' | 'TECHNICIAN';
+export type UserRole = 'OWNER' | 'OFFICE_MANAGER' | 'TECHNICIAN' | 'SUPER_ADMIN';
 export type UserStatus = 'INVITED' | 'ACTIVE' | 'SUSPENDED';
 export type BusinessStatus = 'TRIALING' | 'ACTIVE' | 'READ_ONLY' | 'SUSPENDED';
 
@@ -143,3 +143,118 @@ export interface ApiErrorEnvelope {
   code?: string;
   errors?: Record<string, string[]>;
 }
+
+export interface PaginationMeta {
+  page: number;
+  pageSize: number;
+  totalRecords: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}
+
+export interface AdminMetrics {
+  overview: {
+    totalBusinesses: number;
+    totalUsers: number;
+    totalInvoices: number;
+    totalShifts: number;
+    totalRevenueVolume: number;
+    recentRegistrations7Days: number;
+  };
+  tenantsByStatus: {
+    trialing: number;
+    active: number;
+    readOnly: number;
+    suspended: number;
+  };
+  serverHealth: {
+    status: string;
+    timestamp: string;
+    nodeEnv: string;
+  };
+}
+
+export interface AdminBusinessItem {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string | null;
+  industry?: string | null;
+  abn?: string | null;
+  bsb?: string | null;
+  accountNumber?: string | null;
+  bankName?: string | null;
+  invoicePrefix: string;
+  isGstRegistered: boolean;
+  address?: string | null;
+  suburb?: string | null;
+  state?: string | null;
+  postcode?: string | null;
+  status: BusinessStatus;
+  trialStartedAt: string;
+  trialEndsAt: string;
+  hasUsedTrial: boolean;
+  trialDaysRemaining: number;
+  isTrialExpired: boolean;
+  createdAt: string;
+  updatedAt: string;
+  counts: {
+    users: number;
+    clients: number;
+    shifts: number;
+    invoices: number;
+  };
+}
+
+export interface AdminUserItem {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: UserRole;
+  status: UserStatus;
+  emailVerifiedAt?: string | null;
+  lastLoginAt?: string | null;
+  createdAt: string;
+  business?: {
+    id: string;
+    name: string;
+    status: BusinessStatus;
+  } | null;
+}
+
+export interface AdminAuditLogItem {
+  id: string;
+  action: string;
+  ipAddress?: string | null;
+  userAgent?: string | null;
+  metadata?: any;
+  createdAt: string;
+  business?: {
+    id: string;
+    name: string;
+  } | null;
+  user?: {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+  } | null;
+}
+
+export interface AdminBusinessListResponse {
+  records: AdminBusinessItem[];
+  pagination: PaginationMeta;
+}
+
+export interface AdminUserListResponse {
+  records: AdminUserItem[];
+  pagination: PaginationMeta;
+}
+
+export interface AdminAuditLogListResponse {
+  records: AdminAuditLogItem[];
+  pagination: PaginationMeta;
+}
+

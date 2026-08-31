@@ -71,6 +71,16 @@ export function Sidebar({ onCloseMobile }: SidebarProps) {
 
         {/* Navigation Menu */}
         <nav className="space-y-1">
+          {user?.role === 'SUPER_ADMIN' && (
+            <Link
+              href="/admin"
+              onClick={onCloseMobile}
+              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-bold bg-[#2E1065] text-[#C084FC] border border-[#7E22CE] mb-2 hover:bg-[#7E22CE] hover:text-[#F1F5F4] transition-all"
+            >
+              <Building2 className="h-4 w-4 shrink-0 text-[#C084FC]" />
+              <span>Super Admin Panel</span>
+            </Link>
+          )}
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
