@@ -39,7 +39,6 @@ export default function BillingPage() {
 
   function handleSubscribe(planName: string, price: string) {
     toast.success(`Stripe checkout redirect for ${planName} (${price}) will activate with Module 6 payments rollout!`, {
-      icon: '💳',
       duration: 4000,
     });
   }
@@ -123,15 +122,17 @@ export default function BillingPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {/* Starter Plan */}
-            <Card className="p-8 border-[#253130] bg-[#131B1C] hover:border-[#34413F] transition-all flex flex-col justify-between">
+            <Card className="p-8 border border-[#117A65]/70 bg-gradient-to-b from-[#0D332D]/40 to-[#131B1C] shadow-glow flex flex-col justify-between relative overflow-hidden transition-all hover:border-[#16A085]">
               <div className="space-y-6">
                 <div>
                   <div className="flex items-center justify-between">
-                    <span className="text-lg font-bold text-[#F1F5F4]">⚡ Starter Plan</span>
+                    <span className="text-lg font-bold text-[#F1F5F4] flex items-center gap-2">
+                      <Zap className="h-5 w-5 text-[#5EE0C1]" /> Starter Plan
+                    </span>
                     <Badge variant="default">Part-Time</Badge>
                   </div>
                   <div className="mt-4 flex items-baseline gap-1">
-                    <span className="text-4xl font-extrabold text-[#F1F5F4]">$24</span>
+                    <span className="text-4xl font-extrabold text-[#5EE0C1]">$24</span>
                     <span className="text-sm font-medium text-[#9AA9A5]">AUD / month</span>
                   </div>
                   <p className="text-xs text-[#9AA9A5] mt-2">
@@ -139,7 +140,7 @@ export default function BillingPage() {
                   </p>
                 </div>
 
-                <div className="space-y-3 pt-4 border-t border-[#253130] text-xs">
+                <div className="space-y-3 pt-4 border-t border-[#117A65]/40 text-xs">
                   <div className="flex items-center gap-2.5 text-[#F1F5F4]">
                     <Check className="h-4 w-4 text-[#5EE0C1] shrink-0" />
                     <span><strong>Up to 5 Active Participants</strong></span>
@@ -166,7 +167,7 @@ export default function BillingPage() {
               <div className="mt-8">
                 <Button
                   variant="secondary"
-                  className="w-full"
+                  className="w-full hover:border-[#16A085] hover:bg-[#0D332D]/40"
                   onClick={() => handleSubscribe('Starter Plan', '$24 AUD/mo')}
                 >
                   Subscribe with Stripe — $24 AUD/mo
@@ -175,7 +176,7 @@ export default function BillingPage() {
             </Card>
 
             {/* Pro Plan (Highlighted) */}
-            <Card className="p-8 border-[#117A65] bg-gradient-to-b from-[#0D332D]/40 to-[#131B1C] shadow-glow flex flex-col justify-between relative overflow-hidden">
+            <Card className="p-8 border-[#117A65] bg-gradient-to-b from-[#0D332D]/40 to-[#131B1C] shadow-glow flex flex-col justify-between relative overflow-hidden transition-all hover:border-[#16A085]">
               <div className="absolute top-0 right-0 bg-[#16A085] text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg uppercase tracking-wider">
                 Recommended
               </div>
@@ -184,7 +185,7 @@ export default function BillingPage() {
                 <div>
                   <div className="flex items-center justify-between">
                     <span className="text-lg font-bold text-[#F1F5F4] flex items-center gap-2">
-                      <Crown className="h-5 w-5 text-[#5EE0C1]" /> 🚀 Pro Plan
+                      <Crown className="h-5 w-5 text-[#5EE0C1]" /> Pro Plan
                     </span>
                   </div>
                   <div className="mt-4 flex items-baseline gap-1">
@@ -207,7 +208,7 @@ export default function BillingPage() {
                   </div>
                   <div className="flex items-center gap-2.5 text-[#5EE0C1] font-semibold">
                     <Mic className="h-4 w-4 text-[#5EE0C1] shrink-0" />
-                    <span>🎙️ Unlimited Voice-to-Shift AI Logging</span>
+                    <span>Unlimited Voice-to-Shift AI Logging</span>
                   </div>
                   <div className="flex items-center gap-2.5 text-[#F1F5F4]">
                     <Check className="h-4 w-4 text-[#5EE0C1] shrink-0" />

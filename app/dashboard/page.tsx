@@ -181,7 +181,7 @@ export default function DashboardPage() {
               </div>
               <div>
                 <h4 className="text-sm font-semibold text-[#F1F5F4]">
-                  ⚡ 2 unbilled shifts ready for invoicing ($643.52 AUD)
+                  2 unbilled shifts ready for invoicing ($643.52 AUD)
                 </h4>
                 <p className="text-xs text-[#9AA9A5]">
                   Auto-Rejection Shield verifies 2026 NDIA price caps, evening 8:00 PM splits, and ABN compliance before dispatch.
@@ -192,7 +192,7 @@ export default function DashboardPage() {
               variant="primary"
               size="sm"
               className="shadow-glow shrink-0"
-              onClick={() => toast('Invoice batch generation screen will open with Module 5 Invoicing rollout!', { icon: '📄' })}
+              onClick={() => toast('Invoice batch generation screen will open with Module 5 Invoicing rollout!')}
             >
               Batch Generate Invoices (Shield)
             </Button>

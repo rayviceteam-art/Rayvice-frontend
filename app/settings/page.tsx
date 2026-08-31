@@ -165,7 +165,7 @@ export default function SettingsPage() {
       });
 
       setProfile(updated);
-      toast.success('Business settings & compliance profile updated successfully.', { icon: '✅' });
+      toast.success('Business settings & compliance profile updated successfully.');
     } catch (err) {
       toast.error(getApiErrorMessage(err, 'Failed to save settings.'));
     } finally {

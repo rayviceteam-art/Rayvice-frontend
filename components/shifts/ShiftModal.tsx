@@ -66,10 +66,10 @@ export function ShiftModal({
   function handleVoiceToggle() {
     if (!isRecording) {
       setIsRecording(true);
-      toast.success('Voice intake active: speak shift details...', { icon: '🎙️' });
+      toast.success('Voice intake active: speak shift details...');
       setTimeout(() => {
         setIsRecording(false);
-        toast.success('Speech parsed: "Shift with Sarah today 6pm to 9:30pm, 12km travel"', { icon: '⚡' });
+        toast.success('Speech parsed: "Shift with Sarah today 6pm to 9:30pm, 12km travel"');
       }, 3500);
     } else {
       setIsRecording(false);
@@ -77,9 +77,7 @@ export function ShiftModal({
   }
 
   function handleSave() {
-    toast.success(`Shift logged! $${splitCalculation.grandTotal.toFixed(2)} AUD added to uninvoiced queue.`, {
-      icon: '✅',
-    });
+    toast.success(`Shift logged! $${splitCalculation.grandTotal.toFixed(2)} AUD added to uninvoiced queue.`);
     if (onShiftSaved) onShiftSaved();
     onClose();
   }
