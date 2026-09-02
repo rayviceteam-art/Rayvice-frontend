@@ -103,9 +103,40 @@ apiClient.interceptors.response.use(
 /** Extracts a user-facing message from any API error, never a raw stack trace. */
 export function getApiErrorMessage(error: unknown, fallback = 'Something went wrong. Please try again.'): string {
   if (axios.isAxiosError(error)) {
-    const data = error.response?.data as ApiErrorEnvelope | undefined;
-    if (data?.message) return data.message;
+    const data = error.response?.data as (ApiErrorEnvelope & { details?: any; errors?: any }) | undefined;
+
+    // Extract field-level validation errors if present
+    const fieldErrors = data?.errors || data?.details;
+    if (fieldErrors && typeof fieldErrors === 'object') {
+      const messages: string[] = [];
+      for (const [key, val] of Object.entries(fieldErrors)) {
+        if (Array.isArray(val) && val.length > 0) {
+          const cleanKey = key.replace(/^(body|query|params)\./, '');
+          const label = cleanKey
+            .replace(/([A-Z])/g, ' $1')
+            .replace(/^./, (str) => str.toUpperCase())
+            .trim();
+          messages.push(`${label}: ${val[0]}`);
+        } else if (typeof val === 'string' && val.trim()) {
+          messages.push(val.trim());
+        }
+      }
+      if (messages.length > 0) {
+        return messages.join(' • ');
+      }
+    }
+
+    if (data?.message && data.message !== 'Validation failed.') {
+      return data.message;
+    }
+
+    if (data?.message) {
+      return data.message;
+    }
+
     if (error.code === 'ERR_NETWORK') return 'Unable to reach the server. Check your connection and try again.';
+  } else if (error instanceof Error && error.message) {
+    return error.message;
   }
   return fallback;
 }

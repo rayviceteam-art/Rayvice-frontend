@@ -32,7 +32,7 @@ export function AdminProtectedRoute({ children }: { children: ReactNode }) {
   }
 
   // Super Admin Authorization Gate
-  const isSuperAdmin = user?.role === 'SUPER_ADMIN' || user?.email?.toLowerCase().trim() === 'rayvice.team@gmail.com';
+  const isSuperAdmin = user?.role === 'SUPER_ADMIN' || user?.email?.toLowerCase().trim() === 'rayviceofficial@gmail.com';
 
   if (!isSuperAdmin) {
     return (

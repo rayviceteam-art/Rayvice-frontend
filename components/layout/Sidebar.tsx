@@ -71,7 +71,7 @@ export function Sidebar({ onCloseMobile }: SidebarProps) {
 
         {/* Navigation Menu */}
         <nav className="space-y-1">
-          {(user?.role === 'SUPER_ADMIN' || user?.email?.toLowerCase().trim() === 'rayvice.team@gmail.com') && (
+          {(user?.role === 'SUPER_ADMIN' || user?.email?.toLowerCase().trim() === 'rayviceofficial@gmail.com') && (
             <Link
               href="/admin"
               onClick={onCloseMobile}
