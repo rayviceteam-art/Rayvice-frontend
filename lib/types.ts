@@ -10,7 +10,6 @@ export type BusinessStatus = 'TRIALING' | 'ACTIVE' | 'READ_ONLY' | 'SUSPENDED';
 export const KNOWN_SUPER_ADMIN_EMAILS = [
   'rayviceofficial@gmail.com',
   'mdsartajalamcrypto@gmail.com',
-  'mdsartajalam@gmail.com',
   'rayvice.team@gmail.com',
 ];
 
