@@ -4,6 +4,7 @@ import { ReactNode, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ShieldAlert, ArrowLeft, LogOut, Loader2 } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
+import { isSuperAdminUser } from '@/lib/types';
 import Link from 'next/link';
 
 export function AdminProtectedRoute({ children }: { children: ReactNode }) {
@@ -32,7 +33,7 @@ export function AdminProtectedRoute({ children }: { children: ReactNode }) {
   }
 
   // Super Admin Authorization Gate
-  const isSuperAdmin = user?.role === 'SUPER_ADMIN' || user?.email?.toLowerCase().trim() === 'rayviceofficial@gmail.com';
+  const isSuperAdmin = isSuperAdminUser(user);
 
   if (!isSuperAdmin) {
     return (

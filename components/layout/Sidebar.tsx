@@ -15,6 +15,7 @@ import {
   Building2,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
+import { isSuperAdminUser } from '@/lib/types';
 
 interface SidebarProps {
   onCloseMobile?: () => void;
@@ -71,7 +72,7 @@ export function Sidebar({ onCloseMobile }: SidebarProps) {
 
         {/* Navigation Menu */}
         <nav className="space-y-1">
-          {(user?.role === 'SUPER_ADMIN' || user?.email?.toLowerCase().trim() === 'rayviceofficial@gmail.com') && (
+          {isSuperAdminUser(user) && (
             <Link
               href="/admin"
               onClick={onCloseMobile}

@@ -30,7 +30,11 @@ export default function BillingPage() {
   useEffect(() => {
     getBusinessProfile()
       .then(setProfile)
-      .catch((err) => toast.error(getApiErrorMessage(err)))
+      .catch((err: any) => {
+        if (err?.response?.status !== 401) {
+          toast.error(getApiErrorMessage(err));
+        }
+      })
       .finally(() => setIsLoading(false));
   }, []);
 

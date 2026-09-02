@@ -23,7 +23,7 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { useAuth } from '@/lib/auth-context';
 import { getBusinessProfile } from '@/lib/business-service';
-import { BusinessProfile } from '@/lib/types';
+import { BusinessProfile, isSuperAdminUser } from '@/lib/types';
 import { getApiErrorMessage } from '@/lib/api-client';
 
 export default function DashboardPage() {
@@ -34,7 +34,11 @@ export default function DashboardPage() {
   useEffect(() => {
     getBusinessProfile()
       .then(setProfile)
-      .catch((err) => toast.error(getApiErrorMessage(err)))
+      .catch((err: any) => {
+        if (err?.response?.status !== 401) {
+          toast.error(getApiErrorMessage(err));
+        }
+      })
       .finally(() => setIsLoading(false));
   }, []);
 
@@ -66,7 +70,7 @@ export default function DashboardPage() {
     },
   ];
 
-  const isSuperAdmin = user?.role === 'SUPER_ADMIN' || user?.email?.toLowerCase().trim() === 'rayviceofficial@gmail.com';
+  const isSuperAdmin = isSuperAdminUser(user);
 
   return (
     <AppLayout

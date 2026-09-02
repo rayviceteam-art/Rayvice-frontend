@@ -5,6 +5,7 @@ import { Menu, Plus, Mic, Sparkles, Building2 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/lib/auth-context';
+import { isSuperAdminUser } from '@/lib/types';
 
 interface HeaderProps {
   onOpenMobileMenu: () => void;
@@ -15,7 +16,7 @@ interface HeaderProps {
 
 export function Header({ onOpenMobileMenu, onOpenShiftModal, title, subtitle }: HeaderProps) {
   const { user } = useAuth();
-  const isSuperAdmin = user?.role === 'SUPER_ADMIN' || user?.email?.toLowerCase().trim() === 'rayviceofficial@gmail.com';
+  const isSuperAdmin = isSuperAdminUser(user);
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-[#253130] bg-[#0A0F10]/95 px-4 sm:px-8 backdrop-blur-md">

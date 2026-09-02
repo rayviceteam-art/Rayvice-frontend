@@ -7,6 +7,21 @@ export type UserRole = 'OWNER' | 'OFFICE_MANAGER' | 'TECHNICIAN' | 'SUPER_ADMIN'
 export type UserStatus = 'INVITED' | 'ACTIVE' | 'SUSPENDED';
 export type BusinessStatus = 'TRIALING' | 'ACTIVE' | 'READ_ONLY' | 'SUSPENDED';
 
+export const KNOWN_SUPER_ADMIN_EMAILS = [
+  'rayviceofficial@gmail.com',
+  'mdsartajalamcrypto@gmail.com',
+  'mdsartajalam@gmail.com',
+  'rayvice.team@gmail.com',
+];
+
+export function isSuperAdminUser(user?: { role?: string; email?: string } | null): boolean {
+  if (!user) return false;
+  if (user.role === 'SUPER_ADMIN') return true;
+  const email = user.email?.toLowerCase().trim();
+  if (!email) return false;
+  return KNOWN_SUPER_ADMIN_EMAILS.includes(email);
+}
+
 export interface TrialLimits {
   MAX_CLIENTS: number;
   MAX_SHIFTS: number;

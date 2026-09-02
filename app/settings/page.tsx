@@ -121,8 +121,10 @@ function SettingsContent() {
         setSuburb(data.suburb || '');
         setState(data.state || 'NSW');
         setPostcode(data.postcode || '');
-      } catch (err) {
-        toast.error(getApiErrorMessage(err, 'Failed to load business profile.'));
+      } catch (err: any) {
+        if (err?.response?.status !== 401) {
+          toast.error(getApiErrorMessage(err, 'Failed to load business profile.'));
+        }
       } finally {
         setIsLoading(false);
       }
