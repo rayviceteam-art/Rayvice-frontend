@@ -101,7 +101,7 @@ export default function AdminBusinessesPage() {
   async function handleStatusChange(businessId: string, status: BusinessStatus) {
     try {
       setIsSubmitting(true);
-      const updated = await updateBusinessStatus(businessId, status, 'Super Admin state change');
+      const updated = await updateBusinessStatus(businessId, status, 'Admin state change');
       toast.success(`Status updated to ${status} for ${updated.name}`);
       loadBusinesses(pagination.page);
     } catch (err: any) {

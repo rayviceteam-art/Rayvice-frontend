@@ -23,7 +23,7 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { useAuth } from '@/lib/auth-context';
 import { getBusinessProfile } from '@/lib/business-service';
-import { BusinessProfile, isSuperAdminUser } from '@/lib/types';
+import { BusinessProfile } from '@/lib/types';
 import { getApiErrorMessage } from '@/lib/api-client';
 
 export default function DashboardPage() {
@@ -70,40 +70,12 @@ export default function DashboardPage() {
     },
   ];
 
-  const isSuperAdmin = isSuperAdminUser(user);
-
   return (
     <AppLayout
       title={`Welcome back, ${user?.firstName || 'Support Worker'}`}
       subtitle="NDIS Sole-Trader Billing, Timesheets & Auto-Rejection Shield Dashboard"
     >
       <div className="space-y-6">
-        {/* Super Admin Master Access Banner */}
-        {isSuperAdmin && (
-          <div className="relative overflow-hidden rounded-xl border border-[#7E22CE] bg-gradient-to-r from-[#2E1065] via-[#1E0B38] to-[#0A0F10] p-4 shadow-xl">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <div className="rounded-lg bg-[#3B0764] p-2.5 text-[#C084FC] border border-[#7E22CE]">
-                  <Building2 className="h-5 w-5" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-sm text-[#F1F5F4]">Super Admin Master Clearance Active</span>
-                    <span className="rounded bg-[#7E22CE] px-2 py-0.5 text-[10px] font-bold text-[#F1F5F4]">Platform Super Admin</span>
-                  </div>
-                  <p className="text-xs text-[#C084FC]/80 mt-0.5">
-                    Logged in as <span className="font-medium text-[#F1F5F4]">{user?.email}</span>. You have full platform access to manage all tenants, users, trials, and security audit logs.
-                  </p>
-                </div>
-              </div>
-              <Link href="/admin">
-                <Button size="sm" className="bg-[#7E22CE] hover:bg-[#9333EA] text-[#F1F5F4] border border-[#A855F7] font-semibold shrink-0">
-                  Open Super Admin Panel →
-                </Button>
-              </Link>
-            </div>
-          </div>
-        )}
 
         {/* Compliance Incomplete Alert Banner with Direct 1-Click Quick Fill */}
         {!compliance?.isCompliant && (

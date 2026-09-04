@@ -79,7 +79,7 @@ export default function AdminUsersPage() {
       case 'SUPER_ADMIN':
         return (
           <span className="inline-flex items-center gap-1 rounded-full bg-[#2E1065] px-2.5 py-0.5 text-xs font-bold text-[#C084FC] border border-[#7E22CE]">
-            <ShieldAlert className="h-3 w-3" /> SUPER ADMIN
+            <ShieldAlert className="h-3 w-3" /> ADMIN
           </span>
         );
       case 'OWNER':
