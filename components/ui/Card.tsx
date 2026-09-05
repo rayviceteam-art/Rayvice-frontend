@@ -6,7 +6,7 @@ import { HTMLAttributes } from 'react';
  * Hover: Background #182122, Border #34413F
  * Highlighted: Background #0D332D, Border #117A65
  */
-interface CardProps extends HTMLAttributes<HTMLDivElement> {
+export interface CardProps extends HTMLAttributes<HTMLDivElement> {
   variant?: 'default' | 'elevated' | 'highlighted';
   isInteractive?: boolean;
 }
@@ -26,7 +26,7 @@ export function Card({
 }: CardProps) {
   return (
     <div
-      className={`rounded-card border p-6 text-[#F1F5F4] shadow-card transition-all duration-150 ${
+      className={`rounded-card border text-[#F1F5F4] shadow-card transition-all duration-150 ${
         variantStyles[variant]
       } ${
         isInteractive ? 'cursor-pointer hover:border-[#34413F] hover:bg-[#182122]' : ''
@@ -37,3 +37,12 @@ export function Card({
     </div>
   );
 }
+
+export function CardHeader({ className = '', ...props }: HTMLAttributes<HTMLDivElement>) {
+  return <div className={`border-b border-[#253130] px-5 py-4 ${className}`} {...props} />;
+}
+
+export function CardBody({ className = '', ...props }: HTMLAttributes<HTMLDivElement>) {
+  return <div className={`px-5 py-4 ${className}`} {...props} />;
+}
+

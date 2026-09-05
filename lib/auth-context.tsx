@@ -22,6 +22,7 @@ interface AuthContextValue {
   register: (values: Omit<RegisterFormValues, 'confirmPassword'>) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
+  can: (...roles: string[]) => boolean;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -133,6 +134,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       register,
       logout,
       refreshUser,
+      can: (...roles: string[]) => !!user && roles.includes(user.role),
     }),
     [user, business, isLoading]
   );

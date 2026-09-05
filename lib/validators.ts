@@ -150,3 +150,77 @@ export const inviteTeamMemberFormSchema = z.object({
 });
 
 export type InviteTeamMemberFormValues = z.infer<typeof inviteTeamMemberFormSchema>;
+
+// =======================================================================
+// MODULE 3: NDIS Participants & Plan Managers Form Schemas
+// =======================================================================
+
+export const planManagementTypeSchema = z.enum(['PLAN_MANAGED', 'SELF_MANAGED', 'NDIA_MANAGED']);
+
+export const clientFormSchema = z
+  .object({
+    participantName: z
+      .string()
+      .trim()
+      .min(1, 'Participant name is required.'),
+    ndisNumber: z
+      .string()
+      .regex(/^\d{9}$/, 'NDIS number must be exactly 9 digits.'),
+    dateOfBirth: z.string().optional().or(z.literal('')),
+    planManagementType: planManagementTypeSchema,
+    planManagerAgencyName: z.string().trim().optional().or(z.literal('')),
+    planManagerEmail: z
+      .string()
+      .trim()
+      .email('Enter a valid email address.')
+      .optional()
+      .or(z.literal('')),
+    nomineeBillingEmail: z.string().trim().email('Enter a valid email address.').optional().or(z.literal('')),
+    nomineeBillingPhone: z.string().trim().optional().or(z.literal('')),
+    defaultSupportItemCode: z.string().min(1, 'Select a default support category.'),
+    hourlyRateAgreed: z
+      .number({ invalid_type_error: 'Enter a valid hourly rate.' })
+      .nonnegative('Hourly rate cannot be negative.'),
+    allocatedBudgetTotal: z
+      .number({ invalid_type_error: 'Enter a valid budget amount.' })
+      .nonnegative('Budget cannot be negative.')
+      .nullable()
+      .optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.planManagementType === 'PLAN_MANAGED') {
+      if (!data.planManagerAgencyName) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['planManagerAgencyName'],
+          message: 'Plan Manager agency name and claims email are required for Plan-Managed participants.',
+        });
+      }
+      if (!data.planManagerEmail) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['planManagerEmail'],
+          message: 'Plan Manager agency name and claims email are required for Plan-Managed participants.',
+        });
+      }
+    }
+  });
+
+export type ClientFormValues = z.infer<typeof clientFormSchema>;
+
+export function emptyClientFormValues(defaultHourlyRate: number): ClientFormValues {
+  return {
+    participantName: '',
+    ndisNumber: '',
+    dateOfBirth: '',
+    planManagementType: 'PLAN_MANAGED',
+    planManagerAgencyName: '',
+    planManagerEmail: '',
+    nomineeBillingEmail: '',
+    nomineeBillingPhone: '',
+    defaultSupportItemCode: '',
+    hourlyRateAgreed: defaultHourlyRate,
+    allocatedBudgetTotal: null,
+  };
+}
+

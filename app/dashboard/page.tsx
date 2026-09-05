@@ -156,7 +156,7 @@ export default function DashboardPage() {
           {/* Card 1: Estimated Earnings */}
           <Card className="p-5 border-[#253130] bg-[#131B1C]">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-[#9AA9A5]">This Week's Logged Shifts</span>
+              <span className="text-xs font-medium text-[#9AA9A5]">This Week&apos;s Logged Shifts</span>
               <div className="rounded-lg bg-[#0D332D] p-2 text-[#5EE0C1] border border-[#117A65]">
                 <DollarSign className="h-4 w-4" />
               </div>

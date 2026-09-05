@@ -9,6 +9,7 @@ export interface ModalProps {
   title?: string;
   description?: string;
   children: React.ReactNode;
+  footer?: React.ReactNode;
   maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 }
 
@@ -18,6 +19,7 @@ export const Modal: React.FC<ModalProps> = ({
   title,
   description,
   children,
+  footer,
   maxWidth = 'lg',
 }) => {
   useEffect(() => {
@@ -70,6 +72,7 @@ export const Modal: React.FC<ModalProps> = ({
         </div>
 
         {children}
+        {footer && <div className="mt-5 flex items-center justify-end gap-3 border-t border-[#253130] pt-4">{footer}</div>}
       </div>
     </div>
   );

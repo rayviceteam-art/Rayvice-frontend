@@ -103,7 +103,9 @@ apiClient.interceptors.response.use(
 /** Extracts a user-facing message from any API error, never a raw stack trace. */
 export function getApiErrorMessage(error: unknown, fallback = 'Something went wrong. Please try again.'): string {
   if (axios.isAxiosError(error)) {
-    const data = error.response?.data as (ApiErrorEnvelope & { details?: any; errors?: any }) | undefined;
+    const data = error.response?.data as
+      | (ApiErrorEnvelope & { details?: any; errors?: any; error?: { message?: string } })
+      | undefined;
 
     // Extract field-level validation errors if present
     const fieldErrors = data?.errors || data?.details;
@@ -126,6 +128,10 @@ export function getApiErrorMessage(error: unknown, fallback = 'Something went wr
       }
     }
 
+    if (data?.error?.message) {
+      return data.error.message;
+    }
+
     if (data?.message && data.message !== 'Validation failed.') {
       return data.message;
     }
@@ -140,3 +146,20 @@ export function getApiErrorMessage(error: unknown, fallback = 'Something went wr
   }
   return fallback;
 }
+
+export function getApiFieldErrors(error: unknown): Record<string, string[] | undefined> | undefined {
+  if (axios.isAxiosError(error)) {
+    const data = error.response?.data as any;
+    return data?.error?.fieldErrors || data?.errors || data?.details;
+  }
+  return undefined;
+}
+
+export function getApiErrorCode(error: unknown): string | undefined {
+  if (axios.isAxiosError(error)) {
+    const data = error.response?.data as any;
+    return data?.error?.code || data?.code;
+  }
+  return undefined;
+}
+

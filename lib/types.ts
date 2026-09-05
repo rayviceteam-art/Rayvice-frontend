@@ -272,3 +272,78 @@ export interface AdminAuditLogListResponse {
   pagination: PaginationMeta;
 }
 
+// =======================================================================
+// MODULE 3: NDIS Participants & Plan Managers
+// =======================================================================
+
+export type PlanManagementType = 'PLAN_MANAGED' | 'SELF_MANAGED' | 'NDIA_MANAGED';
+
+export interface ApiErrorBody {
+  error: {
+    code: string;
+    message: string;
+    fieldErrors?: Record<string, string[] | undefined>;
+  };
+}
+
+export interface Client {
+  id: string;
+  businessId: string;
+  participantName: string;
+  ndisNumber: string;
+  dateOfBirth: string | null;
+  planManagementType: PlanManagementType;
+  planManagerAgencyName: string | null;
+  planManagerEmail: string | null;
+  hourlyRateAgreed: number;
+  defaultSupportItemCode: string;
+  allocatedBudgetTotal: number | null;
+  allocatedBudgetSpent: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+}
+
+export interface ClientListItem extends Client {
+  pendingUninvoicedShiftsCount: number;
+}
+
+export interface RecentShift {
+  id: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  hours: number;
+  amount: number;
+  status: string;
+}
+
+export interface ClientDetailResponse extends Client {
+  pendingUninvoicedShiftsCount: number;
+  recentShifts: RecentShift[];
+}
+
+export interface ClientListResponse {
+  data: ClientListItem[];
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+}
+
+export interface CreateClientPayload {
+  participantName: string;
+  ndisNumber: string;
+  dateOfBirth?: string | null;
+  planManagementType: PlanManagementType;
+  planManagerAgencyName?: string | null;
+  planManagerEmail?: string | null;
+  hourlyRateAgreed: number;
+  defaultSupportItemCode: string;
+  allocatedBudgetTotal?: number | null;
+}
+
+export type UpdateClientPayload = Partial<Omit<CreateClientPayload, 'ndisNumber'>>;
+
+
