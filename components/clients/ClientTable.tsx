@@ -17,6 +17,7 @@ interface ClientTableProps {
 
 export function ClientTable({ clients, isLoading, hasFiltersApplied, onAddParticipant }: ClientTableProps) {
   const router = useRouter();
+  const clientList = Array.isArray(clients) ? clients : [];
 
   if (isLoading) {
     return (
@@ -46,7 +47,7 @@ export function ClientTable({ clients, isLoading, hasFiltersApplied, onAddPartic
     );
   }
 
-  if (clients.length === 0) {
+  if (clientList.length === 0) {
     return (
       <div className="flex flex-col items-center gap-3 rounded-card border border-border bg-surface px-6 py-16 text-center">
         {hasFiltersApplied ? (
@@ -80,7 +81,7 @@ export function ClientTable({ clients, isLoading, hasFiltersApplied, onAddPartic
         </tr>
       </Thead>
       <tbody>
-        {clients.map((client) => {
+        {clientList.map((client) => {
           const usedPct =
             client.allocatedBudgetTotal && client.allocatedBudgetTotal > 0
               ? Math.round((client.allocatedBudgetSpent / client.allocatedBudgetTotal) * 100)

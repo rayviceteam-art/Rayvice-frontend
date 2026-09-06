@@ -2,6 +2,7 @@ import { apiClient } from './api-client';
 import {
   Client,
   ClientDetailResponse,
+  ClientListItem,
   ClientListResponse,
   CreateClientPayload,
   PlanManagementType,
@@ -18,25 +19,49 @@ export interface ClientListParams {
 
 const ENDPOINT = '/clients';
 
+// Backend wraps all responses in { success, message, data: T }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Envelope<T = any> = { success: boolean; message: string; data: T };
+
 export const clientsService = {
   async list(params: ClientListParams): Promise<ClientListResponse> {
-    const { data } = await apiClient.get<ClientListResponse>(ENDPOINT, { params });
-    return data;
+    const { data: envelope } = await apiClient.get<Envelope<{ items: ClientListItem[]; pagination: { page: number; pageSize: number; totalRecords: number; totalPages: number } }>>(ENDPOINT, { params });
+    const result = envelope.data;
+    return {
+      data: result?.items ?? [],
+      page: result?.pagination?.page ?? 1,
+      pageSize: result?.pagination?.pageSize ?? 20,
+      totalCount: result?.pagination?.totalRecords ?? 0,
+      totalPages: result?.pagination?.totalPages ?? 1,
+    };
   },
 
   async getById(id: string): Promise<ClientDetailResponse> {
-    const { data } = await apiClient.get<ClientDetailResponse>(`${ENDPOINT}/${id}`);
-    return data;
+    const { data: envelope } = await apiClient.get<Envelope>(`${ENDPOINT}/${id}`);
+    const client = envelope.data;
+    return {
+      ...client,
+      pendingUninvoicedShiftsCount: client.pendingUninvoicedShiftsCount ?? 0,
+      recentShifts: (client.shifts ?? client.recentShifts ?? []).map((s: Record<string, unknown>) => ({
+        id: s.id,
+        date: s.shiftDate ?? s.date,
+        startTime: s.startTime ?? '',
+        endTime: s.endTime ?? '',
+        hours: Number(s.totalHours ?? s.hours ?? 0),
+        amount: Number(s.totalClaim ?? s.amount ?? 0),
+        status: s.status ?? 'PENDING',
+      })),
+    };
   },
 
   async create(payload: CreateClientPayload): Promise<Client> {
-    const { data } = await apiClient.post<Client>(ENDPOINT, payload);
-    return data;
+    const { data: envelope } = await apiClient.post<Envelope<Client>>(ENDPOINT, payload);
+    return envelope.data;
   },
 
   async update(id: string, payload: UpdateClientPayload): Promise<Client> {
-    const { data } = await apiClient.put<Client>(`${ENDPOINT}/${id}`, payload);
-    return data;
+    const { data: envelope } = await apiClient.put<Envelope<Client>>(`${ENDPOINT}/${id}`, payload);
+    return envelope.data;
   },
 
   async deactivate(id: string): Promise<void> {

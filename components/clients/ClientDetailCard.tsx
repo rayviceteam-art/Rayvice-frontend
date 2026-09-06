@@ -86,7 +86,7 @@ export function ClientDetailCard({ client }: { client: ClientDetailResponse }) {
           )}
         </CardHeader>
         <div>
-          {client.recentShifts.length === 0 ? (
+          {(client.recentShifts ?? []).length === 0 ? (
             <p className="px-5 py-6 text-body2 text-text-muted">No shifts logged for this participant yet.</p>
           ) : (
             <div className="px-5 pb-5">
@@ -102,7 +102,7 @@ export function ClientDetailCard({ client }: { client: ClientDetailResponse }) {
                   </tr>
                 </Thead>
                 <tbody>
-                  {client.recentShifts.map((shift) => (
+                  {(client.recentShifts ?? []).map((shift) => (
                     <Tr key={shift.id}>
                       <Td>{formatCalendarDate(shift.date)}</Td>
                       <Td>{shift.startTime}</Td>
