@@ -16,7 +16,7 @@ interface ShiftModalProps {
 export function ShiftModal({
   isOpen,
   onClose,
-  clients = [{ id: 'sample-1', participantName: 'Sarah Jenkins (Sample Client)', ndisNumber: '430123456' }],
+  clients = [],
   onShiftSaved,
 }: ShiftModalProps) {
   const [isRecording, setIsRecording] = useState(false);
@@ -123,11 +123,15 @@ export function ShiftModal({
               onChange={(e) => setSelectedClientId(e.target.value)}
               className="w-full rounded-lg bg-[#0E1617] border border-[#253130] px-3.5 py-2.5 text-sm text-[#F1F5F4] focus:border-[#16A085] focus:outline-none"
             >
-              {clients.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.participantName} (NDIS: {c.ndisNumber})
-                </option>
-              ))}
+              {clients.length === 0 ? (
+                <option value="">No participants registered yet</option>
+              ) : (
+                clients.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.participantName} (NDIS: {c.ndisNumber})
+                  </option>
+                ))
+              )}
             </select>
           </div>
 

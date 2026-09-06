@@ -299,6 +299,7 @@ export interface Client {
   defaultSupportItemCode: string;
   allocatedBudgetTotal: number | null;
   allocatedBudgetSpent: number;
+  budgetUtilizationPercent?: number | null;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
