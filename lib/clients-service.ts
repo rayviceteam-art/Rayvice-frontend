@@ -20,7 +20,6 @@ export interface ClientListParams {
 const ENDPOINT = '/clients';
 
 // Backend wraps all responses in { success, message, data: T }
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Envelope<T = any> = { success: boolean; message: string; data: T };
 
 export const clientsService = {
