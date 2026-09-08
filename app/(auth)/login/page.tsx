@@ -21,6 +21,7 @@ export default function LoginPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
 
   const {
     register,
@@ -30,12 +31,15 @@ export default function LoginPage() {
 
   async function onSubmit(values: LoginFormValues) {
     setIsSubmitting(true);
+    setApiError(null);
     try {
       await login(values);
       toast.success('Welcome back.');
       router.push('/dashboard');
     } catch (error) {
-      toast.error(getApiErrorMessage(error, 'Invalid email or password.'));
+      const message = getApiErrorMessage(error, 'Invalid email or password.');
+      setApiError(message);
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -57,6 +61,13 @@ export default function LoginPage() {
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+          {/* Inline API error banner */}
+          {apiError && (
+            <div className="rounded-md bg-red-500/10 border border-red-500/30 px-4 py-3 text-sm text-red-400" role="alert">
+              {apiError}
+            </div>
+          )}
+
           <Input
             label="Email address"
             type="email"
