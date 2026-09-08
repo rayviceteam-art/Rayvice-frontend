@@ -35,6 +35,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // On first load, check if redirected back with Google OAuth tokens in hash,
   // or silently try to exchange the httpOnly refresh cookie for a fresh access token.
   useEffect(() => {
+    // Guard against rapid /auth/refresh calls (e.g. repeated failed registration
+    // attempts or fast page reloads) triggering 429 rate-limit errors.
+    const REFRESH_COOLDOWN_MS = 10_000;
+    const lastRefreshKey = '_rvLastRefresh';
+
     async function bootstrap() {
       try {
         if (typeof window !== 'undefined' && window.location.hash) {
@@ -71,6 +76,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
         }
 
+        const lastRefresh = Number(sessionStorage.getItem(lastRefreshKey) ?? 0);
+        if (Date.now() - lastRefresh < REFRESH_COOLDOWN_MS) {
+          // Skip refresh this mount — a successful one already happened recently.
+          setIsLoading(false);
+          return;
+        }
+        sessionStorage.setItem(lastRefreshKey, String(Date.now()));
+
         const { accessToken } = await authService.refresh();
         setAccessToken(accessToken);
         const profile = await authService.getMe();
@@ -78,12 +91,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } catch {
         setAccessToken(null);
         setUser(null);
+        // Clear the cooldown on failure so the next page load can retry immediately.
+        sessionStorage.removeItem(lastRefreshKey);
       } finally {
         setIsLoading(false);
       }
     }
     bootstrap();
   }, []);
+
 
   async function login(values: LoginFormValues) {
     const result = await authService.login(values);

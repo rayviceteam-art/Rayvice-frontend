@@ -112,16 +112,36 @@ export function getApiErrorMessage(error: unknown, fallback = 'Something went wr
     if (fieldErrors && typeof fieldErrors === 'object') {
       const messages: string[] = [];
       for (const [key, val] of Object.entries(fieldErrors)) {
-        if (Array.isArray(val) && val.length > 0) {
-          const cleanKey = key.replace(/^(body|query|params)\./, '');
-          const label = cleanKey
-            .replace(/([A-Z])/g, ' $1')
-            .replace(/^./, (str) => str.toUpperCase())
-            .trim();
-          messages.push(`${label}: ${val[0]}`);
-        } else if (typeof val === 'string' && val.trim()) {
-          messages.push(val.trim());
+        // Skip top-level structural keys that are meaningless to users (e.g. "body", "query")
+        const isStructuralKey = /^(body|query|params)$/.test(key);
+        const rawMessage = Array.isArray(val) && val.length > 0 ? String(val[0]) : typeof val === 'string' ? val.trim() : null;
+        if (!rawMessage) continue;
+
+        if (isStructuralKey) {
+          // Rephrase raw Zod structural messages into friendly equivalents
+          const friendly = rawMessage
+            .replace(/String must contain at least (\d+) character\(s\)/, 'Please enter a valid value (at least $1 characters).')
+            .replace(/String must contain at most (\d+) character\(s\)/, 'Value is too long (max $1 characters).')
+            .replace(/Invalid email/, 'Please enter a valid email address.')
+            .replace(/Required/, 'This field is required.');
+          messages.push(friendly);
+          continue;
         }
+
+        const cleanKey = key.replace(/^(body|query|params)\./, '');
+        const label = cleanKey
+          .replace(/([A-Z])/g, ' $1')
+          .replace(/^./, (str) => str.toUpperCase())
+          .trim();
+
+        // Map raw Zod constraint messages to user-friendly equivalents
+        const friendlyVal = rawMessage
+          .replace(/String must contain at least (\d+) character\(s\)/, `Please enter a valid ${label.toLowerCase()} (at least $1 characters).`)
+          .replace(/String must contain at most (\d+) character\(s\)/, `${label} is too long (max $1 characters).`)
+          .replace(/Invalid email/, 'Please enter a valid email address.')
+          .replace(/Required/, `${label} is required.`);
+
+        messages.push(friendlyVal !== rawMessage ? friendlyVal : `${label}: ${rawMessage}`);
       }
       if (messages.length > 0) {
         return messages.join(' • ');

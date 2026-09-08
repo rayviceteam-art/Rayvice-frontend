@@ -31,7 +31,16 @@ export const emailSchema = z.string().trim().toLowerCase().email('A valid email 
 export const registerSchema = z
   .object({
     businessName: z.string().trim().min(2, 'Business name must be at least 2 characters.').max(150),
-    businessPhone: z.string().trim().min(7).max(20).optional().or(z.literal('')),
+    businessPhone: z
+      .union([
+        z.literal(''),
+        z
+          .string()
+          .trim()
+          .min(7, 'Please enter a valid phone number (at least 7 digits).')
+          .max(20, 'Business phone must not exceed 20 characters.'),
+      ])
+      .optional(),
     industry: z.string().trim().max(100).optional().or(z.literal('')),
     firstName: z.string().trim().min(1, 'First name is required.').max(80),
     lastName: z.string().trim().min(1, 'Last name is required.').max(80),
