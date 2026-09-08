@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import * as authService from '@/lib/auth-service';
 import { getApiErrorMessage } from '@/lib/api-client';
+import { isAllowedEmail } from '@/lib/validators';
 
 type Status = 'verifying' | 'success' | 'error';
 
@@ -41,8 +42,8 @@ function VerifyEmailContent() {
 
   async function handleResend(e: React.FormEvent) {
     e.preventDefault();
-    if (!resendEmail || !resendEmail.includes('@')) {
-      toast.error('Please enter a valid email address.');
+    if (!resendEmail || !resendEmail.includes('@') || !isAllowedEmail(resendEmail)) {
+      toast.error('Only email addresses ending in .com, .com.au, .net, or .org are allowed (disposable emails are not permitted).');
       return;
     }
 

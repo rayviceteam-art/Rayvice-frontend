@@ -27,7 +27,7 @@ import { useAuth } from '@/lib/auth-context';
 import { getApiErrorMessage } from '@/lib/api-client';
 import * as businessService from '@/lib/business-service';
 import { BusinessProfile, TeamMember, ComplianceReport } from '@/lib/types';
-import { validateAbnClient, AUSTRALIAN_STATES, InviteTeamMemberFormValues } from '@/lib/validators';
+import { validateAbnClient, AUSTRALIAN_STATES, InviteTeamMemberFormValues, isAllowedEmail } from '@/lib/validators';
 
 function SettingsContent() {
   const { user } = useAuth();
@@ -218,6 +218,10 @@ function SettingsContent() {
 
   async function handleInviteMember(e: React.FormEvent) {
     e.preventDefault();
+    if (!isAllowedEmail(inviteEmail)) {
+      toast.error('Only email addresses ending in .com, .com.au, .net, or .org are allowed (disposable emails are not permitted).');
+      return;
+    }
     try {
       setIsInviting(true);
       const newMember = await businessService.inviteTeamMember({
