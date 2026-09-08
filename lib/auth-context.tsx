@@ -88,9 +88,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setAccessToken(accessToken);
         const profile = await authService.getMe();
         setUser(profile);
+        if ((profile as any)?.business) {
+          setBusiness((profile as any).business);
+        }
       } catch {
         setAccessToken(null);
         setUser(null);
+        setBusiness(null);
         // Clear the cooldown on failure so the next page load can retry immediately.
         sessionStorage.removeItem(lastRefreshKey);
       } finally {
@@ -100,11 +104,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     bootstrap();
   }, []);
 
-
   async function login(values: LoginFormValues) {
     const result = await authService.login(values);
     setAccessToken(result.accessToken);
     setUser(result.user);
+    try {
+      const profile = await authService.getMe();
+      setUser(profile);
+      if ((profile as any)?.business) {
+        setBusiness((profile as any).business);
+      }
+    } catch {
+      // Minimal session fallback
+    }
   }
 
   async function loginWithGoogle(payload: { credential?: string; idToken?: string; accessToken?: string }) {
@@ -137,6 +149,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   async function refreshUser() {
     const profile = await authService.getMe();
     setUser(profile);
+    if ((profile as any)?.business) {
+      setBusiness((profile as any).business);
+    }
   }
 
   const value = useMemo(

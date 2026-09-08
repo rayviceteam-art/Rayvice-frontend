@@ -39,7 +39,12 @@ export default function RegisterPage() {
     setIsSubmitting(true);
     try {
       const { confirmPassword, ...payload } = values;
-      await registerBusiness(payload);
+      const cleanedPayload = {
+        ...payload,
+        businessPhone: payload.businessPhone?.trim() || undefined,
+        industry: payload.industry?.trim() || undefined,
+      };
+      await registerBusiness(cleanedPayload);
       toast.success('Business registered. Your 9-day free trial has started.');
       router.push('/dashboard');
     } catch (error) {

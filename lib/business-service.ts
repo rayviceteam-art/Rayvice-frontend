@@ -92,3 +92,10 @@ export async function suspendTeamMember(userId: string): Promise<void> {
 export async function reactivateTeamMember(userId: string): Promise<void> {
   await apiClient.patch(`/business/team/${userId}/reactivate`);
 }
+
+/**
+ * Team Management: Accepts an invitation and sets the user's password.
+ */
+export async function acceptInvite(token: string, password: string): Promise<void> {
+  await apiClient.post('/business/team/accept-invite', { token, password });
+}

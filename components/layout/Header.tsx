@@ -1,8 +1,8 @@
-'use client';
-
 import React from 'react';
-import { Menu, Plus, Mic, Sparkles } from 'lucide-react';
+import Link from 'next/link';
+import { Menu, Plus, Mic, Sparkles, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { useAuth } from '@/lib/auth-context';
 
 interface HeaderProps {
   onOpenMobileMenu: () => void;
@@ -12,6 +12,14 @@ interface HeaderProps {
 }
 
 export function Header({ onOpenMobileMenu, onOpenShiftModal, title, subtitle }: HeaderProps) {
+  const { business } = useAuth();
+  const isTrialExpired =
+    business?.effectiveStatus === 'READ_ONLY' ||
+    Boolean(business?.trial?.isExpired) ||
+    (business?.status === 'TRIALING' && business?.trialEndsAt && new Date(business.trialEndsAt).getTime() <= Date.now());
+  const isPaid = business?.status === 'ACTIVE';
+  const daysRemaining = business?.trial?.daysRemaining ?? 9;
+
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-[#253130] bg-[#0A0F10]/95 px-4 sm:px-8 backdrop-blur-md">
       <div className="flex items-center gap-3">
@@ -31,10 +39,25 @@ export function Header({ onOpenMobileMenu, onOpenShiftModal, title, subtitle }: 
       </div>
 
       <div className="flex items-center gap-2 sm:gap-3">
-
-        <div className="hidden md:flex items-center gap-1.5 rounded-full border border-[#117A65] bg-[#0D332D] px-3 py-1 text-xs font-semibold text-[#5EE0C1]">
-          <Sparkles className="h-3.5 w-3.5" /> 9-Day Free Trial (1 Client Mode)
-        </div>
+        {isTrialExpired ? (
+          <Link
+            href="/settings/billing"
+            className="hidden md:flex items-center gap-1.5 rounded-full border border-[#EF4444]/50 bg-[#EF4444]/15 px-3 py-1 text-xs font-semibold text-[#EF4444] hover:bg-[#EF4444]/25 transition-colors"
+          >
+            <AlertTriangle className="h-3.5 w-3.5" /> Trial Expired (Read-Only)
+          </Link>
+        ) : isPaid ? (
+          <div className="hidden md:flex items-center gap-1.5 rounded-full border border-[#16A085]/40 bg-[#0D332D] px-3 py-1 text-xs font-semibold text-[#5EE0C1]">
+            <CheckCircle2 className="h-3.5 w-3.5" /> Active Plan
+          </div>
+        ) : (
+          <Link
+            href="/settings/billing"
+            className="hidden md:flex items-center gap-1.5 rounded-full border border-[#117A65] bg-[#0D332D] px-3 py-1 text-xs font-semibold text-[#5EE0C1] hover:border-[#16A085] transition-colors"
+          >
+            <Sparkles className="h-3.5 w-3.5" /> {daysRemaining} Day{daysRemaining === 1 ? '' : 's'} Trial Left
+          </Link>
+        )}
 
         <Button
           variant="primary"
