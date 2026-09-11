@@ -1,4 +1,4 @@
-import { AlertTriangle } from 'lucide-react';
+import { Info } from 'lucide-react';
 import { Input } from '@/components/ui/Input';
 
 interface SelfManagedFieldsProps {
@@ -10,14 +10,9 @@ interface SelfManagedFieldsProps {
 }
 
 /**
- * Self-Managed nominee contact fields.
- *
- * Known specification gap (spec §52, Gap A): the supplied backend Module 3
- * contract has no persistent field for these values yet. Per the spec's
- * "approach 2", the controls are shown but intentionally kept OUT of the
- * create/update payload (see ClientForm.tsx's `buildPayload`) until a
- * backend field is agreed. The inline notice below keeps that gap visible
- * to whoever is using the form, rather than silently discarding the data.
+ * Self-Managed nominee contact fields (spec §5.2). These values are stored
+ * on the participant record (selfManagedBillingEmail / selfManagedBillingPhone)
+ * and are used to route invoices directly to the participant or their nominee.
  */
 export function SelfManagedFields({
   nomineeBillingEmail,
@@ -45,12 +40,9 @@ export function SelfManagedFields({
           onChange={(e) => onNomineeBillingPhoneChange(e.target.value)}
         />
       </div>
-      <div className="flex items-start gap-2 rounded border border-warning-border bg-warning-bg px-3 py-2 text-caption text-text-secondary">
-        <AlertTriangle size={14} className="mt-0.5 shrink-0 text-warning" aria-hidden="true" />
-        <span>
-          Not yet saved to the participant record — the backend doesn&apos;t have a field for nominee contact
-          details yet. This will be wired up once that&apos;s added.
-        </span>
+      <div className="flex items-start gap-2 rounded border border-info/30 bg-info/10 px-3 py-2 text-caption text-text-secondary">
+        <Info size={14} className="mt-0.5 shrink-0 text-info" aria-hidden="true" />
+        <span>Invoices for self-managed participants are sent directly to this nominee contact.</span>
       </div>
     </div>
   );

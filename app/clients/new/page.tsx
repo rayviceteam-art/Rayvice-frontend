@@ -33,7 +33,7 @@ export default function NewClientPage() {
       router.push(created?.id ? `/clients/${created.id}` : '/clients');
     } catch (err) {
       const code = getApiErrorCode(err);
-      if (code === 'TRIAL_LIMIT_REACHED') {
+      if (code === 'TRIAL_CLIENT_LIMIT_REACHED') {
         setShowUpgradeModal(true);
       } else if (code === 'VALIDATION_ERROR') {
         setFieldErrors(getApiFieldErrors(err));

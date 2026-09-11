@@ -13,7 +13,7 @@ export interface ShiftClientOption {
   id: string;
   participantName: string;
   ndisNumber: string;
-  hourlyRateAgreed?: number;
+  hourlyRateAgreed?: number | null;
   defaultSupportItemCode?: string;
 }
 

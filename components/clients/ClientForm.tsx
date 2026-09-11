@@ -30,11 +30,11 @@ function clientToFormValues(client: Client): ClientFormValues {
     planManagementType: client.planManagementType,
     planManagerAgencyName: client.planManagerAgencyName ?? '',
     planManagerEmail: client.planManagerEmail ?? '',
-    nomineeBillingEmail: '',
-    nomineeBillingPhone: '',
+    nomineeBillingEmail: client.selfManagedBillingEmail ?? '',
+    nomineeBillingPhone: client.selfManagedBillingPhone ?? '',
     defaultSupportItemCode: client.defaultSupportItemCode,
-    hourlyRateAgreed: client.hourlyRateAgreed,
-    allocatedBudgetTotal: client.allocatedBudgetTotal,
+    hourlyRateAgreed: client.hourlyRateAgreed ?? DEFAULT_HOURLY_RATE_2026,
+    allocatedBudgetTotal: client.allocatedBudgetTotal ?? null,
   };
 }
 
@@ -94,9 +94,8 @@ export function ClientForm({ mode, initialClient, isSubmitting, serverFieldError
     setIsDirty(false);
 
     const planManaged = values.planManagementType === 'PLAN_MANAGED';
+    const selfManaged = values.planManagementType === 'SELF_MANAGED';
 
-    // Only documented backend fields are sent - nominee billing fields are
-    // intentionally excluded (see SelfManagedFields.tsx and spec Gap A).
     const payload: CreateClientPayload | UpdateClientPayload = {
       participantName: values.participantName.trim(),
       ...(mode === 'create' ? { ndisNumber: values.ndisNumber } : {}),
@@ -104,6 +103,8 @@ export function ClientForm({ mode, initialClient, isSubmitting, serverFieldError
       planManagementType: values.planManagementType,
       planManagerAgencyName: planManaged ? values.planManagerAgencyName || null : null,
       planManagerEmail: planManaged ? values.planManagerEmail || null : null,
+      selfManagedBillingEmail: selfManaged ? values.nomineeBillingEmail.trim() || null : null,
+      selfManagedBillingPhone: selfManaged ? values.nomineeBillingPhone.trim() || null : null,
       defaultSupportItemCode: values.defaultSupportItemCode,
       hourlyRateAgreed: values.hourlyRateAgreed,
       allocatedBudgetTotal: values.allocatedBudgetTotal ?? null,

@@ -295,7 +295,9 @@ export interface Client {
   planManagementType: PlanManagementType;
   planManagerAgencyName: string | null;
   planManagerEmail: string | null;
-  hourlyRateAgreed: number;
+  selfManagedBillingEmail: string | null;
+  selfManagedBillingPhone: string | null;
+  hourlyRateAgreed: number | null;
   defaultSupportItemCode: string;
   allocatedBudgetTotal: number | null;
   allocatedBudgetSpent: number;
@@ -340,6 +342,8 @@ export interface CreateClientPayload {
   planManagementType: PlanManagementType;
   planManagerAgencyName?: string | null;
   planManagerEmail?: string | null;
+  selfManagedBillingEmail?: string | null;
+  selfManagedBillingPhone?: string | null;
   hourlyRateAgreed: number;
   defaultSupportItemCode: string;
   allocatedBudgetTotal?: number | null;

@@ -69,6 +69,18 @@ export function ClientDetailCard({ client }: { client: ClientDetailResponse }) {
         </Card>
       )}
 
+      {client.planManagementType === 'SELF_MANAGED' && (
+        <Card>
+          <CardHeader>
+            <h2 className="text-h4 text-text-primary">Parent / Nominee Billing</h2>
+          </CardHeader>
+          <CardBody className="flex flex-col gap-1">
+            <p className="text-body1 text-text-primary">{client.selfManagedBillingEmail ?? '—'}</p>
+            <p className="text-body2 text-text-secondary">{client.selfManagedBillingPhone ?? '—'}</p>
+          </CardBody>
+        </Card>
+      )}
+
       {client.planManagementType === 'NDIA_MANAGED' && (
         <Card>
           <CardBody>
@@ -107,7 +119,9 @@ export function ClientDetailCard({ client }: { client: ClientDetailResponse }) {
             <h2 className="text-h4 text-text-primary">Agreed Rate</h2>
           </CardHeader>
           <CardBody>
-            <p className="text-body1 text-text-primary">{formatAud(client.hourlyRateAgreed)} AUD/hour</p>
+            <p className="text-body1 text-text-primary">
+              {client.hourlyRateAgreed !== null ? `${formatAud(client.hourlyRateAgreed)} AUD/hour` : '—'}
+            </p>
           </CardBody>
         </Card>
       </div>
