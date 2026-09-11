@@ -178,7 +178,7 @@ export function getApiFieldErrors(error: unknown): Record<string, string[] | und
 export function getApiErrorCode(error: unknown): string | undefined {
   if (axios.isAxiosError(error)) {
     const data = error.response?.data as any;
-    return data?.error?.code || data?.code;
+    return data?.errorCode || data?.error?.code || data?.code;
   }
   return undefined;
 }
