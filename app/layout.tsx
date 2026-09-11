@@ -9,6 +9,11 @@ export const metadata: Metadata = {
   applicationName: 'Rayvice',
   authors: [{ name: 'Rayvice Team', url: 'https://www.rayvice.com' }],
   keywords: ['NDIS', 'Sole Trader', 'NDIS Billing', 'Rate Splitting', 'Australia', 'Invoicing', 'Compliance'],
+  icons: {
+    icon: '/brand/favicon.svg',
+    shortcut: '/brand/favicon.svg',
+    apple: '/brand/app-icon.png',
+  },
   openGraph: {
     title: 'Rayvice — NDIS Sole-Trader Billing & Compliance OS',
     description: 'Automated billing, rate-splitting, and compliance OS for independent Australian NDIS Sole Traders.',
@@ -16,11 +21,20 @@ export const metadata: Metadata = {
     siteName: 'Rayvice',
     locale: 'en_AU',
     type: 'website',
+    images: [
+      {
+        url: '/brand/og-image.png',
+        width: 1920,
+        height: 1080,
+        alt: 'Rayvice — Precision in Motion',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Rayvice — NDIS Sole-Trader Billing & Compliance OS',
     description: 'Automated billing, rate-splitting, and compliance OS for independent Australian NDIS Sole Traders.',
+    images: ['/brand/og-image.png'],
   },
 };
 

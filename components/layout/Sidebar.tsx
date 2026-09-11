@@ -39,9 +39,7 @@ export function Sidebar({ onCloseMobile }: SidebarProps) {
       {/* Brand & Workspace */}
       <div className="space-y-6">
         <div className="flex items-center gap-3 px-2 pt-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#0D332D] text-base font-bold text-[#5EE0C1] shadow-glow border border-[#117A65]">
-            R
-          </div>
+          <img src="/brand/rayvice-mark-dark.svg" alt="Rayvice logo" className="h-9 w-9" />
           <div>
             <div className="flex items-center gap-1.5">
               <span className="text-base font-bold tracking-tight text-[#F1F5F4]">Rayvice</span>

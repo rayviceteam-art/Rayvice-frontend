@@ -38,6 +38,8 @@ export function Header({ onOpenMobileMenu, onOpenShiftModal, title, subtitle }: 
           <Menu className="h-5 w-5" />
         </button>
 
+        <img src="/brand/rayvice-mark-dark.svg" alt="Rayvice" className="h-8 w-8 lg:hidden" />
+
         {title && (
           <div>
             <h1 className="text-base sm:text-lg font-bold tracking-tight text-[#F1F5F4]">{title}</h1>
