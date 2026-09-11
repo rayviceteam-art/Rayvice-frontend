@@ -84,7 +84,7 @@ export function Sidebar({ onCloseMobile }: SidebarProps) {
           )}
           {navItems.map((item) => {
             const Icon = item.icon;
-            const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
+            const isActive = pathname === item.href || (item.href !== '/dashboard' && item.href !== '/settings' && pathname.startsWith(item.href));
 
             return (
               <Link

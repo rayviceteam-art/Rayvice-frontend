@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+'use client';
+
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { AlertTriangle, ArrowRight } from 'lucide-react';
 import { ProtectedRoute } from './ProtectedRoute';
@@ -16,12 +18,16 @@ interface AppLayoutProps {
 export function AppLayout({ children, title, subtitle }: AppLayoutProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isShiftModalOpen, setIsShiftModalOpen] = useState(false);
+  const [isTrialExpired, setIsTrialExpired] = useState(false);
   const { business } = useAuth();
 
-  const isTrialExpired =
-    business?.effectiveStatus === 'READ_ONLY' ||
-    Boolean(business?.trial?.isExpired) ||
-    (business?.status === 'TRIALING' && business?.trialEndsAt && new Date(business.trialEndsAt).getTime() <= Date.now());
+  useEffect(() => {
+    const expired =
+      business?.effectiveStatus === 'READ_ONLY' ||
+      Boolean(business?.trial?.isExpired) ||
+      (business?.status === 'TRIALING' && business?.trialEndsAt && new Date(business.trialEndsAt).getTime() <= Date.now());
+    setIsTrialExpired(Boolean(expired));
+  }, [business]);
 
   return (
     <ProtectedRoute>
@@ -36,8 +42,10 @@ export function AppLayout({ children, title, subtitle }: AppLayoutProps) {
         {/* Mobile Drawer */}
         {isMobileMenuOpen && (
           <div className="fixed inset-0 z-50 flex lg:hidden">
-            <div
-              className="fixed inset-0 bg-black/80 backdrop-blur-sm animate-in fade-in"
+            <button
+              type="button"
+              aria-label="Close menu"
+              className="fixed inset-0 bg-black/80 backdrop-blur-sm animate-in fade-in border-0 cursor-default"
               onClick={() => setIsMobileMenuOpen(false)}
             />
             <div className="relative z-10 w-64 max-w-xs animate-in slide-in-from-left">

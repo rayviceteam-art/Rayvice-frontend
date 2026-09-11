@@ -1,4 +1,6 @@
-import React from 'react';
+'use client';
+
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Menu, Plus, Mic, Sparkles, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -13,10 +15,16 @@ interface HeaderProps {
 
 export function Header({ onOpenMobileMenu, onOpenShiftModal, title, subtitle }: HeaderProps) {
   const { business } = useAuth();
-  const isTrialExpired =
-    business?.effectiveStatus === 'READ_ONLY' ||
-    Boolean(business?.trial?.isExpired) ||
-    (business?.status === 'TRIALING' && business?.trialEndsAt && new Date(business.trialEndsAt).getTime() <= Date.now());
+  const [isTrialExpired, setIsTrialExpired] = useState(false);
+
+  useEffect(() => {
+    const expired =
+      business?.effectiveStatus === 'READ_ONLY' ||
+      Boolean(business?.trial?.isExpired) ||
+      (business?.status === 'TRIALING' && business?.trialEndsAt && new Date(business.trialEndsAt).getTime() <= Date.now());
+    setIsTrialExpired(Boolean(expired));
+  }, [business]);
+
   const isPaid = business?.status === 'ACTIVE';
   const daysRemaining = business?.trial?.daysRemaining ?? 9;
 
@@ -64,6 +72,7 @@ export function Header({ onOpenMobileMenu, onOpenShiftModal, title, subtitle }: 
           size="sm"
           className="shadow-glow flex items-center gap-2"
           onClick={onOpenShiftModal}
+          disabled={isTrialExpired}
         >
           <Mic className="h-4 w-4" />
           <span className="hidden sm:inline">+ Log Shift (Voice)</span>

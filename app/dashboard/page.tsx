@@ -25,14 +25,17 @@ import { Badge } from '@/components/ui/Badge';
 import { useAuth } from '@/lib/auth-context';
 import { getBusinessProfile } from '@/lib/business-service';
 import { clientsService } from '@/lib/clients-service';
+import { shiftsService, ShiftRecord } from '@/lib/shifts-service';
 import { BusinessProfile, ClientListItem } from '@/lib/types';
 import { getApiErrorMessage } from '@/lib/api-client';
+import { formatAud, formatCalendarDate } from '@/lib/format';
 
 export default function DashboardPage() {
   const { user } = useAuth();
   const [profile, setProfile] = useState<BusinessProfile | null>(null);
   const [clients, setClients] = useState<ClientListItem[]>([]);
   const [totalClientsCount, setTotalClientsCount] = useState(0);
+  const [shifts, setShifts] = useState<ShiftRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -53,27 +56,29 @@ export default function DashboardPage() {
         }
       })
       .finally(() => setIsLoading(false));
+
+    // Load logged shifts from service
+    setShifts(shiftsService.getRecent(10));
+
+    // Subscribe to shift additions (from global header modal)
+    const unsubscribe = shiftsService.subscribe(() => {
+      setShifts(shiftsService.getRecent(10));
+    });
+
+    return () => unsubscribe();
   }, []);
 
   const compliance = profile?.compliance;
   const trial = profile?.trial;
   const daysRemaining = trial?.daysRemaining ?? 9;
 
-  // Real uninvoiced count aggregated from participants
-  const pendingUninvoicedCount = clients.reduce((acc, c) => acc + (c.pendingUninvoicedShiftsCount || 0), 0);
+  // Real uninvoiced count aggregated from participants and local shift queue
+  const pendingFromClients = clients.reduce((acc, c) => acc + (c.pendingUninvoicedShiftsCount || 0), 0);
+  const pendingFromLocal = shifts.filter((s) => s.status === 'PENDING').length;
+  const pendingUninvoicedCount = Math.max(pendingFromClients, pendingFromLocal);
 
-  // Active shifts: when Module 4 shift endpoints are connected, these will load live.
-  // For new accounts, empty by default.
-  const recentShifts: Array<{
-    id: string;
-    clientName: string;
-    ndisNumber: string;
-    date: string;
-    time: string;
-    splitType: string;
-    travel?: string;
-    totalAmount: number;
-  }> = [];
+  const thisWeekEarnings = shifts.reduce((acc, s) => acc + (s.grandTotal || 0), 0);
+  const thisWeekCount = shifts.length;
 
   const primaryClient = clients[0] || null;
 
@@ -160,12 +165,13 @@ export default function DashboardPage() {
               </div>
             </div>
             <div className="mt-3">
-              <span className="text-2xl font-bold tracking-tight text-[#F1F5F4]">$0.00</span>
-              <span className="text-xs font-medium text-[#9AA9A5] ml-1">AUD</span>
+              <span className="text-2xl font-bold tracking-tight text-[#F1F5F4]">{formatAud(thisWeekEarnings)}</span>
             </div>
             <div className="mt-2 flex items-center gap-1 text-[11px] text-[#9AA9A5]">
               <TrendingUp className="h-3 w-3 text-[#5EE0C1]" />
-              <span>0 shifts logged this week</span>
+              <span>
+                {thisWeekCount} shift{thisWeekCount === 1 ? '' : 's'} logged
+              </span>
             </div>
           </Card>
 
@@ -254,29 +260,33 @@ export default function DashboardPage() {
             </div>
 
             <Card className="overflow-hidden border border-[#253130]">
-              {recentShifts.length > 0 ? (
+              {shifts.length > 0 ? (
                 <div className="divide-y divide-[#253130]">
-                  {recentShifts.map((shift) => (
+                  {shifts.map((shift) => (
                     <div key={shift.id} className="p-4 hover:bg-[#182122]/50 transition-colors flex items-center justify-between gap-4">
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
                           <span className="font-semibold text-xs text-[#F1F5F4]">{shift.clientName}</span>
-                          <span className="text-[10px] text-[#9AA9A5]">NDIS: {shift.ndisNumber}</span>
+                          {shift.ndisNumber && <span className="text-[10px] text-[#9AA9A5]">NDIS: {shift.ndisNumber}</span>}
                         </div>
                         <div className="flex items-center gap-3 text-[11px] text-[#9AA9A5]">
                           <span className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3" /> {shift.date}
+                            <Calendar className="h-3 w-3" /> {formatCalendarDate(shift.shiftDate)}
                           </span>
-                          <span>{shift.time}</span>
-                          <span className="text-[#5EE0C1] font-medium">{shift.splitType}</span>
-                          {shift.travel && <span>Travel: {shift.travel}</span>}
+                          <span>{shift.startTime} - {shift.endTime} ({shift.totalHours}h)</span>
+                          <span className="text-[#5EE0C1] font-medium">
+                            {shift.eveHours > 0 ? `Split (${shift.dayHours}h Day / ${shift.eveHours}h Eve)` : 'Daytime'}
+                          </span>
+                          {shift.travelKms > 0 && <span>Travel: {shift.travelKms} km</span>}
                         </div>
                       </div>
                       <div className="text-right shrink-0">
                         <div className="font-bold text-sm text-[#5EE0C1] font-mono">
-                          ${shift.totalAmount.toFixed(2)} AUD
+                          {formatAud(shift.grandTotal)}
                         </div>
-                        <Badge variant="brand" size="sm">Uninvoiced</Badge>
+                        <Badge variant={shift.status === 'INVOICED' ? 'default' : 'brand'} size="sm">
+                          {shift.status === 'INVOICED' ? 'Invoiced' : 'Uninvoiced'}
+                        </Badge>
                       </div>
                     </div>
                   ))}
@@ -330,10 +340,10 @@ export default function DashboardPage() {
                       </div>
                     )}
                     <div className="flex justify-between text-[10px] text-[#9AA9A5]">
-                      <span>${Number(primaryClient.allocatedBudgetSpent || 0).toLocaleString()} spent</span>
+                      <span>{formatAud(Number(primaryClient.allocatedBudgetSpent || 0))} spent</span>
                       <span>
                         {primaryClient.allocatedBudgetTotal
-                          ? `$${(Number(primaryClient.allocatedBudgetTotal) - Number(primaryClient.allocatedBudgetSpent || 0)).toLocaleString()} balance remaining`
+                          ? `${formatAud(Math.max(0, Number(primaryClient.allocatedBudgetTotal) - Number(primaryClient.allocatedBudgetSpent || 0)))} balance remaining`
                           : 'Unlimited'}
                       </span>
                     </div>

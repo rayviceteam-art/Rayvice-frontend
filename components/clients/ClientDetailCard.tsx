@@ -1,13 +1,47 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { Table, Thead, Th, Tr, Td } from '@/components/ui/Table';
 import { formatAud, formatCalendarDate } from '@/lib/format';
 import { getSupportItemLabel } from '@/lib/ndis-rates';
 import { ClientDetailResponse } from '@/lib/types';
+import { shiftsService } from '@/lib/shifts-service';
 import { BudgetProgress } from './BudgetProgress';
 import { PLAN_MANAGEMENT_LABELS } from './planManagementLabels';
 
 export function ClientDetailCard({ client }: { client: ClientDetailResponse }) {
+  const [page, setPage] = useState(1);
+  const pageSize = 5;
+
+  const [allShifts, setAllShifts] = useState(client.recentShifts ?? []);
+
+  useEffect(() => {
+    shiftsService.list({ clientId: client.id }).then((records) => {
+      const formattedLocal = records.map((r) => ({
+        id: r.id,
+        date: r.shiftDate,
+        startTime: r.startTime,
+        endTime: r.endTime,
+        hours: r.totalHours,
+        amount: r.grandTotal,
+        status: r.status,
+      }));
+
+      const existingIds = new Set((client.recentShifts ?? []).map((s) => s.id));
+      const newItems = formattedLocal.filter((s) => !existingIds.has(s.id));
+      setAllShifts([...newItems, ...(client.recentShifts ?? [])]);
+    }).catch(() => {
+      // fallback
+    });
+  }, [client.id, client.recentShifts]);
+
+  const totalShifts = allShifts.length;
+  const totalPages = Math.max(1, Math.ceil(totalShifts / pageSize));
+  const paginatedShifts = allShifts.slice((page - 1) * pageSize, page * pageSize);
+
   return (
     <div className="flex flex-col gap-4">
       <Card>
@@ -86,7 +120,7 @@ export function ClientDetailCard({ client }: { client: ClientDetailResponse }) {
           )}
         </CardHeader>
         <div>
-          {(client.recentShifts ?? []).length === 0 ? (
+          {paginatedShifts.length === 0 ? (
             <p className="px-5 py-6 text-body2 text-text-muted">No shifts logged for this participant yet.</p>
           ) : (
             <div className="px-5 pb-5">
@@ -102,7 +136,7 @@ export function ClientDetailCard({ client }: { client: ClientDetailResponse }) {
                   </tr>
                 </Thead>
                 <tbody>
-                  {(client.recentShifts ?? []).map((shift) => (
+                  {paginatedShifts.map((shift) => (
                     <Tr key={shift.id}>
                       <Td>{formatCalendarDate(shift.date)}</Td>
                       <Td>{shift.startTime}</Td>
@@ -110,12 +144,38 @@ export function ClientDetailCard({ client }: { client: ClientDetailResponse }) {
                       <Td>{shift.hours}</Td>
                       <Td>{formatAud(shift.amount)}</Td>
                       <Td>
-                        <Badge tone="neutral">{shift.status}</Badge>
+                        <Badge tone={shift.status === 'INVOICED' ? 'neutral' : 'brand'}>{shift.status}</Badge>
                       </Td>
                     </Tr>
                   ))}
                 </tbody>
               </Table>
+
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between border-t border-[#253130] pt-3 mt-3 text-xs text-text-secondary">
+                  <span>
+                    Page {page} of {totalPages} ({totalShifts} total shifts)
+                  </span>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      disabled={page <= 1}
+                      onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    >
+                      Previous
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      disabled={page >= totalPages}
+                      onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    >
+                      Next
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

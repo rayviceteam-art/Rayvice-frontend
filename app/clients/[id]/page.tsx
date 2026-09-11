@@ -181,6 +181,7 @@ export default function ClientDetailPage() {
           isOpen={isDeactivateModalOpen}
           participantName={client.participantName}
           isDeactivating={isDeactivating}
+          pendingUninvoicedShiftsCount={client.pendingUninvoicedShiftsCount}
           onCancel={() => setIsDeactivateModalOpen(false)}
           onConfirm={handleDeactivate}
         />
