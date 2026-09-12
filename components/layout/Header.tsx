@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Menu, Plus, Mic, Sparkles, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/lib/auth-context';
@@ -34,11 +35,21 @@ export function Header({ onOpenMobileMenu, onOpenShiftModal, title, subtitle }: 
         <button
           onClick={onOpenMobileMenu}
           className="rounded-lg p-2 text-[#9AA9A5] hover:bg-[#131B1C] hover:text-[#F1F5F4] lg:hidden"
+          aria-label="Open menu"
         >
           <Menu className="h-5 w-5" />
         </button>
 
-        <img src="/brand/rayvice-mark-dark.svg" alt="Rayvice" className="h-8 w-8 lg:hidden" />
+        <Link href="/dashboard" className="flex items-center gap-2 lg:hidden">
+          <Image
+            src="/brand/rayvice-mark.svg"
+            alt="Rayvice"
+            width={28}
+            height={28}
+            className="h-7 w-7 shrink-0"
+            priority
+          />
+        </Link>
 
         {title && (
           <div>

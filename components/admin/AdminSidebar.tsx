@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
@@ -34,10 +35,15 @@ export function AdminSidebar({ onCloseMobile }: AdminSidebarProps) {
     <aside className="flex h-full w-64 flex-col justify-between border-r border-[#253130] bg-[#0A0F10] p-4 text-[#F1F5F4]">
       {/* Brand & Super Admin Badge */}
       <div className="space-y-6">
-        <div className="flex items-center gap-3 px-2 pt-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#2E1065] text-base font-bold text-[#C084FC] shadow-glow border border-[#7E22CE]">
-            ⚡
-          </div>
+        <Link href="/admin" className="flex items-center gap-3 px-2 pt-2 group">
+          <Image
+            src="/brand/rayvice-mark.svg"
+            alt="Rayvice"
+            width={36}
+            height={36}
+            className="h-9 w-9 shrink-0 transition-transform group-hover:scale-105"
+            priority
+          />
           <div>
             <div className="flex items-center gap-1.5">
               <span className="text-base font-bold tracking-tight text-[#F1F5F4]">Rayvice</span>
@@ -47,7 +53,7 @@ export function AdminSidebar({ onCloseMobile }: AdminSidebarProps) {
             </div>
             <p className="text-[11px] text-[#9AA9A5]">Master Control Panel</p>
           </div>
-        </div>
+        </Link>
 
         {/* Global Live Engine Status Pill */}
         <div className="rounded-xl border border-[#253130] bg-[#131B1C] p-3">

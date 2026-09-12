@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
@@ -38,8 +39,15 @@ export function Sidebar({ onCloseMobile }: SidebarProps) {
     <aside className="flex h-full w-64 flex-col justify-between border-r border-[#253130] bg-[#0A0F10] p-4 text-[#F1F5F4]">
       {/* Brand & Workspace */}
       <div className="space-y-6">
-        <div className="flex items-center gap-3 px-2 pt-2">
-          <img src="/brand/rayvice-mark-dark.svg" alt="Rayvice logo" className="h-9 w-9" />
+        <Link href="/dashboard" className="flex items-center gap-3 px-2 pt-2 group">
+          <Image
+            src="/brand/rayvice-mark.svg"
+            alt="Rayvice"
+            width={36}
+            height={36}
+            className="h-9 w-9 shrink-0 transition-transform group-hover:scale-105"
+            priority
+          />
           <div>
             <div className="flex items-center gap-1.5">
               <span className="text-base font-bold tracking-tight text-[#F1F5F4]">Rayvice</span>
@@ -49,7 +57,7 @@ export function Sidebar({ onCloseMobile }: SidebarProps) {
             </div>
             <p className="text-[11px] text-[#9AA9A5]">NDIS Sole-Trader OS</p>
           </div>
-        </div>
+        </Link>
 
         {/* 9-Day Trial Status Pill */}
         <Link
