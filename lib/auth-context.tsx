@@ -35,10 +35,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // On first load, check if redirected back with Google OAuth tokens in hash,
   // or silently try to exchange the httpOnly refresh cookie for a fresh access token.
   useEffect(() => {
-    // Guard against rapid /auth/refresh calls (e.g. repeated failed registration
-    // attempts or fast page reloads) triggering 429 rate-limit errors.
+    // Throttle only *failed* refresh attempts (e.g. repeated failed registration
+    // attempts or fast page reloads hitting a rate limit). A successful refresh
+    // must always run on mount: the access token is kept in memory only, so
+    // skipping it would leave the user without a session and log them out.
     const REFRESH_COOLDOWN_MS = 10_000;
-    const lastRefreshKey = '_rvLastRefresh';
+    const lastRefreshFailureKey = '_rvRefreshFailedAt';
 
     async function bootstrap() {
       try {
@@ -76,15 +78,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
         }
 
-        const lastRefresh = Number(sessionStorage.getItem(lastRefreshKey) ?? 0);
-        if (Date.now() - lastRefresh < REFRESH_COOLDOWN_MS) {
-          // Skip refresh this mount — a successful one already happened recently.
+        const lastRefreshFailure = Number(sessionStorage.getItem(lastRefreshFailureKey) ?? 0);
+        if (lastRefreshFailure && Date.now() - lastRefreshFailure < REFRESH_COOLDOWN_MS) {
+          // A refresh already failed moments ago — back off instead of hammering
+          // the endpoint (avoids 429 rate-limit errors).
           setIsLoading(false);
           return;
         }
-        sessionStorage.setItem(lastRefreshKey, String(Date.now()));
 
         const { accessToken } = await authService.refresh();
+        sessionStorage.removeItem(lastRefreshFailureKey);
         setAccessToken(accessToken);
         const profile = await authService.getMe();
         setUser(profile);
@@ -95,8 +98,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setAccessToken(null);
         setUser(null);
         setBusiness(null);
-        // Clear the cooldown on failure so the next page load can retry immediately.
-        sessionStorage.removeItem(lastRefreshKey);
+        // Remember the failure briefly so repeated rapid reloads back off.
+        sessionStorage.setItem(lastRefreshFailureKey, String(Date.now()));
       } finally {
         setIsLoading(false);
       }
