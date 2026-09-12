@@ -22,7 +22,7 @@ export function AuthLayout({
               width={220}
               height={60}
               priority
-              className="h-12 w-auto mx-auto"
+              className="h-12 sm:h-14 w-auto mx-auto"
             />
           </Link>
           <h1 className="text-2xl font-bold tracking-tight text-[#F1F5F4]">{title}</h1>
