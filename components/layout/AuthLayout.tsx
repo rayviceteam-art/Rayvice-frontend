@@ -15,14 +15,17 @@ export function AuthLayout({
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
-          <Link href="/" className="inline-block mb-6 focus:outline-none focus:ring-2 focus:ring-[#117A65] rounded-xl">
+          <Link
+            href="/"
+            className="inline-flex items-center justify-center h-20 sm:h-24 w-auto max-w-full overflow-hidden mb-6 focus:outline-none focus:ring-2 focus:ring-[#117A65] rounded-xl"
+          >
             <Image
-              src="/brand/rayvice-logo-dark.svg"
+              src="/brand/rayvice-logo.svg"
               alt="Rayvice"
-              width={220}
-              height={60}
+              width={320}
+              height={213}
               priority
-              className="h-12 sm:h-14 w-auto mx-auto"
+              className="w-[280px] sm:w-[320px] h-auto max-w-none shrink-0"
             />
           </Link>
           <h1 className="text-2xl font-bold tracking-tight text-[#F1F5F4]">{title}</h1>
