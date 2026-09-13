@@ -202,179 +202,126 @@ Manage participant details, 9-digit NDIS IDs, and Plan Manager agency claim rout
 
 ---
 
-### 📌 MODULE 4: SHIFT LOGGER WITH VOICE AI & LIVE AUTO-SPLIT (`app/shifts/page.tsx`)
+### 📌 MODULE 4: SHIFT LOGGER WITH VOICE AI, LIVE AUTO-SPLIT & DASHBOARD
 
-#### 6.1 Purpose & User Flow
-Allows sole traders to log a shift in under 15 seconds from their car using **Voice Audio** or **1-Tap Form Entry**, with live rate-split calculations rendered on screen.
+> **FULL IMPLEMENTATION CONTRACT:** `MODULE_4_FRONTEND_SPECIFICATION.md` (repository root) is the binding, line-by-line frontend document for this module — screen specs, component props, exact copy, states, service contracts, QA checklist (34 items) and acceptance criteria (36 items). This section is the authoritative summary; where the two differ, the dedicated document wins. **No feature may be added that is not described in either document.**
 
-#### 6.2 The Shift Logger Modal Component (`components/shifts/ShiftModal.tsx`)
+#### 6.1 Purpose & UX Principles
+Let a support worker log a shift in **under 15 seconds from their car** (voice or 1-tap form) with a **live NDIS rate-split preview** on screen, and give the owner a dashboard view of weekly earnings, unbilled work and participant budget health.
 
-```tsx
-// components/shifts/ShiftModal.tsx
-'use client';
+Principles:
+1. **Fewer taps:** participant pre-selected, agreed rate and support item pre-filled, today's date pre-filled **in the business timezone**.
+2. **Transparency:** every claim line is visible (item code, time range, hours × rate = amount) before saving — this is what prevents rejected invoices.
+3. **Backend is authoritative for money:** the on-screen split is a mirror for instant feedback; after save the server values replace it.
+4. **Human confirmation:** AI voice output only prefills the form. Nothing is auto-saved.
+5. **Mobile-first:** 44 px minimum touch targets, one-thumb operation, native date/time inputs, no horizontal page scroll.
 
-import React, { useState, useMemo } from 'react';
-import { Mic, Clock, Car, CheckCircle2, Sparkles, X } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
+#### 6.2 Screens & Files
+| Route | File | Purpose |
+| :--- | :--- | :--- |
+| `/shifts` | `app/shifts/page.tsx` | Directory: tabs (Uninvoiced / Invoiced / All), filters, pagination, row actions |
+| `/shifts/new` | `app/shifts/new/page.tsx` | Dedicated full-page logger (deep-linkable, `?clientId=` supported) |
+| `/shifts/[id]` | `app/shifts/[id]/page.tsx` | Detail + edit (PENDING only) / read-only with lock (INVOICED) |
+| — | `components/shifts/ShiftModal.tsx` | Global quick logger mounted in `AppLayout`, opened from the header CTA |
+| — | `components/shifts/ShiftForm.tsx` | Shared form used by the modal, the new page and the edit view |
+| — | `components/shifts/SplitPreview.tsx` | Live auto-split panel |
+| — | `components/shifts/ShiftTable.tsx`, `ShiftFilters.tsx`, `CancelShiftModal.tsx`, `VoiceRecorder.tsx`, `VoiceShiftParser.tsx`, `VoiceUpgradeModal.tsx` | List + voice + cancel surfaces |
+| `/dashboard` | `app/dashboard/page.tsx` | Module 4 widgets (weekly earnings, uninvoiced banner, budget watch, recent shifts) |
 
-interface ShiftModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  clients: Array<{ id: string; participantName: string; ndisNumber: string }>;
-  onShiftSaved: () => void;
-}
+Sidebar item "Shifts & Splitter" already links to `/shifts` (currently 404 — this module fixes that). The header CTA label stays **`+ Log Shift (Voice)`**.
 
-export function ShiftModal({ isOpen, onClose, clients, onShiftSaved }: ShiftModalProps) {
-  const [isRecording, setIsRecording] = useState(false);
-  const [selectedClientId, setSelectedClientId] = useState(clients[0]?.id || '');
-  const [shiftDate, setShiftDate] = useState(new Date().toISOString().split('T')[0]);
-  const [startTime, setStartTime] = useState('18:00');
-  const [endTime, setEndTime] = useState('21:30');
-  const [travelKms, setTravelKms] = useState('12');
-  const [caseNotes, setCaseNotes] = useState('Assisted with community access and evening meal preparation.');
+#### 6.3 Design Compliance (MANDATORY — identical look to Modules 1–3)
+- Reuse the existing tokens from `tailwind.config.ts` + `app/globals.css` — **no new colour, gradient, font, radius or shadow**.
+- Key tokens: page bg `#080B0D` (`bg-background`), sidebar `#0A0F10`, surface `#131B1C` (`bg-surface`), elevated `#182122`, input `#0E1617` (`bg-input`), border `#253130` (`border-border`), text `#F1F5F4` / `#9AA9A5` / `#687572`, brand `#16A085` (hover `#1DB89A`), brand-soft `#0D332D` / `#5EE0C1` / `#117A65`, success `#22C55E`/`#0B2B1B`/`#166534`, warning `#F59E0B`/`#2A210B`/`#92400E`, error `#EF4444`/`#2B1010`/`#991B1B`.
+- Typography: Inter, `text-h1…h4`, `text-body1/body2/caption`, `rounded-card` (12 px), `shadow-card`.
+- Reuse `components/ui/*` primitives (`Button`, `Input`, `Select`, `Card`, `Modal`, `Badge`, `Table`, `Skeleton`). Do not restyle them.
+- New screens must sit next to `/clients` and `/dashboard` with no visual jump.
 
-  // Live Auto-Split Calculation Engine (Client-Side Preview)
-  const splitCalculation = useMemo(() => {
-    const [sH, sM] = startTime.split(':').map(Number);
-    const [eH, eM] = endTime.split(':').map(Number);
-    const startDec = sH + sM / 60;
-    const endDec = eH + eM / 60;
-    const totalHours = Math.max(0, Number((endDec - startDec).toFixed(2)));
-    const kms = Number(travelKms) || 0;
+#### 6.4 Shift Form (`components/shifts/ShiftForm.tsx`)
+| # | Field | Control | Default |
+| :--- | :--- | :--- | :--- |
+| 1 | Participant | `Select` (active participants only) | `?clientId=` → else first participant |
+| 2 | Date | `type="date"` | **today in `Business.timezone`** (never `new Date().toISOString()`) |
+| 3 | Start Time | `type="time"` | `09:00` |
+| 4 | End Time | `type="time"` | `13:00` |
+| 5 | Activity-Based Transport (km) | number, 0–500, step 0.1 | `0` |
+| 6 | Default Support Category | `Select` from the catalogue | participant's `defaultSupportItemCode` → else `01_011_0107_1_1` |
+| 7 | Public Holiday | segmented control: Auto / Public holiday / Normal day | `Auto` (`isPublicHoliday: null`) |
+| 8 | Case Notes | textarea, max 2000 | empty |
 
-    const DAY_RATE = 67.56;
-    const EVE_RATE = 74.42;
-    const KM_RATE = 0.97;
-    const THRESHOLD = 20.0; // 8:00 PM
+Behaviour: overnight badge when `endTime <= startTime` (**"Crosses midnight — will be split at 12:00 AM"**); participant change re-applies their default support item; edit mode disables the participant select (**"Participant cannot be changed — cancel and re-log the shift instead."**); Zod validation in `lib/validators.ts`; one `Idempotency-Key` (UUID) per form session; submit label **`Save Shift ($258.39)`** using the live total; dirty-form guard before unload and on modal close.
 
-    let dayHours = 0;
-    let eveHours = 0;
+#### 6.5 Live Auto-Split Preview (`components/shifts/SplitPreview.tsx`)
+- Client mirror rules (identical to the backend engine): `HOLIDAY > SUNDAY > SATURDAY > weekday`; weekday splits at **20:00 local**; overnight splits at local midnight with each segment rated by its own day; `effectiveRate = min(agreed, cap)`; travel uses the statutory km rate (never the agreed rate); quantities and amounts rounded to 2 decimals; total = sum of rounded lines.
+- Panel layout: header **"NDIS Auto-Split Engine"** + **"✓ 2026 NDIA Limits Active"**; one row per line showing `item code + range`, `quantity × rate`, `= amount`; `EVENING` row in `#5EE0C1`; travel row muted; total row bold in brand colour as `$258.39 AUD`.
+- Overnight rows display `Friday 22:00 – 24:00` then `Saturday 00:00 – 01:00`.
+- Agreed-rate-below-cap lines are annotated **(agreed rate)**.
+- Warning rows: long shift > 12 h (amber), budget ≥ 70% after this shift (amber), budget ≥ 100% (red, still saveable), travel claimed on a travel-disallowed item (red, save disabled).
+- The panel is always visible; with incomplete times it shows **"Enter a start and end time to see the split."** and `$0.00`.
 
-    if (endDec <= THRESHOLD) {
-      dayHours = totalHours;
-    } else if (startDec >= THRESHOLD) {
-      eveHours = totalHours;
-    } else {
-      dayHours = Number((THRESHOLD - startDec).toFixed(2));
-      eveHours = Number((endDec - THRESHOLD).toFixed(2));
-    }
+#### 6.6 Shift List (`/shifts`)
+- Tabs: `Uninvoiced` (default → `status=PENDING`), `Invoiced` (`status=INVOICED`), `All` (no status filter; cancelled rows appear here with an error-tone badge).
+- Filters: From date, To date, Participant, Worker (**OWNER/OFFICE_MANAGER only**). No free-text search (the API does not support it). Changing any filter resets to page 1; a "Clear filters" action appears only when a filter is set.
+- Summary strip for the current filter: `Total $X • Y h • Z shifts`.
+- Columns: Date, Participant (with NDIS number), Time (with `Next day` badge), Hours, Split badges (DAY/EVE/SAT/SUN/HOL/KM), Travel, Amount (`font-mono`, bold), Status, Actions.
+- Row actions: `View` always; `Edit` and `Cancel` only when `status = PENDING` and the role/ownership rule passes; invoiced rows show a lock icon with `title="On invoice — cannot be changed"`.
+- Pagination identical to `/clients` (Previous / Page X of Y / Next).
+- Mandatory states: 6 skeleton rows while loading; **"No shifts logged yet"** + `+ Log Shift` when empty; **"No shifts match these filters"** + `Clear filters` when filtered empty; **"Unable to load shifts"** + `Try Again` on error.
+- After create/edit/cancel always re-fetch from the server (never optimistically rewrite amounts).
 
-    const dayTotal = Number((dayHours * DAY_RATE).toFixed(2));
-    const eveTotal = Number((eveHours * EVE_RATE).toFixed(2));
-    const travelTotal = Number((kms * KM_RATE).toFixed(2));
-    const grandTotal = Number((dayTotal + eveTotal + travelTotal).toFixed(2));
+#### 6.7 Detail, Edit & Cancel Rules
+- **PENDING:** editable via `?edit=1`; the form prefills all fields; save calls `PATCH /shifts/:id` and re-runs the split.
+- **INVOICED:** read-only with an info banner — **"This shift is on an invoice and cannot be changed."** No edit/cancel actions.
+- **CANCELLED:** read-only with an error-tone banner — **"This shift was cancelled and is excluded from totals."**
+- Cancel modal (`CancelShiftModal`): title **"Cancel this shift?"**, body **"The shift will be removed from your uninvoiced totals but kept in your records for audit. This cannot be undone from the app."**, buttons `Keep shift` / `Cancel shift`. This is a **soft cancel** — never use "delete permanently" wording.
+- Detail page shows the server `lineItems` verbatim (no recomputation), plus the public-holiday line when applicable, timezone used, and calculated-at.
 
-    return { totalHours, dayHours, eveHours, dayTotal, eveTotal, travelTotal, grandTotal, kms };
-  }, [startTime, endTime, travelKms]);
+#### 6.8 Voice AI UX (`VoiceRecorder.tsx` + `VoiceShiftParser.tsx`)
+- **States:** idle → requesting (spinner, "Requesting microphone…") → recording (red pulsing button, live timer, `aria-live` status) → processing ("Transcribing…") → idle + prefill; plus `denied` (**"Microphone access is blocked. Allow it in your browser settings, or type the shift instead."**) and `error` (message + retry). Manual entry is always available.
+- **MIME fallback order (mandatory):** `audio/webm;codecs=opus` → `audio/webm` → `audio/mp4` → `audio/aac` → browser default, chosen via `MediaRecorder.isTypeSupported`. This is what makes iPhone Safari work.
+- **Hard limits:** 60 s auto-stop (countdown after 45 s), 5 MB max; audio is held in memory only, never written to storage, never re-uploaded anywhere except `POST /shifts/voice-parse`, and media tracks are always stopped.
+- **Consent (mandatory):** before the first recording per session show **"Voice is processed by AI to fill the form. Review before saving."** with `Got it` (dismissal stored in `sessionStorage`).
+- **Prefill:** matched participant / candidates, date, times, km, notes; **AI-filled fields get an `AI` badge** that clears on manual edit; first missing field is focused; collapsible **"Heard: “…”"** transcript preview (≤ 300 chars); amber banner **"Please check the highlighted fields before saving."** when `confidence < 0.5` or fields are missing; the response `usage` block updates the local plan state.
+- **Never auto-submits.**
+- **Gating:** `403 VOICE_PLAN_REQUIRED` → Pro upgrade modal; `403 TRIAL_VOICE_LIMIT_REACHED` → trial voice modal (3 parses); `402 TRIAL_EXPIRED` → subscribe modal; `503 VOICE_UNAVAILABLE` / `504` / `429` / `413` / `415` / `422` → inline messages, manual entry unaffected. When the mic is known-unavailable it renders disabled but still opens the upgrade modal.
 
-  if (!isOpen) return null;
+#### 6.9 Dashboard Widgets (`app/dashboard/page.tsx`)
+Single request: `GET /dashboard/summary` (no per-widget calls, no localStorage).
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4">
-      <div className="w-full max-w-lg rounded-2xl bg-[#182122] border border-[#253130] p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-150">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-[#253130] pb-4 mb-5">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-[#0D332D] text-[#5EE0C1] flex items-center justify-center border border-[#117A65]">
-              <Clock className="w-4 h-4" />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-[#F1F5F4]">Log NDIS Shift</h3>
-              <p className="text-xs text-[#9AA9A5]">15-second entry with live NDIA auto-split</p>
-            </div>
-          </div>
-          <button
-            onClick={() => setIsRecording(!isRecording)}
-            title="Tap to speak shift details"
-            className={`flex items-center justify-center w-11 h-11 rounded-full transition-all ${
-              isRecording
-                ? 'bg-red-500 text-white animate-pulse shadow-[0_0_20px_rgba(239,68,68,0.5)]'
-                : 'bg-[#16A085] text-white hover:bg-[#1DB89A] shadow-glow'
-            }`}
-          >
-            <Mic className="w-5 h-5" />
-          </button>
-        </div>
+| Widget | Content | Edge case |
+| :--- | :--- | :--- |
+| This Week's Earnings | `formatAud(earnings)`, `{hours} h • {shiftCount} shifts`, change vs last week | `changePercent === null` → **"— vs last week"** (never NaN/Infinity) |
+| Uninvoiced banner | **"⚡ You have {n} unbilled shift(s) ready for invoicing ({amount})."** + `Generate Invoice →` | Hidden when count is 0; the CTA stays disabled with `title="Available with invoicing (Module 5)"` until Module 5 ships |
+| Active Participants | Count + **"All budgets healthy"** or **"{n} nearing budget limit"** (amber) | 0 → **"No participants yet"** + link to `/clients/new` |
+| Recent Shifts | 5 rows (date, participant, times, amount, status), each linking to `/shifts/[id]`, footer **"View all shifts →"** | Empty → **"No shifts logged yet"** + `+ Log Shift` |
+| NDIS Budget Health Watch | Up to 10 participants at ≥ 70% with `formatAud(spent) of formatAud(total)` and a progress bar (reuse `components/clients/BudgetProgress.tsx`) | Empty → **"All participant budgets are healthy"** (success tone) |
+| Trial usage | **"{used}/{limit} trial shifts used • {days} days left"** | `trial === null` → render nothing |
 
-        {/* Inputs */}
-        <div className="space-y-4">
-          <div>
-            <label className="block text-xs font-medium text-[#9AA9A5] mb-1">Participant</label>
-            <select
-              value={selectedClientId}
-              onChange={(e) => setSelectedClientId(e.target.value)}
-              className="w-full rounded-lg bg-[#0E1617] border border-[#253130] px-3.5 py-2 text-sm text-[#F1F5F4] focus:border-[#16A085] focus:outline-none"
-            >
-              {clients.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.participantName} (NDIS: {c.ndisNumber})
-                </option>
-              ))}
-            </select>
-          </div>
+Refresh on mount, after a successful shift save, and on tab `visibilitychange` — keeping the previous numbers visible while refreshing.
 
-          <div className="grid grid-cols-3 gap-3">
-            <Input label="Date" type="date" value={shiftDate} onChange={(e) => setShiftDate(e.target.value)} />
-            <Input label="Start Time" type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
-            <Input label="End Time" type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
-          </div>
+#### 6.10 Service Layer & Module 1–3 Compatibility
+- `lib/shifts-service.ts` is **rewritten to use the real API** (`apiClient`), and `lib/dashboard-service.ts` is added.
+- **Backward compatibility is mandatory:** `components/clients/ClientDetailCard.tsx` uses `shiftsService.list({ clientId })` and expects `ShiftRecord[]`; `app/dashboard/page.tsx` uses `getRecent()` / `subscribe()`; `ShiftModal` uses `create()`. These exported names, the `ShiftRecord` field list and the `subscribe` signature must be preserved (new `listPaged()` is added alongside).
+- **The `localStorage` fallback (`rayvice_logged_shifts`) is removed:** a shift that exists only in the browser can never be invoiced and creates phantom data. On API failure show an error + retry, and delete the legacy key on first load.
+- New types (additive): `Shift`, `ShiftLineItem`, `ShiftStatus`, `RateTier`, `ShiftListResponse`, `ShiftSummary`, `BudgetBlock`, `ShiftMutationResponse`, `DashboardSummary`, `VoiceParseResult`; plus `timezone` / `state` / `planTier` on `Business` / `BusinessProfile`.
+- New dependency allowed: **luxon** (+ `@types/luxon`) — used for business-timezone "today" and the preview mirror.
 
-          <Input
-            label="Activity-Based Transport (KM)"
-            type="number"
-            value={travelKms}
-            onChange={(e) => setTravelKms(e.target.value)}
-            placeholder="0"
-          />
+#### 6.11 States, Errors & Copy
+- Error mapping (`errorCode` → message) covers: `TRIAL_SHIFT_LIMIT_REACHED`, `TRIAL_VOICE_LIMIT_REACHED`, `VOICE_PLAN_REQUIRED`, `VOICE_UNAVAILABLE`, `VOICE_FILE_TOO_LARGE`, `INVALID_AUDIO_FORMAT`, `VOICE_AUDIO_TOO_LONG`, `VOICE_TRANSCRIPT_UNUSABLE`, `VOICE_TRANSCRIPTION_FAILED`, `VOICE_PARSE_FAILED`, `SHIFT_ALREADY_INVOICED`, `SHIFT_CANCELLED`, `SHIFT_OVERLAP`, `DUPLICATE_SHIFT`, `SHIFT_DATE_IN_FUTURE`, `SHIFT_DATE_TOO_OLD`, `SHIFT_DURATION_TOO_LONG`, `SHIFT_DURATION_INVALID`, `TRAVEL_KM_INVALID`, `TRAVEL_NOT_ALLOWED_FOR_ITEM`, `INVALID_SUPPORT_ITEM`, `CLIENT_NOT_FOUND`/`CLIENT_INACTIVE`, `TRIAL_EXPIRED`, `RATE_LIMITED`, `FORBIDDEN` (+ `getApiErrorMessage()` fallback). Never show a raw `errorCode` or stack trace.
+- Toasts (exact): **"Shift logged successfully."**, **"Shift updated successfully."**, **"Shift cancelled."**, **"Voice captured — review the details before saving."**, plus error-tone mapped messages.
+- Every new surface needs loading, empty, error and happy states.
 
-          {/* LIVE NDIS AUTO-SPLIT ENGINE PREVIEW */}
-          <div className="rounded-xl bg-[#131B1C] border border-[#253130] p-4 space-y-2.5">
-            <div className="flex items-center justify-between text-xs font-semibold text-[#687572] uppercase tracking-wider">
-              <span>NDIS Auto-Split Engine</span>
-              <span className="text-[#5EE0C1] flex items-center gap-1">
-                <CheckCircle2 className="w-3.5 h-3.5" /> 2026 NDIA Limits Active
-              </span>
-            </div>
+#### 6.12 Mobile & Accessibility
+- 44 px minimum touch targets; primary actions full-width at the bottom on mobile; native date/time inputs; numeric inputs use `inputMode="decimal"`.
+- Modals scroll internally (`max-h-[90vh] overflow-y-auto`) so the keyboard never hides the save button.
+- Tables scroll horizontally inside a container; the first column stays readable at 360 px; no horizontal page scroll.
+- Recording state announced via `aria-live="polite"`; all icon-only buttons carry `aria-label`; validation errors are linked to inputs and the first invalid field receives focus.
 
-            <div className="space-y-1.5 text-xs">
-              {splitCalculation.dayHours > 0 && (
-                <div className="flex justify-between text-[#F1F5F4]">
-                  <span>01_011_0107_1_1 (Daytime {startTime} - {splitCalculation.eveHours > 0 ? '20:00' : endTime})</span>
-                  <span className="font-mono">{splitCalculation.dayHours}h × $67.56 = ${splitCalculation.dayTotal}</span>
-                </div>
-              )}
-              {splitCalculation.eveHours > 0 && (
-                <div className="flex justify-between text-[#5EE0C1]">
-                  <span>01_015_0107_1_1 (Evening 20:00 - {endTime})</span>
-                  <span className="font-mono">{splitCalculation.eveHours}h × $74.42 = ${splitCalculation.eveTotal}</span>
-                </div>
-              )}
-              {splitCalculation.kms > 0 && (
-                <div className="flex justify-between text-[#9AA9A5]">
-                  <span>01_799_0107_1_1 (Travel {splitCalculation.kms} km)</span>
-                  <span className="font-mono">{splitCalculation.kms} km × $0.97 = ${splitCalculation.travelTotal}</span>
-                </div>
-              )}
-            </div>
+#### 6.13 QA & Acceptance
+The dedicated document defines a **34-item manual QA checklist** (Section 15) and **36 acceptance criteria** (Section 17) — including: preview matching the backend for eight scenarios, overnight split rendering, invoiced immutability, idempotent double-tap save, budget threshold warnings, voice on iOS Safari, plan-gating modals, single dashboard request, no Module 1–3 regressions, and clean `npx tsc --noEmit` + `npx next build`. Both lists are binding.
 
-            <div className="flex justify-between items-center pt-2 border-t border-[#253130] font-bold text-sm text-[#5EE0C1]">
-              <span>Total Claim Amount:</span>
-              <span>${splitCalculation.grandTotal.toFixed(2)} AUD</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Actions */}
-        <div className="mt-6 flex items-center justify-end gap-3">
-          <Button variant="secondary" onClick={onClose}>Cancel</Button>
-          <Button variant="primary" onClick={onShiftSaved}>Save Shift (${splitCalculation.grandTotal.toFixed(2)})</Button>
-        </div>
-      </div>
-    </div>
-  );
-}
-```
+#### 6.14 Out of Scope for v1 (v2 backlog — DO NOT BUILD)
+Sleepover/night entry mode, cancellation-claim UI, PRODA/Myplace CSV export, offline queue and background sync, 15-minute billing-increment settings, map-based travel distance, push notifications, and any invoice-generation UI (Module 5 owns `/invoices/*`). The design system, auth flow and participant pages must not be modified.
 
 ---
 
