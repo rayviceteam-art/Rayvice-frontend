@@ -5,15 +5,15 @@ export type VoiceGateReason = 'TRIAL_VOICE_LIMIT_REACHED' | 'VOICE_PLAN_REQUIRED
 
 const COPY: Record<VoiceGateReason, { title: string; body: string }> = {
   TRIAL_VOICE_LIMIT_REACHED: {
-    title: 'Voice trial limit reached',
+    title: 'Free trial voice limit reached',
     body: 'Your trial includes 3 voice transcriptions. Upgrade to keep using voice logging.',
   },
   VOICE_PLAN_REQUIRED: {
     title: 'Voice AI is a Pro feature',
-    body: 'Upgrade to Pro to use voice logging.',
+    body: 'Starter includes unlimited manual shift logging. Upgrade to Pro for unlimited voice-to-shift AI.',
   },
   TRIAL_EXPIRED: {
-    title: 'Your trial has ended',
+    title: 'Trial ended',
     body: 'Subscribe to continue logging shifts.',
   },
 };
@@ -40,7 +40,7 @@ export function VoiceUpgradeModal({
             Not now
           </Button>
           <Button variant="primary" onClick={onUpgrade}>
-            Upgrade
+            Upgrade to Pro
           </Button>
         </div>
       </div>

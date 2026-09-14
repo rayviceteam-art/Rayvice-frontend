@@ -1,9 +1,11 @@
 'use client';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { VoiceRecorder } from './VoiceRecorder';
 import { VoiceUpgradeModal, type VoiceGateReason } from './VoiceUpgradeModal';
 import { shiftsService } from '@/lib/shifts-service';
 import { getApiErrorCode, getApiErrorMessage } from '@/lib/api-client';
+import { useToast } from '@/lib/toast-context';
 import type { VoiceParseResult } from '@/lib/types';
 
 export interface VoicePrefillPayload {
@@ -26,12 +28,16 @@ interface VoiceShiftParserProps {
 const GATE_CODES: VoiceGateReason[] = ['TRIAL_VOICE_LIMIT_REACHED', 'VOICE_PLAN_REQUIRED', 'TRIAL_EXPIRED'];
 
 export function VoiceShiftParser({ onPrefill, onTranscript, disabled }: VoiceShiftParserProps) {
+  const router = useRouter();
   const [gateReason, setGateReason] = useState<VoiceGateReason | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [reviewWarning, setReviewWarning] = useState(false);
+  const { showToast } = useToast();
   const versionRef = useState({ n: 0 })[0];
 
   async function handleRecording(blob: Blob) {
     setErrorMessage(null);
+    setReviewWarning(false);
     const form = new FormData();
     form.append('file', blob, 'shift.webm');
 
@@ -41,7 +47,10 @@ export function VoiceShiftParser({ onPrefill, onTranscript, disabled }: VoiceShi
       versionRef.n += 1;
       onPrefill({
         version: versionRef.n,
-        clientId: result.matchedClientId,
+        // §12.5: matched client, else the single candidate when unambiguous.
+        clientId:
+          result.matchedClientId ??
+          (result.clientCandidates.length === 1 ? result.clientCandidates[0].id : null),
         shiftDate: result.parsed.shiftDate,
         startTime: result.parsed.startTime,
         endTime: result.parsed.endTime,
@@ -49,6 +58,11 @@ export function VoiceShiftParser({ onPrefill, onTranscript, disabled }: VoiceShi
         caseNotes: result.parsed.caseNotes,
         missingFields: result.parsed.missingFields,
       });
+      // §12.5: flag low-confidence / incomplete parses for review.
+      if (result.parsed.confidence < 0.5 || (result.parsed.missingFields ?? []).length > 0) {
+        setReviewWarning(true);
+      }
+      showToast('Voice captured — review the details before saving.', 'success');
     } catch (err) {
       const code = getApiErrorCode(err);
       if (code && GATE_CODES.includes(code as VoiceGateReason)) {
@@ -67,12 +81,18 @@ export function VoiceShiftParser({ onPrefill, onTranscript, disabled }: VoiceShi
   return (
     <div className="relative">
       <VoiceRecorder onResult={handleRecording} onErrorMessage={setErrorMessage} disabled={disabled} />
+      {reviewWarning && !errorMessage && (
+        <p className="mt-1 text-caption text-warning">Please check the highlighted fields before saving.</p>
+      )}
       {errorMessage && <p className="mt-1 text-caption text-error">{errorMessage}</p>}
       <VoiceUpgradeModal
         reason={gateReason}
         isOpen={gateReason != null}
         onClose={() => setGateReason(null)}
-        onUpgrade={() => setGateReason(null)}
+        onUpgrade={() => {
+          setGateReason(null);
+          router.push('/settings/billing');
+        }}
       />
     </div>
   );

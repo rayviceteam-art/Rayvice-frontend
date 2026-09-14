@@ -106,7 +106,7 @@ export function ShiftModal({ isOpen, onClose, clients, onShiftSaved, defaultClie
         </div>
 
         {transcript && (
-          <p className="border-b border-border px-4 py-2 text-caption italic text-text-muted">&quot;{transcript}&quot;</p>
+          <p className="border-b border-border px-4 py-2 text-caption italic text-text-muted">Heard: &quot;{transcript}&quot;</p>
         )}
 
         <ShiftForm

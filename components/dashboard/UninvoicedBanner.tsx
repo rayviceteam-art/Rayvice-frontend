@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { formatAud } from '@/lib/format';
 import type { DashboardSummary } from '@/lib/types';
 
@@ -6,14 +5,20 @@ export function UninvoicedBanner({ data }: { data: DashboardSummary['uninvoiced'
   if (data.shiftCount === 0) return null; // only shown when there are unbilled shifts (QA #22)
 
   return (
-    <Link
-      href="/shifts?status=PENDING"
-      className="flex items-center justify-between rounded-card border border-brand-dark bg-brand-bg px-4 py-3 text-body2 text-brand-light hover:opacity-90"
-    >
+    <div className="flex items-center justify-between gap-3 rounded-card border border-brand-dark bg-brand-bg px-4 py-3 text-body2 text-brand-light">
       <span>
-        {data.shiftCount} uninvoiced shift{data.shiftCount === 1 ? '' : 's'} worth {formatAud(data.totalAmount)}
+        ⚡ You have {data.shiftCount} unbilled shift{data.shiftCount === 1 ? '' : 's'} ready for invoicing (
+        {formatAud(data.totalAmount)}).
       </span>
-      <span className="underline">View →</span>
-    </Link>
+      {/* /invoices/generate ships with Module 5 — disabled until then (§13.3). */}
+      <button
+        type="button"
+        disabled
+        title="Available with invoicing (Module 5)"
+        className="shrink-0 cursor-not-allowed underline opacity-60"
+      >
+        Generate Invoice →
+      </button>
+    </div>
   );
 }

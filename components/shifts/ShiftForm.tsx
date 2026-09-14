@@ -104,27 +104,29 @@ export function ShiftForm({
     if (!voicePrefill || voicePrefill.version === lastVoiceVersion.current) return;
     lastVoiceVersion.current = voicePrefill.version;
     const filled = new Set<string>();
-    if (voicePrefill.clientId) {
+    // Never overwrite a field the worker already edited manually (§12.5).
+    const canFill = (field: string) => !touchedRef.current.has(field);
+    if (voicePrefill.clientId && canFill('clientId')) {
       setClientId(voicePrefill.clientId);
       filled.add('clientId');
     }
-    if (voicePrefill.shiftDate) {
+    if (voicePrefill.shiftDate && canFill('shiftDate')) {
       setShiftDate(voicePrefill.shiftDate);
       filled.add('shiftDate');
     }
-    if (voicePrefill.startTime) {
+    if (voicePrefill.startTime && canFill('startTime')) {
       setStartTime(voicePrefill.startTime);
       filled.add('startTime');
     }
-    if (voicePrefill.endTime) {
+    if (voicePrefill.endTime && canFill('endTime')) {
       setEndTime(voicePrefill.endTime);
       filled.add('endTime');
     }
-    if (voicePrefill.travelKms != null) {
+    if (voicePrefill.travelKms != null && canFill('travelKms')) {
       setTravelKms(String(voicePrefill.travelKms));
       filled.add('travelKms');
     }
-    if (voicePrefill.caseNotes) {
+    if (voicePrefill.caseNotes && canFill('caseNotes')) {
       setCaseNotes(voicePrefill.caseNotes);
       filled.add('caseNotes');
     }
@@ -189,9 +191,18 @@ export function ShiftForm({
     setDirty(true);
   }
 
+  // Fields the worker has edited by hand in this session — voice prefill
+  // must never overwrite them (§12.5).
+  const touchedRef = useRef<Set<string>>(new Set());
+
+  function markTouched(field: string) {
+    touchedRef.current.add(field);
+    markDirty();
+  }
+
   function handleClientChange(id: string) {
     setClientId(id);
-    markDirty();
+    markTouched('clientId');
     if (!supportItemTouched) {
       const p = activeParticipants.find((x) => x.id === id);
       setSupportItemCode(p?.defaultSupportItemCode ?? DEFAULT_SUPPORT_ITEM_CODE);
@@ -246,7 +257,22 @@ export function ShiftForm({
     if (splitResult.errors.length > 0) errs.travelKms = splitResult.errors[0];
 
     setFieldErrors(errs);
-    return Object.keys(errs).length === 0;
+    const keys = Object.keys(errs);
+    if (keys.length > 0) {
+      // §8.6: focus the first invalid field so the worker can fix it immediately.
+      const refFor: Record<string, React.RefObject<HTMLElement | null>> = {
+        clientId: clientFieldRef,
+        shiftDate: dateFieldRef,
+        startTime: startFieldRef,
+        endTime: endFieldRef,
+        travelKms: travelFieldRef,
+        caseNotes: notesFieldRef,
+      };
+      const first = keys.map((k) => refFor[k]?.current).find(Boolean);
+      if (first) setTimeout(() => first.focus(), 0);
+      return false;
+    }
+    return true;
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -334,7 +360,7 @@ export function ShiftForm({
             onChange={(e) => {
               setShiftDate(e.target.value);
               clearAiBadge('shiftDate');
-              markDirty();
+              markTouched('shiftDate');
             }}
             error={mergedErrors.shiftDate}
           />
@@ -348,7 +374,7 @@ export function ShiftForm({
             onChange={(e) => {
               setStartTime(e.target.value);
               clearAiBadge('startTime');
-              markDirty();
+              markTouched('startTime');
             }}
             error={mergedErrors.startTime}
           />
@@ -362,7 +388,7 @@ export function ShiftForm({
             onChange={(e) => {
               setEndTime(e.target.value);
               clearAiBadge('endTime');
-              markDirty();
+              markTouched('endTime');
             }}
             error={mergedErrors.endTime}
           />
@@ -386,7 +412,7 @@ export function ShiftForm({
           onChange={(e) => {
             setTravelKms(e.target.value);
             clearAiBadge('travelKms');
-            markDirty();
+            markTouched('travelKms');
           }}
           error={mergedErrors.travelKms}
         />
@@ -450,7 +476,7 @@ export function ShiftForm({
           onChange={(e) => {
             setCaseNotes(e.target.value);
             clearAiBadge('caseNotes');
-            markDirty();
+            markTouched('caseNotes');
           }}
           error={mergedErrors.caseNotes}
         />

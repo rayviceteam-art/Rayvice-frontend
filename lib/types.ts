@@ -64,6 +64,10 @@ export interface Business {
   trialEndsAt?: string | null;
   trial?: TrialDetails | null;
   subscriptionStatus?: string | null;
+  // MODULE 4 (additive, FRONTEND_SPEC §14.4): rate-tier timezone + plan gating.
+  timezone?: string;
+  state?: string | null;
+  planTier?: string;
 }
 
 export interface BusinessProfile {
@@ -87,6 +91,9 @@ export interface BusinessProfile {
   postcode?: string | null;
   status: BusinessStatus;
   effectiveStatus: BusinessStatus;
+  // MODULE 4 (additive, FRONTEND_SPEC §14.4): profile now returns timezone (§5.2).
+  timezone?: string;
+  planTier?: string;
   trialStartedAt?: string;
   trialEndsAt?: string;
   trial?: TrialDetails | null;
@@ -375,6 +382,7 @@ export interface ShiftLineItem {
 export interface Shift {
   id: string;
   clientId: string;
+  userId: string;
   clientName: string;
   ndisNumber: string;
   shiftDate: string;
@@ -389,10 +397,19 @@ export interface Shift {
   status: ShiftStatus;
   totalHours: number;
   totalAmount: number;
+  // Backend §21.1 compat fields (day/eve split + invoice state).
+  dayHours: number;
+  dayTotal: number;
+  eveHours: number;
+  eveTotal: number;
+  hourlyRate: number | null;
+  grandTotal: number;
+  isInvoiced: boolean;
+  calculatedAt: string | null;
   lineItems: ShiftLineItem[];
   timezone: string;
   createdAt: string;
-  createdBy: string;
+  createdBy?: string;
 }
 
 export interface Pagination {

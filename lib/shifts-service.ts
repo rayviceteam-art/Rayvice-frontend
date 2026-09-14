@@ -65,9 +65,12 @@ interface BackendVoiceResult {
 
 export const shiftsService = {
   async list(params: ShiftListParams): Promise<ShiftListResponse> {
+    // The backend names the worker filter `userId` (§12.2); the UI calls it workerId.
+    const { workerId, ...rest } = params;
+    const query = workerId ? { ...rest, userId: workerId } : rest;
     const { data: envelope } = await apiClient.get<
       Envelope<{ items: Shift[]; pagination: BackendShiftPagination; summary: ShiftSummary }>
-    >('/shifts', { params });
+    >('/shifts', { params: query });
     const body = envelope.data;
     return {
       items: body?.items ?? [],

@@ -8,6 +8,7 @@ import { CancelShiftModal } from '@/components/shifts/CancelShiftModal';
 import { Card, CardBody, Button } from '@/components/ui';
 import { shiftsService } from '@/lib/shifts-service';
 import { clientsService, toParticipantOptions } from '@/lib/clients-service';
+import { getApiErrorMessage } from '@/lib/api-client';
 import { formatAud, formatHours } from '@/lib/format';
 import type { ParticipantOption, ShiftListResponse } from '@/lib/types';
 
@@ -27,9 +28,14 @@ export default function ShiftsPage() {
   const [data, setData] = useState<ShiftListResponse | null>(null);
   const [participants, setParticipants] = useState<ParticipantOption[]>([]);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [cancelTargetId, setCancelTargetId] = useState<string | null>(null);
 
+  // FRONTEND_SPEC §7.3: an impossible range shows an inline hint and blocks the request.
+  const rangeInvalid = Boolean(filters.from && filters.to && filters.from > filters.to);
+
   const load = useCallback(async () => {
+    if (rangeInvalid) return; // §7.3: invalid range blocks the request
     setStatus('loading');
     try {
       const [list] = await Promise.all([
@@ -44,11 +50,13 @@ export default function ShiftsPage() {
         }),
       ]);
       setData(list);
+      setLoadError(null);
       setStatus('ready');
-    } catch {
+    } catch (err) {
+      setLoadError(getApiErrorMessage(err));
       setStatus('error');
     }
-  }, [tab, filters, page]);
+  }, [tab, filters, page, rangeInvalid]);
 
   useEffect(() => {
     clientsService
@@ -72,8 +80,19 @@ export default function ShiftsPage() {
 
   const hasFilters = Boolean(filters.from || filters.to || filters.clientId || filters.workerId);
 
+  function updateFilters(next: ShiftFiltersValue) {
+    setPage(1);
+    setFilters(next);
+  }
+
   return (
-    <AppLayout title="Shifts & Splitter" subtitle="Every shift you've logged, uninvoiced or not" onShiftSaved={load}>
+    <AppLayout title="Shifts & Splitter" subtitle="Logged shifts with automatic NDIS rate splits" onShiftSaved={load}>
+      <div className="mb-4 flex items-center justify-between">
+        <h1 className="text-h2 text-text-primary">Shifts</h1>
+        <Button variant="primary" onClick={() => router.push('/shifts/new')}>
+          + Log Shift
+        </Button>
+      </div>
       <div className="mb-4 flex gap-2 border-b border-border">
         {TABS.map((t) => (
           <button
@@ -89,7 +108,12 @@ export default function ShiftsPage() {
       </div>
 
       <div className="mb-4">
-        <ShiftFilters value={filters} onChange={setFilters} participants={participants} workers={[]} />
+        <ShiftFilters value={filters} onChange={updateFilters} participants={participants} workers={[]} />
+        {rangeInvalid && (
+          <p role="alert" className="mt-2 text-caption text-error">
+            The &lsquo;from&rsquo; date is after the &lsquo;to&rsquo; date. Adjust the range to load shifts.
+          </p>
+        )}
       </div>
 
       {data && (
@@ -118,7 +142,7 @@ export default function ShiftsPage() {
       <Card>
         <CardBody>
           {status === 'loading' && <ShiftTableSkeleton />}
-          {status === 'error' && <ShiftTableError onRetry={load} />}
+          {status === 'error' && <ShiftTableError message={loadError} onRetry={load} />}
           {status === 'ready' && data && data.items.length === 0 && (
             <ShiftTableEmpty
               hasFilters={hasFilters}

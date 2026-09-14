@@ -26,15 +26,52 @@ export interface ShiftSplitResult {
   warnings: string[]; // informational only, never blocks save
 }
 
-// Minimal AU public holiday stub for the "Auto" resolution.
-// Replace with the real client-side list mirrored from the backend catalogue.
-const AU_PUBLIC_HOLIDAYS_2026: Record<string, string[]> = {
-  NSW: ['2026-01-01', '2026-01-26', '2026-04-03', '2026-04-06', '2026-12-25', '2026-12-26'],
-  VIC: ['2026-01-01', '2026-01-26', '2026-04-03', '2026-04-06', '2026-12-25', '2026-12-26'],
+// Client-side AU public holiday list for the "Auto" mode (FRONTEND_SPEC §10.2).
+// Preview only — the backend re-resolves every shift with `date-holidays`
+// (state-aware, incl. substitute days) and is authoritative on save, so a
+// missing entry here can never change billed money, only the preview tier.
+// National days + the main state days for 2026–2027; state `null` falls back
+// to NSW. Regional show days are intentionally excluded (worker override covers them).
+const NATIONAL_HOLIDAYS: Record<string, string[]> = {
+  '2026': ['2026-01-01', '2026-01-26', '2026-04-03', '2026-04-06', '2026-04-25', '2026-12-25', '2026-12-26', '2026-12-28'],
+  '2027': ['2027-01-01', '2027-01-26', '2027-03-26', '2027-03-29', '2027-04-25', '2027-04-26', '2027-12-25', '2027-12-26', '2027-12-27', '2027-12-28'],
 };
 
+const STATE_HOLIDAYS_2026: Record<string, string[]> = {
+  NSW: ['2026-04-27', '2026-06-08', '2026-10-05'],
+  VIC: ['2026-03-09', '2026-06-08', '2026-09-25', '2026-11-03', '2026-04-27'],
+  QLD: ['2026-05-04', '2026-10-05', '2026-04-27'],
+  SA: ['2026-03-09', '2026-06-08', '2026-10-05', '2026-04-27'],
+  WA: ['2026-03-02', '2026-06-01', '2026-09-28', '2026-04-27'],
+  TAS: ['2026-03-09', '2026-04-07', '2026-06-08'],
+  ACT: ['2026-03-09', '2026-06-01', '2026-06-08', '2026-10-05', '2026-04-27'],
+  NT: ['2026-05-04', '2026-06-08', '2026-08-03', '2026-04-27'],
+};
+
+const STATE_HOLIDAYS_2027: Record<string, string[]> = {
+  NSW: ['2027-06-14', '2027-10-04'],
+  VIC: ['2027-03-08', '2027-06-14', '2027-09-24', '2027-11-02'],
+  QLD: ['2027-05-03', '2027-10-04'],
+  SA: ['2027-03-08', '2027-06-14', '2027-10-04'],
+  WA: ['2027-03-01', '2027-06-07', '2027-09-27'],
+  TAS: ['2027-03-08', '2027-03-30', '2027-06-14'],
+  ACT: ['2027-03-08', '2027-06-07', '2027-06-14', '2027-10-04'],
+  NT: ['2027-05-03', '2027-06-14', '2027-08-02'],
+};
+
+function stateHolidays(state: string | null | undefined, year: string): string[] {
+  const table = year === '2027' ? STATE_HOLIDAYS_2027 : STATE_HOLIDAYS_2026;
+  return table[state ?? 'NSW'] ?? table.NSW;
+}
+
 function isHolidayDate(dateIso: string, state: string | null | undefined): boolean {
-  const list = AU_PUBLIC_HOLIDAYS_2026[state ?? 'NSW'] ?? AU_PUBLIC_HOLIDAYS_2026.NSW;
+  const year = dateIso.slice(0, 4);
+  if (year !== '2026' && year !== '2027') {
+    // Outside the bundled list: fall back to weekends-only so the preview
+    // never invents a holiday rate; the backend still resolves correctly.
+    return false;
+  }
+  const list = [...(NATIONAL_HOLIDAYS[year] ?? []), ...stateHolidays(state, year)];
   return list.includes(dateIso);
 }
 

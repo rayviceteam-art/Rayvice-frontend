@@ -56,7 +56,7 @@ export default function ShiftDetailPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  const canManage = can('OWNER', 'OFFICE_MANAGER') || shift?.createdBy === user?.id;
+  const canManage = can('OWNER', 'OFFICE_MANAGER') || shift?.userId === user?.id;
 
   async function handleUpdate(payload: UpdateShiftPayload, idempotencyKey: string) {
     setIsSubmitting(true);
