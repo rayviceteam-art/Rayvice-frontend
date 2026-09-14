@@ -91,6 +91,14 @@ export function ShiftForm({
   const [aiFields, setAiFields] = useState<Set<string>>(new Set());
   const lastVoiceVersion = useRef<number | undefined>(undefined);
 
+  // Field refs for voice missing-fields focus (Section 12, QA "Missing fields are focused").
+  const clientFieldRef = useRef<HTMLSelectElement>(null);
+  const dateFieldRef = useRef<HTMLInputElement>(null);
+  const startFieldRef = useRef<HTMLInputElement>(null);
+  const endFieldRef = useRef<HTMLInputElement>(null);
+  const travelFieldRef = useRef<HTMLInputElement>(null);
+  const notesFieldRef = useRef<HTMLTextAreaElement>(null);
+
   // Apply a new voice-parse result as a prefill (Section 12: voice never auto-saves).
   useEffect(() => {
     if (!voicePrefill || voicePrefill.version === lastVoiceVersion.current) return;
@@ -122,6 +130,30 @@ export function ShiftForm({
     }
     setAiFields(filled);
     setDirty(true);
+
+    // Focus the first still-missing field in form order so the worker can
+    // complete the voice-drafted shift without hunting for gaps.
+    const missing = new Set((voicePrefill.missingFields ?? []).map((f) => f.toLowerCase()));
+    const isMissing = (...names: string[]) => names.some((n) => missing.has(n.toLowerCase()));
+    const focusTarget =
+      !voicePrefill.clientId || isMissing('clientid', 'clientfirstname', 'client')
+        ? clientFieldRef.current
+        : isMissing('shiftdate', 'date')
+          ? dateFieldRef.current
+          : isMissing('starttime', 'start')
+            ? startFieldRef.current
+            : isMissing('endtime', 'end')
+              ? endFieldRef.current
+              : isMissing('travelkms', 'travel')
+                ? travelFieldRef.current
+                : isMissing('casenotes', 'notes')
+                  ? notesFieldRef.current
+                  : null;
+    if (focusTarget) {
+      // Let the prefilled values paint first, then move focus.
+      const timer = setTimeout(() => focusTarget.focus({ preventScroll: false }), 0);
+      return () => clearTimeout(timer);
+    }
   }, [voicePrefill]);
 
   function clearAiBadge(field: string) {
@@ -275,6 +307,7 @@ export function ShiftForm({
           </>
         ) : (
           <Select
+            ref={clientFieldRef}
             value={clientId}
             onChange={(e) => handleClientChange(e.target.value)}
             error={mergedErrors.clientId}
@@ -295,6 +328,7 @@ export function ShiftForm({
         <div>
           <label className="mb-1 block text-body2 text-text-secondary">Date <AiBadge field="shiftDate" /></label>
           <Input
+            ref={dateFieldRef}
             type="date"
             value={shiftDate}
             onChange={(e) => {
@@ -308,6 +342,7 @@ export function ShiftForm({
         <div>
           <label className="mb-1 block text-body2 text-text-secondary">Start Time <AiBadge field="startTime" /></label>
           <Input
+            ref={startFieldRef}
             type="time"
             value={startTime}
             onChange={(e) => {
@@ -321,6 +356,7 @@ export function ShiftForm({
         <div>
           <label className="mb-1 block text-body2 text-text-secondary">End Time <AiBadge field="endTime" /></label>
           <Input
+            ref={endFieldRef}
             type="time"
             value={endTime}
             onChange={(e) => {
@@ -340,6 +376,7 @@ export function ShiftForm({
       <div>
         <label className="mb-1 block text-body2 text-text-secondary">Activity-Based Transport (km) <AiBadge field="travelKms" /></label>
         <Input
+          ref={travelFieldRef}
           type="number"
           inputMode="decimal"
           min={0}
@@ -406,6 +443,7 @@ export function ShiftForm({
       <div>
         <label className="mb-1 block text-body2 text-text-secondary">Case Notes <AiBadge field="caseNotes" /></label>
         <Textarea
+          ref={notesFieldRef}
           rows={4}
           maxLength={2000}
           value={caseNotes}
