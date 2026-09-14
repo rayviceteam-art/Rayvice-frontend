@@ -8,11 +8,13 @@ import { BudgetWatchCard } from '@/components/dashboard/BudgetWatchCard';
 import { RecentShiftsCard } from '@/components/dashboard/RecentShiftsCard';
 import { Card, CardBody, Skeleton, Button } from '@/components/ui';
 import { dashboardService } from '@/lib/dashboard-service';
+import { getApiErrorMessage } from '@/lib/api-client';
 import type { DashboardSummary } from '@/lib/types';
 
 export default function DashboardPage() {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   // §13.4: show previous numbers while refreshing — no full-page spinner after first load.
   const load = useCallback(async (silent = false) => {
@@ -20,9 +22,13 @@ export default function DashboardPage() {
     try {
       const data = await dashboardService.getSummary(); // single call powers every widget below
       setSummary(data);
+      setLoadError(null);
       setStatus('ready');
-    } catch {
-      if (!summary) setStatus('error');
+    } catch (err) {
+      if (!summary) {
+        setLoadError(getApiErrorMessage(err));
+        setStatus('error');
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -61,6 +67,7 @@ export default function DashboardPage() {
             <p role="alert" className="text-error">
               Couldn&apos;t load your dashboard.
             </p>
+            {loadError && <p className="mt-1 text-body2 text-text-secondary">{loadError}</p>}
             <Button className="mt-3" variant="secondary" onClick={() => load()}>
               Try Again
             </Button>
