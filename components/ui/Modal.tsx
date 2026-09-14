@@ -65,7 +65,7 @@ export const Modal: React.FC<ModalProps> = ({
 
       {/* Modal Dialog */}
       <div
-        className={`relative w-full ${widthClass} rounded-2xl border border-[#253130] bg-[#182122] p-6 shadow-2xl animate-in zoom-in-95 duration-150 text-[#F1F5F4] z-10`}
+        className={`relative w-full ${widthClass} max-h-[calc(100vh-2rem)] overflow-y-auto rounded-2xl border border-[#253130] bg-[#182122] p-6 shadow-2xl animate-in zoom-in-95 duration-150 text-[#F1F5F4] z-10`}
       >
         {showHeader && (
         <div className="flex items-start justify-between border-b border-[#253130] pb-4 mb-5">

@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Mic, Loader2, X } from 'lucide-react';
 
 type RecorderState = 'idle' | 'requesting' | 'recording' | 'processing' | 'denied' | 'error';
+type DeniedReason = 'none' | 'permission' | 'no-device' | 'in-use' | 'unsupported' | 'refresh';
 
 const MIME_CANDIDATES = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/aac'];
 const MAX_SECONDS = 60;
@@ -24,6 +25,7 @@ export function VoiceRecorder({ onResult, onErrorMessage, disabled }: VoiceRecor
   const [state, setState] = useState<RecorderState>('idle');
   const [seconds, setSeconds] = useState(0);
   const [showConsent, setShowConsent] = useState(false);
+  const [deniedReason, setDeniedReason] = useState<DeniedReason>('none');
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);
@@ -84,7 +86,19 @@ export function VoiceRecorder({ onResult, onErrorMessage, disabled }: VoiceRecor
           return next;
         });
       }, 1000);
-    } catch {
+    } catch (err) {
+      const name = (err as DOMException)?.name ?? '';
+      if (name === 'NotAllowedError' || name === 'SecurityError' || name === 'PermissionDeniedError') {
+        setDeniedReason('permission');
+      } else if (name === 'NotFoundError' || name === 'DevicesNotFoundError' || name === 'OverconstrainedError') {
+        setDeniedReason('no-device');
+      } else if (name === 'NotReadableError' || name === 'TrackStartError') {
+        setDeniedReason('in-use');
+      } else if (!navigator.mediaDevices || typeof navigator.mediaDevices.getUserMedia !== 'function') {
+        setDeniedReason('unsupported');
+      } else {
+        setDeniedReason('permission');
+      }
       setState('denied');
       stopTracks();
     }
@@ -178,7 +192,13 @@ export function VoiceRecorder({ onResult, onErrorMessage, disabled }: VoiceRecor
 
       {state === 'denied' && (
         <div className="text-caption text-warning">
-          Microphone access is blocked. Allow it in your browser settings, or type the shift instead.
+          {deniedReason === 'in-use'
+            ? 'Another app is using your microphone. Close that app, then tap Retry.'
+            : deniedReason === 'no-device'
+              ? 'No microphone was found on your device. Type the shift instead.'
+              : deniedReason === 'unsupported'
+                ? 'Your browser does not support microphone access here. Type the shift instead.'
+                : 'Microphone access is blocked. Allow it in your browser settings, or type the shift instead.'}
           <button className="ml-2 text-brand-light" onClick={() => setState('idle')}>
             Retry
           </button>

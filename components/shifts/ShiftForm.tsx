@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import Link from 'next/link';
 import { DateTime } from 'luxon';
 import { Button, Input, Select, Textarea, Badge } from '@/components/ui';
 import { SplitPreview } from './SplitPreview';
@@ -332,21 +333,32 @@ export function ShiftForm({
             </p>
           </>
         ) : (
-          <Select
-            ref={clientFieldRef}
-            value={clientId}
-            onChange={(e) => handleClientChange(e.target.value)}
-            error={mergedErrors.clientId}
-          >
-            <option value="" disabled>
-              Select participant…
-            </option>
-            {activeParticipants.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.participantName}
+          <div>
+            <Select
+              ref={clientFieldRef}
+              value={clientId}
+              onChange={(e) => handleClientChange(e.target.value)}
+              error={mergedErrors.clientId}
+            >
+              <option value="" disabled>
+                Select participant…
               </option>
-            ))}
-          </Select>
+              {activeParticipants.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.participantName}
+                </option>
+              ))}
+            </Select>
+            {activeParticipants.length === 0 && (
+              <p className="mt-1 text-caption text-text-muted">
+                No participants yet.{' '}
+                <Link href="/clients/new" className="text-brand-light underline">
+                  Add your first participant
+                </Link>{' '}
+                to log a shift.
+              </p>
+            )}
+          </div>
         )}
       </div>
 
