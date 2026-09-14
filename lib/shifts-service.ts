@@ -106,7 +106,7 @@ export const shiftsService = {
   },
 
   async cancel(id: string): Promise<void> {
-    await apiClient.post(`/shifts/${id}/cancel`);
+    await apiClient.delete(`/shifts/${id}`);
     emit();
   },
 
