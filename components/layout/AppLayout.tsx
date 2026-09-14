@@ -13,9 +13,12 @@ interface AppLayoutProps {
   children: React.ReactNode;
   title?: string;
   subtitle?: string;
+  // MODULE 4 (additive): refresh hook after the global quick-log ShiftModal
+  // saves — passed straight through to ShiftModal.
+  onShiftSaved?: () => void;
 }
 
-export function AppLayout({ children, title, subtitle }: AppLayoutProps) {
+export function AppLayout({ children, title, subtitle, onShiftSaved }: AppLayoutProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isShiftModalOpen, setIsShiftModalOpen] = useState(false);
   const [isTrialExpired, setIsTrialExpired] = useState(false);
@@ -89,6 +92,10 @@ export function AppLayout({ children, title, subtitle }: AppLayoutProps) {
         <ShiftModal
           isOpen={isShiftModalOpen}
           onClose={() => setIsShiftModalOpen(false)}
+          onShiftSaved={() => {
+            setIsShiftModalOpen(false);
+            onShiftSaved?.();
+          }}
         />
       </div>
     </ProtectedRoute>

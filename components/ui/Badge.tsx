@@ -2,7 +2,9 @@ import React from 'react';
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   variant?: 'default' | 'success' | 'warning' | 'danger' | 'info' | 'brand';
-  tone?: 'neutral' | 'success' | 'warning' | 'error' | 'brand';
+  // MODULE 4 (additive): 'muted' renders like the default badge, 'info' like
+  // the info badge — matches the Module 4 tone vocabulary.
+  tone?: 'neutral' | 'muted' | 'success' | 'warning' | 'error' | 'info' | 'brand';
   size?: 'sm' | 'md';
 }
 
@@ -15,7 +17,7 @@ export const Badge: React.FC<BadgeProps> = ({
   ...props
 }) => {
   const effectiveVariant = tone
-    ? tone === 'neutral'
+    ? tone === 'neutral' || tone === 'muted'
       ? 'default'
       : tone === 'error'
       ? 'danger'

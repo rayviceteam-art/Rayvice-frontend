@@ -104,7 +104,11 @@ const config: Config = {
           bg: '#2B1010',
           border: '#991B1B',
         },
-        info: '#3B82F6',
+        // MODULE 4 (additive): info background tint used by shift detail banners.
+        info: {
+          DEFAULT: '#3B82F6',
+          bg: '#0C1D35',
+        },
       },
       fontSize: {
         h1: ['32px', { lineHeight: '1.25', fontWeight: '700' }],

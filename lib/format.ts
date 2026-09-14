@@ -17,3 +17,8 @@ export function formatCalendarDate(value: string): string {
     date,
   );
 }
+
+// MODULE 4 (additive): compact hours display for the shift split preview.
+export function formatHours(hours: number): string {
+  return `${(hours ?? 0).toFixed(2).replace(/\.00$/, '')} h`;
+}

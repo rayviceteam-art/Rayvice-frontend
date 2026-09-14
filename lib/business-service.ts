@@ -99,3 +99,25 @@ export async function reactivateTeamMember(userId: string): Promise<void> {
 export async function acceptInvite(token: string, password: string): Promise<void> {
   await apiClient.post('/business/team/accept-invite', { token, password });
 }
+
+// =======================================================================
+// MODULE 4 (additive): state -> IANA timezone mirror. The backend derives
+// and stores `business.timezone` from `state` on create/update
+// (business.service.ts `timezoneForState`); this mirror lets the shift UI
+// resolve the rate-tier timezone from the business profile's `state`
+// without an extra round-trip.
+// =======================================================================
+const STATE_TIMEZONE: Record<string, string> = {
+  NSW: 'Australia/Sydney',
+  ACT: 'Australia/Sydney',
+  VIC: 'Australia/Melbourne',
+  TAS: 'Australia/Hobart',
+  QLD: 'Australia/Brisbane',
+  SA: 'Australia/Adelaide',
+  WA: 'Australia/Perth',
+  NT: 'Australia/Darwin',
+};
+
+export function timezoneForState(state: string | null | undefined): string {
+  return (state && STATE_TIMEZONE[state]) || 'Australia/Sydney';
+}

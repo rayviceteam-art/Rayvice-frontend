@@ -11,6 +11,9 @@ export interface ModalProps {
   children: React.ReactNode;
   footer?: React.ReactNode;
   maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+  // MODULE 4 (additive): explicit Tailwind width class (e.g. "max-w-sm").
+  // When provided it wins over `maxWidth`.
+  panelClassName?: string;
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -21,6 +24,7 @@ export const Modal: React.FC<ModalProps> = ({
   children,
   footer,
   maxWidth = 'lg',
+  panelClassName,
 }) => {
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -46,6 +50,11 @@ export const Modal: React.FC<ModalProps> = ({
     '2xl': 'max-w-2xl',
   };
 
+  const widthClass = panelClassName ?? maxWidthClasses[maxWidth];
+  // MODULE 4: title-less modals (custom in-body header) render no chrome
+  // header — all existing callers pass `title`, so they are unaffected.
+  const showHeader = Boolean(title || description);
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
@@ -56,8 +65,9 @@ export const Modal: React.FC<ModalProps> = ({
 
       {/* Modal Dialog */}
       <div
-        className={`relative w-full ${maxWidthClasses[maxWidth]} rounded-2xl border border-[#253130] bg-[#182122] p-6 shadow-2xl animate-in zoom-in-95 duration-150 text-[#F1F5F4] z-10`}
+        className={`relative w-full ${widthClass} rounded-2xl border border-[#253130] bg-[#182122] p-6 shadow-2xl animate-in zoom-in-95 duration-150 text-[#F1F5F4] z-10`}
       >
+        {showHeader && (
         <div className="flex items-start justify-between border-b border-[#253130] pb-4 mb-5">
           <div>
             {title && <h3 className="text-lg font-bold tracking-tight text-[#F1F5F4]">{title}</h3>}
@@ -70,6 +80,7 @@ export const Modal: React.FC<ModalProps> = ({
             <X className="h-5 w-5" />
           </button>
         </div>
+        )}
 
         {children}
         {footer && <div className="mt-5 flex items-center justify-end gap-3 border-t border-[#253130] pt-4">{footer}</div>}

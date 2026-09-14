@@ -3,7 +3,9 @@
 import { SelectHTMLAttributes, forwardRef, useId } from 'react';
 
 interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
-  label: string;
+  // MODULE 4: optional so bare selects (external <label>) compile — existing
+  // callers pass `label` and render exactly as before.
+  label?: string;
   error?: string;
 }
 
@@ -15,9 +17,11 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
 
     return (
       <div className="flex flex-col gap-1.5">
+        {label && (
         <label htmlFor={selectId} className="text-body2 font-medium text-text-secondary">
           {label}
         </label>
+        )}
         <select
           id={selectId}
           ref={ref}

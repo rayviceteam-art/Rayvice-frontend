@@ -12,6 +12,7 @@
     "@hookform/resolvers": "^3.9.0",
     "axios": "^1.7.7",
     "lucide-react": "^0.446.0",
+    "luxon": "^3.4.4",
     "next": "14.2.15",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -20,6 +21,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@types/luxon": "^3.4.2",
     "@types/node": "^20.16.10",
     "@types/react": "^18.3.10",
     "@types/react-dom": "^18.3.0",

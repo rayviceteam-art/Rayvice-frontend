@@ -351,4 +351,142 @@ export interface CreateClientPayload {
 
 export type UpdateClientPayload = Partial<Omit<CreateClientPayload, 'ndisNumber'>>;
 
+// =======================================================================
+// MODULE 4: Shift Logging & NDIS Auto-Split Engine (additive, Section 5.3/14.4)
+// =======================================================================
+
+export type ShiftStatus = 'PENDING' | 'INVOICED' | 'CANCELLED';
+export type RateTier = 'DAY' | 'EVENING' | 'SATURDAY' | 'SUNDAY' | 'HOLIDAY' | 'TRAVEL';
+
+export interface ShiftLineItem {
+  rateTier: RateTier;
+  supportItemCode: string;
+  description: string;
+  quantity: number;
+  unit: 'Hour' | 'KM';
+  ndisCapRate: number;
+  appliedRate: number;
+  amount: number;
+  segmentStart: string | null;
+  segmentEnd: string | null;
+  sortOrder: number;
+}
+
+export interface Shift {
+  id: string;
+  clientId: string;
+  clientName: string;
+  ndisNumber: string;
+  shiftDate: string;
+  startTime: string;
+  endTime: string;
+  isOvernight: boolean;
+  travelKms: number;
+  supportItemCode: string;
+  caseNotes: string | null;
+  isPublicHoliday: boolean | null;
+  publicHolidayName: string | null;
+  status: ShiftStatus;
+  totalHours: number;
+  totalAmount: number;
+  lineItems: ShiftLineItem[];
+  timezone: string;
+  createdAt: string;
+  createdBy: string;
+}
+
+export interface Pagination {
+  page: number;
+  pageSize: number;
+  totalItems: number;
+  totalPages: number;
+}
+
+export interface ShiftSummary {
+  totalAmount: number;
+  totalHours: number;
+  count: number;
+}
+
+export interface ShiftListResponse {
+  items: Shift[];
+  pagination: Pagination;
+  summary: ShiftSummary;
+}
+
+export interface CreateShiftPayload {
+  clientId: string;
+  shiftDate: string;
+  startTime: string;
+  endTime: string;
+  travelKms?: number;
+  caseNotes?: string;
+  isPublicHoliday?: boolean | null;
+  supportItemCode?: string;
+}
+
+export type UpdateShiftPayload = Omit<Partial<CreateShiftPayload>, 'clientId'>;
+
+export interface BudgetBlock {
+  allocatedTotal: number | null;
+  allocatedSpent: number;
+  utilizationPercent: number | null;
+  level: 'OK' | 'WARNING' | 'EXHAUSTED';
+}
+
+export interface ShiftMutationResponse {
+  shift: Shift;
+  budget: BudgetBlock;
+  warnings: string[];
+}
+
+export interface DashboardSummary {
+  thisWeek: {
+    earnings: number;
+    hours: number;
+    shiftCount: number;
+    previousWeekEarnings: number;
+    changePercent: number | null;
+  };
+  uninvoiced: { shiftCount: number; totalAmount: number };
+  activeParticipants: number;
+  recentShifts: Shift[];
+  budgetWatch: Array<{
+    clientId: string;
+    participantName: string;
+    allocatedTotal: number;
+    allocatedSpent: number;
+    utilizationPercent: number;
+    level: 'WARNING' | 'EXHAUSTED';
+  }>;
+  trial: { status: string; daysRemaining: number; shiftsUsed: number; shiftsLimit: number } | null;
+}
+
+export interface VoiceParseResult {
+  transcriptPreview: string;
+  parsed: {
+    clientFirstName: string | null;
+    shiftDate: string | null;
+    startTime: string | null;
+    endTime: string | null;
+    travelKms: number | null;
+    caseNotes: string | null;
+    confidence: number;
+    missingFields: string[];
+  };
+  matchedClientId: string | null;
+  clientCandidates: Array<{ id: string; participantName: string; ndisNumber: string }>;
+  ndisNumberRedacted: boolean;
+  usage: { voiceParsesUsed: number; voiceParsesLimit: number; planTier: string };
+}
+
+export interface ParticipantOption {
+  id: string;
+  participantName: string;
+  ndisNumber: string;
+  defaultSupportItemCode?: string;
+  hourlyRateAgreed?: number | null;
+  isActive: boolean;
+}
+
 

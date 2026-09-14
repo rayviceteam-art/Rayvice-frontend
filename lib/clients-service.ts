@@ -5,6 +5,7 @@ import {
   ClientListItem,
   ClientListResponse,
   CreateClientPayload,
+  ParticipantOption,
   PlanManagementType,
   UpdateClientPayload,
 } from './types';
@@ -67,3 +68,18 @@ export const clientsService = {
     await apiClient.delete(`${ENDPOINT}/${id}`);
   },
 };
+
+// =======================================================================
+// MODULE 4 (additive): maps participant list items to the shift-form
+// option shape (id, name, NDIS number, default item, agreed rate).
+// =======================================================================
+export function toParticipantOptions(items: ClientListItem[]): ParticipantOption[] {
+  return (items ?? []).map((c) => ({
+    id: c.id,
+    participantName: c.participantName,
+    ndisNumber: c.ndisNumber,
+    defaultSupportItemCode: c.defaultSupportItemCode,
+    hourlyRateAgreed: c.hourlyRateAgreed,
+    isActive: c.isActive,
+  }));
+}

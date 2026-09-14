@@ -302,3 +302,23 @@ export function emptyClientFormValues(defaultHourlyRate: number): ClientFormValu
   };
 }
 
+// =======================================================================
+// MODULE 4: Shift form schema (additive, Section 5.3/8.5)
+// =======================================================================
+
+export const shiftFormSchema = z.object({
+  clientId: z.string().uuid('Select a participant.'),
+  shiftDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Enter a valid date.'),
+  startTime: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'Enter a valid start time.'),
+  endTime: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'Enter a valid end time.'),
+  travelKms: z
+    .number()
+    .min(0, 'Travel cannot be negative.')
+    .max(500, 'Travel cannot exceed 500 km.')
+    .optional(),
+  supportItemCode: z.string().min(1, 'Select a support category.'),
+  caseNotes: z.string().max(2000, 'Notes cannot exceed 2000 characters.').optional(),
+});
+
+export type ShiftFormValues = z.infer<typeof shiftFormSchema>;
+

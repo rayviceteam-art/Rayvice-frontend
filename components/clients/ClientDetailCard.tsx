@@ -19,14 +19,14 @@ export function ClientDetailCard({ client }: { client: ClientDetailResponse }) {
   const [allShifts, setAllShifts] = useState(client.recentShifts ?? []);
 
   useEffect(() => {
-    shiftsService.list({ clientId: client.id }).then((records) => {
-      const formattedLocal = records.map((r) => ({
+    shiftsService.list({ clientId: client.id }).then((res) => {
+      const formattedLocal = (res.items ?? []).map((r) => ({
         id: r.id,
         date: r.shiftDate,
         startTime: r.startTime,
         endTime: r.endTime,
         hours: r.totalHours,
-        amount: r.grandTotal,
+        amount: r.totalAmount,
         status: r.status,
       }));
 
