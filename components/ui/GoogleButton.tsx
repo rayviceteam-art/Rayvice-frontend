@@ -23,7 +23,7 @@ export function GoogleButton({ text = 'Continue with Google', className = '' }: 
       if (event.data?.type === 'GOOGLE_AUTH_SUCCESS') {
         setIsLoading(false);
         toast.success('Successfully authenticated with Google.');
-        router.push('/dashboard');
+        router.replace('/dashboard');
       }
     }
     window.addEventListener('message', handleMessage);
@@ -90,7 +90,7 @@ export function GoogleButton({ text = 'Continue with Google', className = '' }: 
             if (idToken || accessToken) {
               await loginWithGoogle({ idToken: idToken || undefined, accessToken: accessToken || undefined });
               toast.success('Successfully authenticated with Google.');
-              router.push('/dashboard');
+              router.replace('/dashboard');
             }
           }
         } catch {

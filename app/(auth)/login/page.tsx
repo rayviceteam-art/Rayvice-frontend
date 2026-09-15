@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -17,11 +17,20 @@ import { getApiErrorMessage } from '@/lib/api-client';
 import { loginSchema, type LoginFormValues } from '@/lib/validators';
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login, isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
+
+  // Back-button fix: an already-signed-in user landing on /login (e.g. via
+  // stale history) goes straight back into the app instead of seeing the
+  // login form again.
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      router.replace('/dashboard');
+    }
+  }, [isLoading, isAuthenticated, router]);
 
   const {
     register,
@@ -35,7 +44,9 @@ export default function LoginPage() {
     try {
       await login(values);
       toast.success('Welcome back.');
-      router.push('/dashboard');
+      // replace (not push) so /login is not left in history — otherwise the
+      // browser back button from /dashboard lands back on the login page.
+      router.replace('/dashboard');
     } catch (error) {
       const message = getApiErrorMessage(error, 'Invalid email or password.');
       setApiError(message);

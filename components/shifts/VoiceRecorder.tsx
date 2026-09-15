@@ -62,6 +62,17 @@ export function VoiceRecorder({ onResult, onErrorMessage, disabled }: VoiceRecor
   }
 
   async function startRecording() {
+    // Pre-check before touching the API: on browsers/webviews without mic
+    // capture this must report "unsupported", not "blocked".
+    if (
+      typeof navigator === 'undefined' ||
+      !navigator.mediaDevices ||
+      typeof navigator.mediaDevices.getUserMedia !== 'function'
+    ) {
+      setDeniedReason('unsupported');
+      setState('denied');
+      return;
+    }
     setState('requesting');
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -94,8 +105,6 @@ export function VoiceRecorder({ onResult, onErrorMessage, disabled }: VoiceRecor
         setDeniedReason('no-device');
       } else if (name === 'NotReadableError' || name === 'TrackStartError') {
         setDeniedReason('in-use');
-      } else if (!navigator.mediaDevices || typeof navigator.mediaDevices.getUserMedia !== 'function') {
-        setDeniedReason('unsupported');
       } else {
         setDeniedReason('permission');
       }
@@ -199,7 +208,7 @@ export function VoiceRecorder({ onResult, onErrorMessage, disabled }: VoiceRecor
               : deniedReason === 'unsupported'
                 ? 'Your browser does not support microphone access here. Type the shift instead.'
                 : 'Microphone access is blocked. Allow it in your browser settings, or type the shift instead.'}
-          <button className="ml-2 text-brand-light" onClick={() => setState('idle')}>
+          <button className="ml-2 text-brand-light" onClick={() => void startRecording()}>
             Retry
           </button>
         </div>
@@ -208,7 +217,7 @@ export function VoiceRecorder({ onResult, onErrorMessage, disabled }: VoiceRecor
       {state === 'error' && (
         <div className="text-caption text-error">
           Voice service timed out — please type the shift details.
-          <button className="ml-2 text-brand-light" onClick={() => setState('idle')}>
+          <button className="ml-2 text-brand-light" onClick={() => void startRecording()}>
             Try again
           </button>
         </div>
