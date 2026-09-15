@@ -72,9 +72,13 @@ export const Modal: React.FC<ModalProps> = ({
       <div
         className={`relative w-full ${widthClass} ${
           flushOnMobile
-            ? 'h-[100dvh] max-h-none overflow-y-auto rounded-none sm:h-auto sm:max-h-[calc(100vh-2rem)] sm:rounded-2xl'
-            : 'max-h-[calc(100vh-2rem)] overflow-y-auto rounded-2xl'
-        } border border-[#253130] bg-[#182122] p-6 shadow-2xl animate-in zoom-in-95 duration-150 text-[#F1F5F4] z-10`}
+            ? // MODULE 4: full-screen sheet on phones. The panel itself must NOT
+              // pad — the in-body header (px-4 py-3) and the form (p-4) own their
+              // padding, and the form's sticky footer relies on sitting flush
+              // against the panel edge. Desktop keeps the original dialog look.
+              'h-[100dvh] max-h-none overflow-y-auto rounded-none p-0 sm:h-auto sm:max-h-[calc(100vh-2rem)] sm:rounded-2xl sm:p-6'
+            : 'max-h-[calc(100vh-2rem)] overflow-y-auto rounded-2xl p-6'
+        } border border-[#253130] bg-[#182122] shadow-2xl animate-in zoom-in-95 duration-150 text-[#F1F5F4] z-10`}
       >
         {showHeader && (
         <div className="flex items-start justify-between border-b border-[#253130] pb-4 mb-5">
