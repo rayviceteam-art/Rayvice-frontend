@@ -351,7 +351,7 @@ export interface CreateClientPayload {
   planManagerEmail?: string | null;
   selfManagedBillingEmail?: string | null;
   selfManagedBillingPhone?: string | null;
-  hourlyRateAgreed: number;
+  hourlyRateAgreed: number | null;
   defaultSupportItemCode: string;
   allocatedBudgetTotal?: number | null;
 }

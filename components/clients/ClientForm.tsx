@@ -4,7 +4,7 @@ import { FormEvent, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
-import { DEFAULT_HOURLY_RATE_2026, SUPPORT_ITEMS } from '@/lib/ndis-rates';
+import { SUPPORT_ITEMS } from '@/lib/ndis-rates';
 import { Client, CreateClientPayload, UpdateClientPayload } from '@/lib/types';
 import { ClientFormValues, clientFormSchema, emptyClientFormValues } from '@/lib/validators';
 import { NdiaManagedNotice } from './NdiaManagedNotice';
@@ -33,14 +33,14 @@ function clientToFormValues(client: Client): ClientFormValues {
     nomineeBillingEmail: client.selfManagedBillingEmail ?? '',
     nomineeBillingPhone: client.selfManagedBillingPhone ?? '',
     defaultSupportItemCode: client.defaultSupportItemCode,
-    hourlyRateAgreed: client.hourlyRateAgreed ?? DEFAULT_HOURLY_RATE_2026,
+    hourlyRateAgreed: client.hourlyRateAgreed ?? null,
     allocatedBudgetTotal: client.allocatedBudgetTotal ?? null,
   };
 }
 
 export function ClientForm({ mode, initialClient, isSubmitting, serverFieldErrors, onSubmit, onCancel }: ClientFormProps) {
   const [values, setValues] = useState<ClientFormValues>(() =>
-    initialClient ? clientToFormValues(initialClient) : emptyClientFormValues(DEFAULT_HOURLY_RATE_2026),
+    initialClient ? clientToFormValues(initialClient) : emptyClientFormValues(),
   );
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isDirty, setIsDirty] = useState(false);
@@ -195,10 +195,11 @@ export function ClientForm({ mode, initialClient, isSubmitting, serverFieldError
         type="number"
         step="0.01"
         min="0"
-        value={Number.isNaN(values.hourlyRateAgreed) ? '' : values.hourlyRateAgreed}
-        onChange={(e) => update('hourlyRateAgreed', e.target.value === '' ? NaN : Number(e.target.value))}
+        placeholder="Optional"
+        value={values.hourlyRateAgreed ?? ''}
+        onChange={(e) => update('hourlyRateAgreed', e.target.value === '' ? null : Number(e.target.value))}
         error={fieldError('hourlyRateAgreed')}
-        required
+        helperText="Leave empty for full NDIA rates. Enter a lower rate only if agreed with this participant."
       />
 
       <Input

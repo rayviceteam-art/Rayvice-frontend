@@ -258,7 +258,8 @@ export const clientFormSchema = z
     defaultSupportItemCode: z.string().min(1, 'Select a default support category.'),
     hourlyRateAgreed: z
       .number({ invalid_type_error: 'Enter a valid hourly rate.' })
-      .nonnegative('Hourly rate cannot be negative.'),
+      .nonnegative('Hourly rate cannot be negative.')
+      .nullable(),
     allocatedBudgetTotal: z
       .number({ invalid_type_error: 'Enter a valid budget amount.' })
       .nonnegative('Budget cannot be negative.')
@@ -286,7 +287,7 @@ export const clientFormSchema = z
 
 export type ClientFormValues = z.infer<typeof clientFormSchema>;
 
-export function emptyClientFormValues(defaultHourlyRate: number): ClientFormValues {
+export function emptyClientFormValues(): ClientFormValues {
   return {
     participantName: '',
     ndisNumber: '',
@@ -297,7 +298,7 @@ export function emptyClientFormValues(defaultHourlyRate: number): ClientFormValu
     nomineeBillingEmail: '',
     nomineeBillingPhone: '',
     defaultSupportItemCode: '',
-    hourlyRateAgreed: defaultHourlyRate,
+    hourlyRateAgreed: null,
     allocatedBudgetTotal: null,
   };
 }
