@@ -23,6 +23,17 @@ interface AuthContextValue {
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
   can: (...roles: string[]) => boolean;
+  /**
+   * Why the last session bootstrap failed:
+   *  - 'session'  → the server rejected the session (401/403): the user really
+   *                 is signed out and must log in again.
+   *  - 'network'  → offline / backend cold start: the session is probably still
+   *                 valid, so we must NOT send the user to /login.
+   *  - null       → no failure.
+   */
+  authError: 'session' | 'network' | null;
+  /** Re-runs the session bootstrap (used by the reconnect screen). */
+  retryBootstrap: () => void;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -31,6 +42,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [business, setBusiness] = useState<Business | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [authError, setAuthError] = useState<'session' | 'network' | null>(null);
+  const [bootstrapNonce, setBootstrapNonce] = useState(0);
 
   // On first load, check if redirected back with Google OAuth tokens in hash,
   // or silently try to exchange the httpOnly refresh cookie for a fresh access token.
@@ -47,6 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
     async function bootstrap() {
+      setAuthError(null);
       try {
         if (typeof window !== 'undefined' && window.location.hash) {
           const hash = window.location.hash.startsWith('#')
@@ -114,23 +128,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setAccessToken(null);
           setUser(null);
           setBusiness(null);
-          if (!sessionRejected) {
-            // Transient failure (offline / cold start) — record it so a rapid
-            // reload can still retry, but never fake a logout on its own.
-            sessionStorage.setItem(lastRefreshFailureKey, String(Date.now()));
-          }
+          // 'session' = the server rejected the token → real logout.
+          // 'network' = cold start / offline → keep the user on a reconnect
+          // screen instead of bouncing them to /login.
+          setAuthError(sessionRejected ? 'session' : 'network');
+          sessionStorage.setItem(lastRefreshFailureKey, String(Date.now()));
         }
       } catch {
         setAccessToken(null);
         setUser(null);
         setBusiness(null);
+        setAuthError('network');
         sessionStorage.setItem(lastRefreshFailureKey, String(Date.now()));
       } finally {
         setIsLoading(false);
       }
     }
     bootstrap();
-  }, []);
+  }, [bootstrapNonce]);
 
   async function login(values: LoginFormValues) {
     const result = await authService.login(values);
@@ -194,8 +209,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       logout,
       refreshUser,
       can: (...roles: string[]) => !!user && roles.includes(user.role),
+      authError,
+      retryBootstrap: () => {
+        setIsLoading(true);
+        setBootstrapNonce((n) => n + 1);
+      },
     }),
-    [user, business, isLoading]
+    [user, business, isLoading, authError]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

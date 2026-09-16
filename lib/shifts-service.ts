@@ -111,9 +111,15 @@ export const shiftsService = {
   },
 
   async voiceParse(form: FormData): Promise<VoiceParseResult> {
-    // NOTE: no manual Content-Type — the browser must set the multipart
-    // boundary itself, otherwise multer never sees the file.
-    const { data: envelope } = await apiClient.post<Envelope<BackendVoiceResult>>('/shifts/voice-parse', form);
+    // The shared axios instance sets a default `Content-Type: application/json`
+    // header. That default WINS over the browser's automatic multipart header,
+    // so the request arrived as JSON and multer never saw the file — the backend
+    // answered "Missing audio file." (VOICE_FILE_MISSING) instead of
+    // transcribing. Clearing the header here lets the browser set
+    // `multipart/form-data; boundary=…` itself.
+    const { data: envelope } = await apiClient.post<Envelope<BackendVoiceResult>>('/shifts/voice-parse', form, {
+      headers: { 'Content-Type': undefined },
+    });
     const body = envelope.data;
     return {
       transcriptPreview: body.transcriptPreview,
