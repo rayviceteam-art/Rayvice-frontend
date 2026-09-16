@@ -1,6 +1,6 @@
 'use client';
 import type { VoicePrefillPayload } from './VoiceShiftParser';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Clock } from 'lucide-react';
 import { Modal } from '@/components/ui';
 import { ShiftForm } from './ShiftForm';
@@ -63,6 +63,43 @@ export function ShiftModal({ isOpen, onClose, clients, onShiftSaved, defaultClie
       onClose();
     }
   }
+
+  // Back-button fix: the modal adds no history entry by itself, so Android /
+  // browser Back while the Shift entry form is open pops the previous page —
+  // stale histories land on /login. Push a same-URL entry on open instead:
+  // Back then only closes the form and the user stays on the Dashboard.
+  // Manual close (X / Cancel / Save) drops the extra entry again, so later
+  // Back presses behave exactly as before. Nothing else changes.
+  const closeRef = useRef({ onClose, requestClose });
+  closeRef.current = { onClose, requestClose };
+  const openHrefRef = useRef('');
+  const entryPushedRef = useRef(false);
+
+  useEffect(() => {
+    if (!isOpen || typeof window === 'undefined' || !window.history) return;
+    openHrefRef.current = window.location.href;
+    window.history.pushState({ rayviceShiftModal: true }, '');
+    entryPushedRef.current = true;
+    const handlePopState = () => {
+      // System Back while open: the browser already popped our entry, so
+      // only close the form — no navigation, never /login.
+      entryPushedRef.current = false;
+      closeRef.current.requestClose();
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      if (entryPushedRef.current) {
+        entryPushedRef.current = false;
+        // Same page still showing: remove the extra entry so a later Back
+        // does not stop on a dead same-URL entry. If the user already
+        // navigated elsewhere, leave the stack untouched.
+        if (window.location.href === openHrefRef.current) {
+          window.history.back();
+        }
+      }
+    };
+  }, [isOpen]);
 
   async function handleSubmit(payload: CreateShiftPayload, idempotencyKey: string) {
     setIsSubmitting(true);

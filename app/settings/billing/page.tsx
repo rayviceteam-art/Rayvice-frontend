@@ -169,11 +169,11 @@ export default function BillingPage() {
 
               <div className="mt-8">
                 <Button
-                  variant="secondary"
+                  variant="primary"
                   className="w-full hover:border-[#16A085] hover:bg-[#0D332D]/40"
                   onClick={() => handleSubscribe('Starter Plan', '$24 AUD/mo')}
                 >
-                  Subscribe with Stripe — $24 AUD/mo
+                  Subscribe to Starter — $24 AUD/mo
                 </Button>
               </div>
             </Card>

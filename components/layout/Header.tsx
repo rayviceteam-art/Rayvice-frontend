@@ -88,8 +88,8 @@ export function Header({ onOpenMobileMenu, onOpenShiftModal, title, subtitle }: 
           disabled={isTrialExpired}
         >
           <Plus className="h-4 w-4" />
-          <span className="hidden sm:inline">+ Log Shift</span>
-          <span className="sm:hidden">+ Shift</span>
+          <span className="hidden sm:inline">Log Shift</span>
+          <span className="sm:hidden">Shift</span>
         </Button>
       </div>
     </header>
