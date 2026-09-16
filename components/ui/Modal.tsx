@@ -61,7 +61,7 @@ export const Modal: React.FC<ModalProps> = ({
   const showHeader = Boolean(title || description);
 
   return (
-    <div className={`fixed inset-0 z-50 flex items-center justify-center ${flushOnMobile ? 'p-0 sm:p-4' : 'p-4'}`}>
+    <div className={`fixed inset-0 z-50 flex items-center justify-center ${flushOnMobile ? 'p-0 lg:p-4' : 'p-4'}`}>
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity animate-in fade-in duration-150"
@@ -76,7 +76,7 @@ export const Modal: React.FC<ModalProps> = ({
               // pad — the in-body header (px-4 py-3) and the form (p-4) own their
               // padding, and the form's sticky footer relies on sitting flush
               // against the panel edge. Desktop keeps the original dialog look.
-              'h-[100dvh] max-h-none overflow-y-auto rounded-none p-0 sm:h-auto sm:max-h-[calc(100vh-2rem)] sm:rounded-2xl sm:p-6'
+              'h-[100dvh] max-h-none overflow-y-auto rounded-none p-0 lg:h-auto lg:max-h-[calc(100vh-2rem)] lg:rounded-2xl lg:p-6'
             : 'max-h-[calc(100vh-2rem)] overflow-y-auto rounded-2xl p-6'
         } border border-[#253130] bg-[#182122] shadow-2xl animate-in zoom-in-95 duration-150 text-[#F1F5F4] z-10`}
       >

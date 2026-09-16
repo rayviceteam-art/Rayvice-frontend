@@ -35,12 +35,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // On first load, check if redirected back with Google OAuth tokens in hash,
   // or silently try to exchange the httpOnly refresh cookie for a fresh access token.
   useEffect(() => {
-    // Throttle only *failed* refresh attempts (e.g. repeated failed registration
-    // attempts or fast page reloads hitting a rate limit). A successful refresh
-    // must always run on mount: the access token is kept in memory only, so
-    // skipping it would leave the user without a session and log them out.
-    const REFRESH_COOLDOWN_MS = 10_000;
+    // The access token lives in memory only, so every full page load (including
+    // the browser Back button) must exchange the refresh cookie for a new token.
+    // A single transient failure — Render cold starts take 30s+ — used to leave
+    // the app without a session and bounce the user to /login. We now retry the
+    // exchange with backoff and only treat the user as signed out when the
+    // server explicitly rejects the session (401/403) or every retry failed.
+    const REFRESH_RETRY_DELAYS_MS = [0, 1500, 4000, 8000];
     const lastRefreshFailureKey = '_rvRefreshFailedAt';
+
+    const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
     async function bootstrap() {
       try {
@@ -78,27 +82,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
         }
 
-        const lastRefreshFailure = Number(sessionStorage.getItem(lastRefreshFailureKey) ?? 0);
-        if (lastRefreshFailure && Date.now() - lastRefreshFailure < REFRESH_COOLDOWN_MS) {
-          // A refresh already failed moments ago — back off instead of hammering
-          // the endpoint (avoids 429 rate-limit errors).
-          setIsLoading(false);
-          return;
+        let lastError: unknown = null;
+        let sessionRejected = false;
+
+        for (let attempt = 0; attempt < REFRESH_RETRY_DELAYS_MS.length; attempt++) {
+          const delay = REFRESH_RETRY_DELAYS_MS[attempt];
+          if (delay > 0) await sleep(delay);
+          try {
+            const { accessToken } = await authService.refresh();
+            setAccessToken(accessToken);
+            const profile = await authService.getMe();
+            setUser(profile);
+            if ((profile as any)?.business) {
+              setBusiness((profile as any).business);
+            }
+            sessionStorage.removeItem(lastRefreshFailureKey);
+            lastError = null;
+            break;
+          } catch (err) {
+            lastError = err;
+            const status = (err as { response?: { status?: number } })?.response?.status;
+            // The server actively rejected the session — retrying cannot help.
+            if (status === 401 || status === 403) {
+              sessionRejected = true;
+              break;
+            }
+          }
         }
 
-        const { accessToken } = await authService.refresh();
-        sessionStorage.removeItem(lastRefreshFailureKey);
-        setAccessToken(accessToken);
-        const profile = await authService.getMe();
-        setUser(profile);
-        if ((profile as any)?.business) {
-          setBusiness((profile as any).business);
+        if (lastError) {
+          setAccessToken(null);
+          setUser(null);
+          setBusiness(null);
+          if (!sessionRejected) {
+            // Transient failure (offline / cold start) — record it so a rapid
+            // reload can still retry, but never fake a logout on its own.
+            sessionStorage.setItem(lastRefreshFailureKey, String(Date.now()));
+          }
         }
       } catch {
         setAccessToken(null);
         setUser(null);
         setBusiness(null);
-        // Remember the failure briefly so repeated rapid reloads back off.
         sessionStorage.setItem(lastRefreshFailureKey, String(Date.now()));
       } finally {
         setIsLoading(false);
