@@ -1,10 +1,10 @@
 'use client';
+import type { VoicePrefillPayload } from '@/components/shifts/VoiceShiftParser';
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card } from '@/components/ui';
 import { ShiftForm } from '@/components/shifts/ShiftForm';
-import { VoiceShiftParser, type VoicePrefillPayload } from '@/components/shifts/VoiceShiftParser';
 import { shiftsService } from '@/lib/shifts-service';
 import { clientsService, toParticipantOptions } from '@/lib/clients-service';
 import { getBusinessProfile, timezoneForState } from '@/lib/business-service';
@@ -58,18 +58,6 @@ export default function NewShiftContent() {
   return (
     <AppLayout title="Log a shift" subtitle="15-second entry with live NDIA auto-split">
       <Card>
-        <div className="flex items-center justify-end border-b border-border px-4 py-3">
-          <VoiceShiftParser
-            onPrefill={setVoicePrefill}
-            onTranscript={setTranscript}
-            disabled={isSubmitting}
-          />
-        </div>
-
-        {transcript && (
-          <p className="border-b border-border px-4 py-2 text-caption italic text-text-muted">Heard: &quot;{transcript}&quot;</p>
-        )}
-
         <ShiftForm
           mode="create"
           participants={participants}

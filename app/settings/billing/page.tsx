@@ -9,7 +9,6 @@ import {
   Crown,
   CreditCard,
   ShieldCheck,
-  Mic,
   ArrowRight,
   Clock,
   Users,
@@ -197,7 +196,7 @@ export default function BillingPage() {
                     <span className="text-sm font-medium text-[#9AA9A5]">AUD / month</span>
                   </div>
                   <p className="text-xs text-[#9AA9A5] mt-2">
-                    For full-time support workers & independent carer agencies wanting Voice AI and unlimited scaling.
+                    For full-time support workers & independent carer agencies needing unlimited scaling.
                   </p>
                 </div>
 
@@ -209,10 +208,6 @@ export default function BillingPage() {
                   <div className="flex items-center gap-2.5 text-[#F1F5F4]">
                     <Check className="h-4 w-4 text-[#5EE0C1] shrink-0" />
                     <span><strong>Unlimited Shifts & Unlimited Invoices</strong></span>
-                  </div>
-                  <div className="flex items-center gap-2.5 text-[#5EE0C1] font-semibold">
-                    <Mic className="h-4 w-4 text-[#5EE0C1] shrink-0" />
-                    <span>Unlimited Voice-to-Shift AI Logging</span>
                   </div>
                   <div className="flex items-center gap-2.5 text-[#F1F5F4]">
                     <Check className="h-4 w-4 text-[#5EE0C1] shrink-0" />

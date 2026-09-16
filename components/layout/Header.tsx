@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Menu, Plus, Mic, Sparkles, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { Menu, Plus, Sparkles, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/lib/auth-context';
 
@@ -87,8 +87,8 @@ export function Header({ onOpenMobileMenu, onOpenShiftModal, title, subtitle }: 
           onClick={onOpenShiftModal}
           disabled={isTrialExpired}
         >
-          <Mic className="h-4 w-4" />
-          <span className="hidden sm:inline">+ Log Shift (Voice)</span>
+          <Plus className="h-4 w-4" />
+          <span className="hidden sm:inline">+ Log Shift</span>
           <span className="sm:hidden">+ Shift</span>
         </Button>
       </div>
