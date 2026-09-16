@@ -39,7 +39,19 @@ export function VoiceShiftParser({ onPrefill, onTranscript, disabled }: VoiceShi
     setErrorMessage(null);
     setReviewWarning(false);
     const form = new FormData();
-    form.append('file', blob, 'shift.webm');
+    // The filename extension must match the recorded container: iOS Safari
+    // records audio/mp4, Android/Chrome record audio/webm. A mismatched name
+    // makes the transcription provider reject the upload.
+    const extension = blob.type.includes('mp4') || blob.type.includes('m4a') || blob.type.includes('aac')
+      ? 'mp4'
+      : blob.type.includes('ogg')
+        ? 'ogg'
+        : blob.type.includes('mpeg')
+          ? 'mp3'
+          : blob.type.includes('wav')
+            ? 'wav'
+            : 'webm';
+    form.append('file', blob, `shift.${extension}`);
 
     try {
       const result: VoiceParseResult = await shiftsService.voiceParse(form);

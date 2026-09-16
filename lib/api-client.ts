@@ -9,7 +9,19 @@ import type { ApiEnvelope, ApiErrorEnvelope } from './types';
  * httpOnly cookie set by the backend (src/utils/cookies.ts). Without this,
  * the browser will never send or receive that cookie cross-origin.
  */
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
+const CONFIGURED_API_URL = process.env.NEXT_PUBLIC_API_URL;
+const IS_LOCAL_BACKEND =
+  !CONFIGURED_API_URL ||
+  CONFIGURED_API_URL.includes('localhost') ||
+  CONFIGURED_API_URL.includes('127.0.0.1');
+
+/**
+ * In production the API is served from our own origin through the /api rewrite
+ * in next.config.js, so the refresh cookie stays first-party (third-party
+ * cookies are blocked by Safari/Chrome and caused the "back button logs me out"
+ * bug). Local development keeps talking to the configured backend directly.
+ */
+const API_BASE_URL = IS_LOCAL_BACKEND ? (CONFIGURED_API_URL ?? 'http://localhost:4000/api') : '/api';
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
