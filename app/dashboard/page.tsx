@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import {
@@ -8,9 +8,12 @@ import {
   Clock,
   Users,
   FileText,
+  ShieldCheck,
   AlertTriangle,
   ArrowUpRight,
+  Sparkles,
   Calendar,
+  ChevronRight,
   TrendingUp,
   Building2,
   Plus,
@@ -22,8 +25,8 @@ import { Badge } from '@/components/ui/Badge';
 import { useAuth } from '@/lib/auth-context';
 import { getBusinessProfile } from '@/lib/business-service';
 import { clientsService } from '@/lib/clients-service';
-import { shiftsService } from '@/lib/shifts-service';
-import { BusinessProfile, ClientListItem, Shift } from '@/lib/types';
+import { shiftsService, ShiftRecord } from '@/lib/shifts-service';
+import { BusinessProfile, ClientListItem } from '@/lib/types';
 import { getApiErrorMessage } from '@/lib/api-client';
 import { formatAud, formatCalendarDate } from '@/lib/format';
 
@@ -32,44 +35,44 @@ export default function DashboardPage() {
   const [profile, setProfile] = useState<BusinessProfile | null>(null);
   const [clients, setClients] = useState<ClientListItem[]>([]);
   const [totalClientsCount, setTotalClientsCount] = useState(0);
-  const [shifts, setShifts] = useState<Shift[]>([]);
+  const [shifts, setShifts] = useState<ShiftRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const loadDashboard = useCallback(async (silent = false) => {
-    if (!silent) setIsLoading(true);
-    try {
-      const [prof, clientsRes, shiftsRes] = await Promise.all([
-        getBusinessProfile().catch((err: any) => {
-          if (err?.response?.status !== 401) {
-            toast.error(getApiErrorMessage(err));
-          }
-          return null;
-        }),
-        clientsService.list({ page: 1, pageSize: 20 }).catch(() => null),
-        shiftsService.list({ pageSize: 10 }).catch(() => null),
-      ]);
-
-      if (prof) setProfile(prof);
-      if (clientsRes) {
-        setClients(clientsRes.data || []);
-        setTotalClientsCount(clientsRes.totalCount || 0);
-      }
-      if (shiftsRes) {
-        setShifts(shiftsRes.items || []);
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
   useEffect(() => {
-    loadDashboard();
-  }, [loadDashboard]);
+    Promise.all([
+      getBusinessProfile().catch((err: any) => {
+        if (err?.response?.status !== 401) {
+          toast.error(getApiErrorMessage(err));
+        }
+        return null;
+      }),
+      clientsService.list({ page: 1, pageSize: 5 }).catch(() => null),
+    ])
+      .then(([prof, clientsRes]) => {
+        if (prof) setProfile(prof);
+        if (clientsRes) {
+          setClients(clientsRes.data || []);
+          setTotalClientsCount(clientsRes.totalCount || 0);
+        }
+      })
+      .finally(() => setIsLoading(false));
+
+    // Load logged shifts from service
+    setShifts(shiftsService.getRecent(10));
+
+    // Subscribe to shift additions (from global header modal)
+    const unsubscribe = shiftsService.subscribe(() => {
+      setShifts(shiftsService.getRecent(10));
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const compliance = profile?.compliance;
   const trial = profile?.trial;
   const daysRemaining = trial?.daysRemaining ?? 9;
 
+  // Real uninvoiced count aggregated from participants and local shift queue
   const pendingFromClients = clients.reduce((acc, c) => acc + (c.pendingUninvoicedShiftsCount || 0), 0);
   const pendingFromLocal = shifts.filter((s) => s.status === 'PENDING').length;
   const pendingUninvoicedCount = Math.max(pendingFromClients, pendingFromLocal);
@@ -83,9 +86,10 @@ export default function DashboardPage() {
     <AppLayout
       title={`Welcome back, ${user?.firstName || 'Support Worker'}`}
       subtitle="NDIS Sole-Trader Billing, Timesheets & Auto-Rejection Shield Dashboard"
-      onShiftSaved={() => loadDashboard(true)}
     >
       <div className="space-y-6">
+
+        {/* Compliance Incomplete Alert Banner */}
         {!compliance?.isCompliant && (
           <div className="rounded-xl border border-[#92400E] bg-[#2A210B] p-4 text-xs space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -121,6 +125,7 @@ export default function DashboardPage() {
           </div>
         )}
 
+        {/* Trial Status Header Card */}
         <div className="rounded-xl border border-[#117A65] bg-[#0D332D]/40 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
@@ -149,7 +154,9 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {/* Top 3 Stat Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {/* Card 1: Estimated Earnings */}
           <Card className="p-5 border-[#253130] bg-[#131B1C]">
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-[#9AA9A5]">This Week&apos;s Logged Shifts</span>
@@ -168,6 +175,7 @@ export default function DashboardPage() {
             </div>
           </Card>
 
+          {/* Card 2: Uninvoiced Shifts */}
           <Card className="p-5 border-[#253130] bg-[#131B1C]">
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-[#9AA9A5]">Pending Uninvoiced Shifts</span>
@@ -185,6 +193,7 @@ export default function DashboardPage() {
             </div>
           </Card>
 
+          {/* Card 3: Active Participants */}
           <Card className="p-5 border-[#253130] bg-[#131B1C]">
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-[#9AA9A5]">Active Participants</span>
@@ -212,6 +221,7 @@ export default function DashboardPage() {
           </Card>
         </div>
 
+        {/* Uninvoiced Shifts Batch Callout Banner */}
         {pendingUninvoicedCount > 0 ? (
           <div className="rounded-xl border border-[#117A65] bg-[#0D332D]/70 p-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -228,19 +238,18 @@ export default function DashboardPage() {
                   </p>
                 </div>
               </div>
-              <Button
-                variant="primary"
-                size="sm"
-                className="shadow-glow shrink-0"
-                onClick={() => toast('Invoice batch generation screen will open with Module 5 Invoicing rollout!')}
-              >
-                Batch Generate Invoices (Shield)
-              </Button>
+              <Link href="/invoices/generate">
+                <Button variant="primary" size="sm" className="shadow-glow shrink-0">
+                  Batch Generate Invoices (Shield)
+                </Button>
+              </Link>
             </div>
           </div>
         ) : null}
 
+        {/* Split Grid: Recent Shifts & Budget Watch */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Recent Shifts Table (2 cols) */}
           <div className="lg:col-span-2 space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-semibold text-[#F1F5F4]">Recent Shift Logs & Split Math</h3>
@@ -300,6 +309,7 @@ export default function DashboardPage() {
             </Card>
           </div>
 
+          {/* NDIS Participant Budget Health Watch (1 col) */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-semibold text-[#F1F5F4]">Participant Budget Health</h3>
@@ -313,12 +323,12 @@ export default function DashboardPage() {
                     <div className="flex items-center justify-between text-xs">
                       <span className="font-semibold text-[#F1F5F4]">{primaryClient.participantName}</span>
                       <span className="text-[#5EE0C1] font-mono">
-                        {primaryClient.budgetUtilizationPercent !== null && primaryClient.budgetUtilizationPercent !== undefined
+                        {primaryClient.budgetUtilizationPercent !== null
                           ? `${100 - primaryClient.budgetUtilizationPercent}% Remaining`
                           : 'No Budget Set'}
                       </span>
                     </div>
-                    {primaryClient.budgetUtilizationPercent !== null && primaryClient.budgetUtilizationPercent !== undefined && (
+                    {primaryClient.budgetUtilizationPercent !== null && (
                       <div className="h-2 w-full rounded-full bg-[#0E1617] overflow-hidden">
                         <div
                           className="h-full bg-[#16A085] rounded-full"

@@ -323,3 +323,16 @@ export const shiftFormSchema = z.object({
 
 export type ShiftFormValues = z.infer<typeof shiftFormSchema>;
 
+// =======================================================================
+// MODULE 5: Invoice Generation Schema
+// =======================================================================
+
+export const generateInvoiceSchema = z.object({
+  clientId: z.string().uuid('A valid participant must be selected.'),
+  shiftIds: z.array(z.string().uuid()).min(1, 'At least one shift must be selected.'),
+  dueDate: z.string().optional(),
+  notes: z.string().max(500, 'Notes must not exceed 500 characters.').optional().or(z.literal('')),
+});
+
+export type GenerateInvoiceFormValues = z.infer<typeof generateInvoiceSchema>;
+

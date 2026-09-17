@@ -506,4 +506,106 @@ export interface ParticipantOption {
   isActive: boolean;
 }
 
+// =======================================================================
+// MODULE 5: Invoices, Billing & Pre-Flight Shield
+// =======================================================================
+
+export type InvoiceStatus = 'DRAFT' | 'SENT' | 'PAID' | 'REJECTED' | 'CANCELLED';
+
+export interface InvoiceLineItem {
+  serviceDate: string;
+  supportItemCode: string;
+  description: string;
+  quantity: number;
+  unit: 'Hour' | 'KM';
+  unitPrice: number;
+  totalAmount: number;
+}
+
+export interface Invoice {
+  id: string;
+  invoiceNumber: string;
+  clientId: string;
+  clientName: string;
+  ndisNumber: string;
+  planManagementType: 'PLAN_MANAGED' | 'SELF_MANAGED' | 'NDIA_MANAGED';
+  planManagerAgencyName: string | null;
+  planManagerEmail: string | null;
+  recipientEmail: string | null;
+  issueDate: string;
+  dueDate: string;
+  subtotalAmount: number;
+  gstAmount: number;
+  totalAmount: number;
+  status: InvoiceStatus;
+  shiftCount: number;
+  sentAt: string | null;
+  paidAt: string | null;
+  cancelledAt: string | null;
+  rejectionReason: string | null;
+  notes: string | null;
+  createdAt: string;
+  lineItems: InvoiceLineItem[];
+}
+
+export interface InvoiceListResponse {
+  items: Invoice[];
+  pagination: PaginationMeta;
+  summary: {
+    totalAmount: number;
+    count: number;
+    outstandingAmount: number;
+    paidAmount: number;
+  };
+}
+
+export interface ShieldResult {
+  isValid: boolean;
+  errors: string[];
+  warnings: string[];
+  checks: Array<{ code: string; passed: boolean; detail?: string }>;
+}
+
+export interface DispatchResult {
+  sent: boolean;
+  to: string | null;
+  errorCode?: string;
+}
+
+export interface BillingStatus {
+  planTier: 'TRIAL' | 'STARTER' | 'PRO';
+  subscriptionStatus: string | null;
+  currentPeriodEnd: string | null;
+  cancelAtPeriodEnd: boolean;
+  limits: {
+    clients: number | null;
+    invoicesPerMonth: number | null;
+    voice: boolean;
+  };
+  usage: {
+    activeClients: number;
+    invoicesThisMonth: number;
+    trialDaysRemaining: number | null;
+  };
+}
+
+export interface UninvoicedShift {
+  id: string;
+  shiftDate: string;
+  startTime: string;
+  endTime: string;
+  totalHours: number;
+  travelKms: number;
+  grandTotal: number;
+  supportItemCode: string | null;
+  status: string;
+}
+
+export interface UninvoicedGroup {
+  clientId: string;
+  clientName: string;
+  ndisNumber: string;
+  shifts: UninvoicedShift[];
+  totalAmount: number;
+}
 
