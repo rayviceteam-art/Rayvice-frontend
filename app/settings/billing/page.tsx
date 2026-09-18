@@ -28,7 +28,7 @@ import { ProdaExportButton } from '@/components/invoices/ProdaExportButton';
 function BillingContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { can } = useAuth();
+  const { can, refreshUser } = useAuth();
 
   const isOwner = can('OWNER');
   const isOfficeManager = can('OFFICE_MANAGER');
@@ -46,12 +46,13 @@ function BillingContent() {
     const checkoutStatus = searchParams.get('checkout');
     if (checkoutStatus === 'success') {
       toast.success('Subscription activated successfully! Welcome to your upgraded plan.');
+      refreshUser().catch(() => {});
       router.replace('/settings/billing');
     } else if (checkoutStatus === 'cancelled') {
       toast('Checkout was cancelled. You have not been charged.');
       router.replace('/settings/billing');
     }
-  }, [searchParams, router]);
+  }, [searchParams, router, refreshUser]);
 
   const loadBillingData = useCallback(async () => {
     if (isTechnician) return;
@@ -98,6 +99,8 @@ function BillingContent() {
         setProfile(bizProfile);
       }
 
+      refreshUser().catch(() => {});
+
       // Read shifts count
       const localShifts = shiftsService.getRecent(100);
       setShiftsCount(localShifts.length);
@@ -106,7 +109,7 @@ function BillingContent() {
     } finally {
       setIsLoading(false);
     }
-  }, [isTechnician]);
+  }, [isTechnician, refreshUser]);
 
   useEffect(() => {
     loadBillingData();

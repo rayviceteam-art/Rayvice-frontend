@@ -12,6 +12,7 @@ import {
   Settings,
   CreditCard,
   Sparkles,
+  CheckCircle2,
   LogOut,
   Building2,
 } from 'lucide-react';
@@ -24,7 +25,7 @@ interface SidebarProps {
 
 export function Sidebar({ onCloseMobile }: SidebarProps) {
   const pathname = usePathname();
-  const { user, logout } = useAuth();
+  const { user, business, logout } = useAuth();
 
   const navItems = [
     { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -59,22 +60,51 @@ export function Sidebar({ onCloseMobile }: SidebarProps) {
           </div>
         </Link>
 
-        {/* 9-Day Trial Status Pill */}
-        <Link
-          href="/settings/billing"
-          onClick={onCloseMobile}
-          className="block rounded-xl border border-[#117A65] bg-[#0D332D]/80 p-3 hover:bg-[#0D332D] transition-colors"
-        >
-          <div className="flex items-center justify-between text-xs">
-            <span className="flex items-center gap-1.5 font-semibold text-[#5EE0C1]">
-              <Sparkles className="h-3.5 w-3.5" /> 9-Day Trial
-            </span>
-            <span className="text-[10px] rounded bg-[#117A65] px-1.5 py-0.2 text-[#F1F5F4]">
-              1 Client
-            </span>
-          </div>
-          <p className="mt-1 text-[11px] text-[#9AA9A5]">Live rate-split testing active</p>
-        </Link>
+        {/* Subscription / 9-Day Trial Status Pill */}
+        {(() => {
+          const isPaid =
+            business?.status === 'ACTIVE' ||
+            business?.planTier === 'STARTER' ||
+            business?.planTier === 'PRO' ||
+            business?.subscriptionStatus === 'active';
+          const planLabel = business?.planTier === 'PRO' ? 'Pro Plan' : 'Starter Plan';
+          const clientLimitLabel = business?.planTier === 'PRO' ? 'Unlimited' : '5 Clients';
+          const subLabel = business?.planTier === 'PRO' ? 'Full platform access active' : 'Starter access active';
+
+          return (
+            <Link
+              href="/settings/billing"
+              onClick={onCloseMobile}
+              className="block rounded-xl border border-[#117A65] bg-[#0D332D]/80 p-3 hover:bg-[#0D332D] transition-colors"
+            >
+              {isPaid ? (
+                <div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="flex items-center gap-1.5 font-semibold text-[#5EE0C1]">
+                      <CheckCircle2 className="h-3.5 w-3.5" /> {planLabel}
+                    </span>
+                    <span className="text-[10px] rounded bg-[#117A65] px-1.5 py-0.2 text-[#F1F5F4]">
+                      {clientLimitLabel}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-[11px] text-[#9AA9A5]">{subLabel}</p>
+                </div>
+              ) : (
+                <div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="flex items-center gap-1.5 font-semibold text-[#5EE0C1]">
+                      <Sparkles className="h-3.5 w-3.5" /> 9-Day Trial
+                    </span>
+                    <span className="text-[10px] rounded bg-[#117A65] px-1.5 py-0.2 text-[#F1F5F4]">
+                      1 Client
+                    </span>
+                  </div>
+                  <p className="mt-1 text-[11px] text-[#9AA9A5]">Live rate-split testing active</p>
+                </div>
+              )}
+            </Link>
+          );
+        })()}
 
         {/* Navigation Menu */}
         <nav className="space-y-1">
