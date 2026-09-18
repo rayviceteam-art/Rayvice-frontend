@@ -30,6 +30,14 @@ export const billingService = {
     return envelope.data;
   },
 
+  async changePlan(plan: 'STARTER' | 'PRO'): Promise<BillingStatus> {
+    const { data: envelope } = await apiClient.post<Envelope<BillingStatus>>(
+      `${ENDPOINT}/change-plan`,
+      { plan }
+    );
+    return envelope.data;
+  },
+
   async openPortal(): Promise<{ url: string }> {
     const { data: envelope } = await apiClient.post<Envelope<{ url: string }>>(
       `${ENDPOINT}/portal`

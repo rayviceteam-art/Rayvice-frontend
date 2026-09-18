@@ -119,6 +119,29 @@ function BillingContent() {
       return;
     }
 
+    // Paid plan se dusre paid plan me jana upgrade/downgrade hai — Stripe
+    // proration ke sath turant update hoga, checkout redirect nahi hoga.
+    const isPlanChange = billing && billing.planTier !== 'TRIAL' && billing.planTier !== plan;
+    if (isPlanChange) {
+      setIsRedirecting(true);
+      try {
+        const updated = await billingService.changePlan(plan);
+        setBilling(updated);
+        toast.success('Subscription plan updated successfully.');
+        loadBillingData();
+      } catch (err) {
+        const code = getApiErrorCode(err);
+        if (code === 'ALREADY_SUBSCRIBED') {
+          toast.error('You already have an active subscription.');
+        } else {
+          toast.error(getApiErrorMessage(err, 'Unable to change subscription plan.'));
+        }
+      } finally {
+        setIsRedirecting(false);
+      }
+      return;
+    }
+
     setIsRedirecting(true);
     toast('Redirecting to Stripe…', { icon: '💳' });
     try {
