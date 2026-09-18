@@ -109,7 +109,11 @@ function GenerateInvoiceContent() {
       .then((res) => {
         const payload = res.data?.data ?? res.data;
         let fetched: UninvoicedShift[] = [];
-        if (Array.isArray(payload)) {
+        if (payload?.groups && Array.isArray(payload.groups)) {
+          // Backend shape: { groups: [{ clientId, shifts: ShiftView[] }], ... }
+          const grp = payload.groups.find((g: any) => g.clientId === selectedClientId);
+          fetched = grp?.shifts ?? [];
+        } else if (Array.isArray(payload)) {
           if (payload.length > 0 && Array.isArray(payload[0].shifts)) {
             const grp = payload.find((g: any) => g.clientId === selectedClientId);
             fetched = grp?.shifts ?? [];
@@ -272,9 +276,21 @@ function GenerateInvoiceContent() {
 
       const { invoice, dispatch } = response;
 
+      // Backend dispatch is { status: 'SENT' | 'FAILED' | 'SKIPPED_NDIA_MANAGED' }.
+      // invoices-service normalises it to also expose `sent` for the UI.
+      const rawDispatch: any = dispatch as any;
+      const dispatchStatus: string | undefined = rawDispatch?.status;
+      const dispatchSent: boolean =
+        typeof rawDispatch?.sent === 'boolean'
+          ? rawDispatch.sent
+          : dispatchStatus
+            ? dispatchStatus === 'SENT' || dispatchStatus === 'SKIPPED_NDIA_MANAGED'
+            : true;
+      const dispatchFailed = dispatchStatus === 'FAILED';
+
       if (selectedClientDetail?.planManagementType === 'NDIA_MANAGED') {
         toast.success('Invoice generated.');
-      } else if (dispatch && !dispatch.sent) {
+      } else if (dispatch && (dispatchFailed || !dispatchSent)) {
         toast('Invoice saved as Draft — email could not be sent. Retry from the invoice page.', {
           icon: '⚠️',
           duration: 5000,

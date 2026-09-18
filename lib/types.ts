@@ -567,8 +567,11 @@ export interface ShieldResult {
 }
 
 export interface DispatchResult {
-  sent: boolean;
+  sent?: boolean;
+  status?: string;
   to: string | null;
+  messageId?: string | null;
+  bcc?: string | null;
   errorCode?: string;
 }
 
@@ -580,7 +583,7 @@ export interface BillingStatus {
   limits: {
     clients: number | null;
     invoicesPerMonth: number | null;
-    voice: boolean;
+    voice: boolean | number | null;
   };
   usage: {
     activeClients: number;

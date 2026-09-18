@@ -25,8 +25,8 @@ import { Badge } from '@/components/ui/Badge';
 import { useAuth } from '@/lib/auth-context';
 import { getBusinessProfile } from '@/lib/business-service';
 import { clientsService } from '@/lib/clients-service';
-import { shiftsService, ShiftRecord } from '@/lib/shifts-service';
-import { BusinessProfile, ClientListItem } from '@/lib/types';
+import { shiftsService } from '@/lib/shifts-service';
+import { BusinessProfile, ClientListItem, Shift } from '@/lib/types';
 import { getApiErrorMessage } from '@/lib/api-client';
 import { formatAud, formatCalendarDate } from '@/lib/format';
 
@@ -35,7 +35,7 @@ export default function DashboardPage() {
   const [profile, setProfile] = useState<BusinessProfile | null>(null);
   const [clients, setClients] = useState<ClientListItem[]>([]);
   const [totalClientsCount, setTotalClientsCount] = useState(0);
-  const [shifts, setShifts] = useState<ShiftRecord[]>([]);
+  const [shifts, setShifts] = useState<Shift[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {

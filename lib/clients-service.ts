@@ -48,7 +48,7 @@ export const clientsService = {
         startTime: s.startTime ?? '',
         endTime: s.endTime ?? '',
         hours: Number(s.totalHours ?? s.hours ?? 0),
-        amount: Number(s.totalClaim ?? s.amount ?? 0),
+        amount: Number(s.totalAmount ?? s.grandTotal ?? s.totalClaim ?? s.amount ?? 0),
         status: s.status ?? 'PENDING',
       })),
     };
