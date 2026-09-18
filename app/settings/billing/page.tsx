@@ -99,8 +99,6 @@ function BillingContent() {
         setProfile(bizProfile);
       }
 
-      refreshUser().catch(() => {});
-
       // Read shifts count
       const localShifts = shiftsService.getRecent(100);
       setShiftsCount(localShifts.length);
@@ -109,7 +107,7 @@ function BillingContent() {
     } finally {
       setIsLoading(false);
     }
-  }, [isTechnician, refreshUser]);
+  }, [isTechnician]);
 
   useEffect(() => {
     loadBillingData();
