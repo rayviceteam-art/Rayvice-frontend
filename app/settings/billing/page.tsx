@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/Button';
+import { Modal } from '@/components/ui/Modal';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { useAuth } from '@/lib/auth-context';
@@ -40,6 +41,7 @@ function BillingContent() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isBillingUnavailable, setIsBillingUnavailable] = useState<boolean>(false);
   const [isRedirecting, setIsRedirecting] = useState<boolean>(false);
+  const [pendingPlan, setPendingPlan] = useState<'STARTER' | 'PRO' | null>(null);
 
   // Handle return from Stripe checkout
   useEffect(() => {
@@ -119,26 +121,12 @@ function BillingContent() {
       return;
     }
 
-    // Paid plan se dusre paid plan me jana upgrade/downgrade hai — Stripe
-    // proration ke sath turant update hoga, checkout redirect nahi hoga.
+    // Paid plan se dusre paid plan me jana plan change hai — pehle confirm
+    // popup aayega, phir Stripe proration ke sath saved card pe charge hoga.
+    // (Subscription update me Checkout jaisa payment page nahi khulta.)
     const isPlanChange = billing && billing.planTier !== 'TRIAL' && billing.planTier !== plan;
     if (isPlanChange) {
-      setIsRedirecting(true);
-      try {
-        const updated = await billingService.changePlan(plan);
-        setBilling(updated);
-        toast.success('Subscription plan updated successfully.');
-        loadBillingData();
-      } catch (err) {
-        const code = getApiErrorCode(err);
-        if (code === 'ALREADY_SUBSCRIBED') {
-          toast.error('You already have an active subscription.');
-        } else {
-          toast.error(getApiErrorMessage(err, 'Unable to change subscription plan.'));
-        }
-      } finally {
-        setIsRedirecting(false);
-      }
+      setPendingPlan(plan);
       return;
     }
 
@@ -157,6 +145,27 @@ function BillingContent() {
       } else {
         toast.error(getApiErrorMessage(err, 'Unable to initiate Stripe checkout.'));
       }
+    }
+  };
+
+  const handleConfirmPlanChange = async () => {
+    if (!pendingPlan) return;
+    setIsRedirecting(true);
+    try {
+      const updated = await billingService.changePlan(pendingPlan);
+      setBilling(updated);
+      setPendingPlan(null);
+      toast.success('Subscription plan updated successfully.');
+      loadBillingData();
+    } catch (err) {
+      const code = getApiErrorCode(err);
+      if (code === 'ALREADY_SUBSCRIBED') {
+        toast.error('You already have an active subscription.');
+      } else {
+        toast.error(getApiErrorMessage(err, 'Unable to change subscription plan.'));
+      }
+    } finally {
+      setIsRedirecting(false);
     }
   };
 
@@ -329,6 +338,45 @@ function BillingContent() {
             canManage={isOwner}
           />
         </div>
+
+        {/* Plan change confirmation — Stripe charges the saved card, no Checkout redirect */}
+        <Modal
+          isOpen={pendingPlan !== null}
+          onClose={() => {
+            if (!isRedirecting) setPendingPlan(null);
+          }}
+          title={pendingPlan === 'PRO' ? 'Upgrade to Pro?' : 'Switch plan?'}
+          description="Confirm to proceed with the plan change."
+          footer={
+            <>
+              <Button
+                variant="secondary"
+                onClick={() => setPendingPlan(null)}
+                disabled={isRedirecting}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="primary"
+                onClick={handleConfirmPlanChange}
+                disabled={isRedirecting}
+                className="bg-[#16A085] hover:bg-[#1DB89A] text-white"
+              >
+                {isRedirecting ? 'Processing…' : 'Confirm & Pay'}
+              </Button>
+            </>
+          }
+        >
+          <div className="rounded-card border border-border bg-input p-3 space-y-1 text-xs">
+            <p className="text-text-secondary">
+              Stripe will charge only the prorated difference to your saved card right now — no separate
+              payment page will open.
+            </p>
+            <p className="font-mono text-text-primary">
+              Plan total: {pendingPlan === 'PRO' ? '$44' : '$24'} AUD/mo • Receipt will be emailed
+            </p>
+          </div>
+        </Modal>
       </div>
     </AppLayout>
   );

@@ -76,6 +76,10 @@ export const PlanCards: React.FC<PlanCardsProps> = ({
             <Button variant="secondary" disabled className="w-full opacity-60 cursor-default">
               Current Plan
             </Button>
+          ) : currentTier === 'PRO' ? (
+            <Button variant="secondary" disabled title="Downgrade not available" className="w-full opacity-60 cursor-default">
+              Included in Pro
+            </Button>
           ) : (
             <Button
               variant="primary"
