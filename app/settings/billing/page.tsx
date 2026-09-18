@@ -373,7 +373,9 @@ function BillingContent() {
               payment page will open.
             </p>
             <p className="font-mono text-text-primary">
-              Plan total: {pendingPlan === 'PRO' ? '$44' : '$24'} AUD/mo • Receipt will be emailed
+              {pendingPlan === 'PRO'
+                ? 'Already paid $24 — only the difference will be charged now. Total $44/mo.'
+                : 'Plan total: $24 AUD/mo.'}
             </p>
           </div>
         </Modal>
