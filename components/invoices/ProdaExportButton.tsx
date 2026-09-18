@@ -156,7 +156,7 @@ export const ProdaExportButton: React.FC<ProdaExportButtonProps> = ({
           isOpen={isUpgradeModalOpen}
           onClose={() => setIsUpgradeModalOpen(false)}
           title="PRODA Export is a Pro feature"
-          description="Upgrade to the Pro plan ($44 AUD/mo) to unlock bulk PRODA CSV claims exports, unlimited participants, and Voice AI timesheets."
+          description="Upgrade to the Pro plan ($44 AUD/mo) to unlock bulk PRODA CSV claims exports and unlimited participants."
         />
       )}
     </>

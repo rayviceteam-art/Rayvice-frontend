@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Zap, Crown, Check, Mic, ArrowRight } from 'lucide-react';
+import { Zap, Crown, Check, ArrowRight } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -78,8 +78,8 @@ export const PlanCards: React.FC<PlanCardsProps> = ({
             </Button>
           ) : (
             <Button
-              variant="secondary"
-              className="w-full hover:border-[#16A085] hover:bg-[#0D332D]/40"
+              variant="primary"
+              className="w-full shadow-glow flex items-center justify-center gap-2"
               disabled={isLoading || !canManage}
               onClick={() => onSubscribe('STARTER')}
             >
@@ -107,7 +107,7 @@ export const PlanCards: React.FC<PlanCardsProps> = ({
               <span className="text-sm font-medium text-[#9AA9A5]">AUD / month</span>
             </div>
             <p className="text-xs text-[#9AA9A5] mt-2">
-              For full-time support workers & independent carer agencies wanting Voice AI and unlimited scaling.
+              For full-time support workers & independent carer agencies wanting unlimited scaling.
             </p>
           </div>
 
@@ -123,10 +123,6 @@ export const PlanCards: React.FC<PlanCardsProps> = ({
               <span>
                 <strong>Unlimited Shifts & Unlimited Invoices</strong>
               </span>
-            </div>
-            <div className="flex items-center gap-2.5 text-[#5EE0C1] font-semibold">
-              <Mic className="h-4 w-4 text-[#5EE0C1] shrink-0" />
-              <span>Unlimited Voice-to-Shift AI Logging</span>
             </div>
             <div className="flex items-center gap-2.5 text-[#F1F5F4]">
               <Check className="h-4 w-4 text-[#5EE0C1] shrink-0" />
